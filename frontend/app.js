@@ -109,12 +109,19 @@ function renderOverview() {
 
     // Executive summary from outlook
     const execEl = document.getElementById('execSummary');
+    const outSumEl = document.getElementById('outlookSummary');
+    const outAnalEl = document.getElementById('sentimentAnalysis');
+
     if (outlook && outlook.executive_summary) {
         execEl.textContent = outlook.executive_summary;
+        if (outSumEl) outSumEl.textContent = outlook.executive_summary;
+        if (outAnalEl) outAnalEl.textContent = outlook.sentiment_analysis || '';
+        renderSentimentGauge(outlook.mood_score || 0);
     } else {
         execEl.textContent = ci.description || '';
     }
-    execEl.classList.remove('shimmer');
+    if (execEl) execEl.classList.remove('shimmer');
+    if (outSumEl) outSumEl.classList.remove('shimmer');
 
     // Strategic Pillars (Replacing "essay" description)
     if (ci.strategic_focus) {
@@ -199,6 +206,50 @@ function renderOverview() {
         }).join('');
     }
     if (window.lucide) lucide.createIcons();
+}
+
+function renderSentimentGauge(score) {
+    const container = document.getElementById('sentimentGauge');
+    if (!container) return;
+
+    const angle = ((score + 1) / 2) * 180;
+    const color = score > 0.3 ? '#22c55e' : score < -0.3 ? '#ef4444' : '#fbbf24';
+    const label = score > 0.5 ? 'Very Bullish' : score > 0.1 ? 'Bullish' : score < -0.5 ? 'Very Bearish' : score < -0.1 ? 'Bearish' : 'Neutral';
+
+    container.innerHTML = `
+        <svg width="120" height="70" viewBox="0 0 120 70">
+            <path d="M10 60 A 50 50 0 0 1 110 60" fill="none" stroke="#2d2d2d" stroke-width="12" stroke-linecap="round"/>
+            <path d="M10 60 A 50 50 0 0 1 110 60" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" 
+                stroke-dasharray="157" stroke-dashoffset="${157 - (157 * (angle / 180))}"/>
+            <line x1="60" y1="60" x2="${60 + 40 * Math.cos((angle + 180) * Math.PI / 180)}" 
+                  y2="${60 + 40 * Math.sin((angle + 180) * Math.PI / 180)}" 
+                  stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="60" cy="60" r="4" fill="white"/>
+        </svg>
+    `;
+    const labelEl = document.getElementById('sentimentLabel');
+    if (labelEl) {
+        labelEl.textContent = label;
+        labelEl.style.color = color;
+    }
+}
+
+function renderMacroTicker() {
+    const macro = appData.macro;
+    const tickerItems = document.getElementById('tickerItems');
+    if (!macro || !macro.data || !tickerItems) return;
+
+    const content = macro.data.map(item => `
+        <div class="ticker-item">
+            <span class="ticker-label">${item.name}</span>
+            <span class="ticker-value">${item.value}</span>
+            <span class="ticker-change ${item.change >= 0 ? 'positive' : 'negative'}">
+                ${item.change >= 0 ? '▲' : '▼'} ${Math.abs(item.change)}%
+            </span>
+        </div>
+    `).join('');
+
+    tickerItems.innerHTML = content + content;
 }
 
 function setMetric(id, value, className) {
