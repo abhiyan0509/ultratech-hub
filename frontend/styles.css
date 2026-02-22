@@ -84,12 +84,31 @@ h4,
     display: flex;
     align-items: center;
     gap: 20px;
+    height: 60px;
+    /* Preserve vertical space */
 }
 
 .main-logo {
     height: 48px;
+    min-width: 120px;
+    /* Preserve horizontal space */
     width: auto;
     object-fit: contain;
+}
+
+/* Professional CSS Fallback if image fails */
+.main-logo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: 120px;
+    background: var(--accent);
+    color: var(--bg-primary);
+    font-size: 24px;
+    font-weight: 800;
+    border-radius: 4px;
+    font-family: 'Outfit', sans-serif;
 }
 
 .brand-v-divider {
