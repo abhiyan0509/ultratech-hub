@@ -88,16 +88,16 @@ Generate a comprehensive strategic outlook in STRICT JSON format with these exac
 {{
   "executive_summary": "3-4 sentence summary of UltraTech's current position and trajectory",
   "future_outlook": [
-    {{"title": "...", "description": "2-3 sentences", "probability": "High/Medium/Low", "timeframe": "6-12 months"}}
+    {{"title": "...", "description": "2-3 sentences", "probability": "High/Medium/Low", "timeframe": "6-12 months", "rationale": "strategic justification"}}
   ],
   "predicted_next_moves": [
     {{"move": "...", "rationale": "why this is likely", "probability": "High/Medium/Low"}}
   ],
   "risk_factors": [
-    {{"risk": "...", "severity": "High/Medium/Low", "mitigation": "how UltraTech can handle it"}}
+    {{"risk": "...", "severity": "High/Medium/Low", "mitigation": "how UltraTech can handle it", "rationale": "context behind this risk"}}
   ],
   "interview_talking_points": [
-    {{"point": "...", "supporting_data": "specific numbers to cite"}}
+    {{"point": "...", "supporting_data": "specific numbers to cite", "rationale": "why this is an effective point"}}
   ],
   "key_metrics_to_watch": [
     {{"metric": "...", "current_value": "...", "significance": "why this matters"}}

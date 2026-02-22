@@ -62,6 +62,9 @@ async function loadAllData() {
         renderCompetitors();
         updateStatus('Live', true);
 
+        // Initialize Lucide Icons
+        if (window.lucide) lucide.createIcons();
+
         // Show last updated
         const status = await fetch(`${API_BASE}/api/status`).then(r => r.json()).catch(() => null);
         if (status) {
@@ -116,25 +119,27 @@ function renderOverview() {
     if (ci.strategic_focus) {
         document.getElementById('strategicPillars').innerHTML = ci.strategic_focus.map(p =>
             `<div class="strategic-pill">
-                <span class="pill-icon">${p.icon || '🎯'}</span>
+                <i data-lucide="${p.icon_name || 'crosshair'}" class="pill-icon"></i>
                 <span class="pill-text">${p.title}</span>
             </div>`
         ).join('');
     } else {
-        // Fallback pillars if not in data
+        // Professional Fallback Pillars
         const fallbackPillars = [
-            { title: 'Capacity Leader', icon: '🏗️' },
-            { title: 'M&A Specialist', icon: '🤝' },
-            { title: 'Green Energy', icon: '🍃' },
-            { title: 'Pan-India Reach', icon: '🇮🇳' }
+            { title: 'Capacity Leader', icon: 'factory' },
+            { title: 'M&A Specialist', icon: 'handshake' },
+            { title: 'ESG Focused', icon: 'leaf' },
+            { title: 'Pan-India Reach', icon: 'map-pin' }
         ];
         document.getElementById('strategicPillars').innerHTML = fallbackPillars.map(p =>
             `<div class="strategic-pill">
-                <span class="pill-icon">${p.icon}</span>
+                <i data-lucide="${p.icon}" class="pill-icon"></i>
                 <span class="pill-text">${p.title}</span>
             </div>`
         ).join('');
     }
+
+    if (window.lucide) lucide.createIcons();
 
     // Info grid
     const infoItems = [
@@ -188,10 +193,11 @@ function renderOverview() {
                     <span>${n.source || ''}</span>
                     <span>${n.date || ''}</span>
                 </div>
-                <div class="news-link-icon">Open article &#x2197;</div>
+                <div class="news-link-icon"><i data-lucide="external-link"></i></div>
             </a>`;
         }).join('');
     }
+    if (window.lucide) lucide.createIcons();
 }
 
 function setMetric(id, value, className) {

@@ -4,11 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UltraTech Intelligence Hub | Interview Prep Dashboard</title>
-    <meta name="description" content="Autonomous intelligence dashboard for UltraTech Cement interview preparation">
+    <title>Executive Intelligence Hub | UltraTech Cement</title>
+    <meta name="description" content="Autonomous intelligence dashboard for UltraTech Cement executive analysis">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -17,11 +20,13 @@
     <!-- Header -->
     <header class="header">
         <div class="header-left">
-            <div class="logo">
-                <div class="logo-icon">U</div>
-                <div>
-                    <h1>UltraTech Intelligence Hub</h1>
-                    <p class="tagline">Autonomous Interview Intelligence</p>
+            <div class="brand-group">
+                <img src="https://www.ultratechcement.com/content/dam/ultratechcement/images/home/Logo.png"
+                    alt="UltraTech" class="main-logo">
+                <div class="brand-v-divider"></div>
+                <div class="brand-info">
+                    <h1>Executive Intelligence Hub</h1>
+                    <p class="tagline">Strategic Research & Market Analysis</p>
                 </div>
             </div>
         </div>
@@ -37,21 +42,28 @@
             </div>
             <div id="statusBadge" class="status-badge">
                 <span class="status-dot"></span>
-                <span>Connecting...</span>
+                <span class="status-text">Connecting...</span>
             </div>
             <div id="lastUpdated" class="last-updated"></div>
-            <button class="refresh-btn" onclick="refreshData()" title="Refresh all data">&#x21bb;</button>
+            <button class="refresh-btn" onclick="refreshData()" title="Refresh all data"><i
+                    data-lucide="rotate-cw"></i></button>
         </div>
     </header>
 
     <!-- Navigation -->
     <nav class="tabs">
-        <button class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
-        <button class="tab" data-tab="outlook" onclick="switchTab('outlook')">Outlook</button>
-        <button class="tab" data-tab="ma" onclick="switchTab('ma')">M&amp;A Deals</button>
-        <button class="tab" data-tab="financials" onclick="switchTab('financials')">Financials</button>
-        <button class="tab" data-tab="competitors" onclick="switchTab('competitors')">Competitors</button>
-        <button class="tab" data-tab="ask" onclick="switchTab('ask')">Ask AI</button>
+        <button class="tab active" data-tab="overview" onclick="switchTab('overview')"><i
+                data-lucide="layout-dashboard"></i> Overview</button>
+        <button class="tab" data-tab="outlook" onclick="switchTab('outlook')"><i data-lucide="trending-up"></i>
+            Outlook</button>
+        <button class="tab" data-tab="ma" onclick="switchTab('ma')"><i data-lucide="briefcase"></i> M&amp;A
+            Strategy</button>
+        <button class="tab" data-tab="financials" onclick="switchTab('financials')"><i data-lucide="bar-chart-3"></i>
+            Financials</button>
+        <button class="tab" data-tab="competitors" onclick="switchTab('competitors')"><i data-lucide="users"></i> Market
+            Share</button>
+        <button class="tab" data-tab="ask" onclick="switchTab('ask')"><i data-lucide="message-square"></i> Ask
+            AI</button>
     </nav>
 
     <!-- ============ OVERVIEW TAB ============ -->
