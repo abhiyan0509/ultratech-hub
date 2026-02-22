@@ -208,22 +208,72 @@ function setMetric(id, value, className) {
     }
 }
 
+// ─── Chart Rendering ─────────────────────────────────────────────
 function renderStockChart(priceHistory) {
     const ctx = document.getElementById('stockChart');
     if (!ctx) return;
-    const step = Math.max(1, Math.floor(priceHistory.length / 60));
-    const sampled = priceHistory.filter((_, i) => i % step === 0 || i === priceHistory.length - 1);
+
+    // Store raw data for filtering
+    appData.stockPriceHistory = priceHistory;
+
+    // Default to 1Y filter
+    const filtered = filterDataByPeriod(priceHistory, '1Y');
+
     if (charts.stock) charts.stock.destroy();
-    charts.stock = new Chart(ctx, {
+    charts.stock = createMainChart(ctx, filtered, 'ULTRACEMCO');
+}
+
+function updateChartPeriod(chartId, period) {
+    // Update button states
+    const container = document.querySelector(`[data-chart-id="${chartId}"]`);
+    if (container) {
+        container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === period);
+        if (btn) btn.classList.add('active');
+    }
+
+    if (chartId === 'stockChart') {
+        const filtered = filterDataByPeriod(appData.stockPriceHistory, period);
+        if (charts.stock) charts.stock.destroy();
+        charts.stock = createMainChart(document.getElementById('stockChart'), filtered, 'ULTRACEMCO');
+    } else if (chartId === 'priceCompChart') {
+        renderPriceCompChart(period);
+    }
+}
+
+function filterDataByPeriod(data, period) {
+    if (!data || data.length === 0) return [];
+    const now = new Date();
+    let cutoff = new Date();
+
+    if (period === '1M') cutoff.setMonth(now.getMonth() - 1);
+    else if (period === '6M') cutoff.setMonth(now.getMonth() - 6);
+    else if (period === '1Y') cutoff.setFullYear(now.getFullYear() - 1);
+    else if (period === '5Y') cutoff.setFullYear(now.getFullYear() - 5);
+    else return data;
+
+    const filtered = data.filter(d => new Date(d.date) >= cutoff);
+
+    // Sample if too many points for performance
+    const maxPoints = 120;
+    if (filtered.length > maxPoints) {
+        const step = Math.floor(filtered.length / maxPoints);
+        return filtered.filter((_, i) => i % step === 0);
+    }
+    return filtered;
+}
+
+function createMainChart(ctx, data, label) {
+    return new Chart(ctx, {
         type: 'line',
         data: {
-            labels: sampled.map(p => {
+            labels: data.map(p => {
                 const d = new Date(p.date);
-                return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+                return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: '2-digit' });
             }),
             datasets: [{
-                label: 'ULTRACEMCO', data: sampled.map(p => p.close),
-                borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)',
+                label: label, data: data.map(p => p.close),
+                borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.05)',
                 fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2,
             }]
         },
@@ -424,37 +474,45 @@ function renderFinancials() {
     }
 
     // Price comparison chart
+    renderPriceCompChart('1Y');
+}
+
+function renderPriceCompChart(period) {
     const pcCtx = document.getElementById('priceCompChart');
-    if (pcCtx) {
-        const colors = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'];
-        const datasets = [];
-        let commonLabels = [];
+    if (!pcCtx) return;
 
-        companies.forEach((c, i) => {
-            const hist = fin.companies[c]?.price_history;
-            if (hist && hist.length > 0) {
-                const step = Math.max(1, Math.floor(hist.length / 50));
-                const sampled = hist.filter((_, j) => j % step === 0 || j === hist.length - 1);
-                if (commonLabels.length === 0) {
-                    commonLabels = sampled.map(p => new Date(p.date).toLocaleDateString('en-IN', { month: 'short' }));
-                }
-                const base = sampled[0].close;
-                datasets.push({
-                    label: shortName(c),
-                    data: sampled.map(p => ((p.close - base) / base * 100).toFixed(2)),
-                    borderColor: colors[i % colors.length], backgroundColor: 'transparent',
-                    tension: 0.3, pointRadius: 0, borderWidth: c === 'UltraTech Cement' ? 3 : 1.5,
-                });
+    const fin = appData.financials;
+    const companies = Object.keys(fin.companies);
+    const colors = ['#fbbf24', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'];
+    const datasets = [];
+    let commonLabels = [];
+
+    companies.forEach((c, i) => {
+        const hist = fin.companies[c]?.price_history;
+        if (hist && hist.length > 0) {
+            const filtered = filterDataByPeriod(hist, period);
+            if (filtered.length === 0) return;
+
+            if (commonLabels.length === 0) {
+                commonLabels = filtered.map(p => new Date(p.date).toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }));
             }
-        });
 
-        if (charts.priceComp) charts.priceComp.destroy();
-        charts.priceComp = new Chart(pcCtx, {
-            type: 'line',
-            data: { labels: commonLabels, datasets },
-            options: chartOptions('', '%', 'Normalized % change')
-        });
-    }
+            const base = filtered[0].close;
+            datasets.push({
+                label: shortName(c),
+                data: filtered.map(p => ((p.close - base) / base * 100).toFixed(2)),
+                borderColor: colors[i % colors.length], backgroundColor: 'transparent',
+                tension: 0.3, pointRadius: 0, borderWidth: c === 'UltraTech Cement' ? 3 : 1.5,
+            });
+        }
+    });
+
+    if (charts.priceComp) charts.priceComp.destroy();
+    charts.priceComp = new Chart(pcCtx, {
+        type: 'line',
+        data: { labels: commonLabels, datasets },
+        options: chartOptions('', '%', 'Normalized % change')
+    });
 }
 
 // ─── COMPETITORS TAB ────────────────────────────────────────────

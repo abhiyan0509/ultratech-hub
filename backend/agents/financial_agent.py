@@ -140,7 +140,7 @@ def fetch_company_financials(name, ticker):
 
         # Price history
         try:
-            hist = stock.history(period="1y")
+            hist = stock.history(period="5y")
             if hist is not None and not hist.empty:
                 ph = []
                 for date, row in hist.iterrows():

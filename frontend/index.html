@@ -120,8 +120,16 @@
                 <div class="card-source">Source: Official Documents & Annual Reports</div>
             </div>
             <!-- Stock Chart -->
-            <div class="section-card">
-                <h3 class="section-title">Stock Performance (1Y)</h3>
+            <div class="section-card chart-card">
+                <div class="chart-header">
+                    <h3 class="section-title">Stock Performance</h3>
+                    <div class="chart-controls" data-chart-id="stockChart">
+                        <button onclick="updateChartPeriod('stockChart', '1M')">1M</button>
+                        <button onclick="updateChartPeriod('stockChart', '6M')">6M</button>
+                        <button class="active" onclick="updateChartPeriod('stockChart', '1Y')">1Y</button>
+                        <button onclick="updateChartPeriod('stockChart', '5Y')">5Y</button>
+                    </div>
+                </div>
                 <div class="chart-wrapper"><canvas id="stockChart"></canvas></div>
                 <div class="card-source">Source: Yahoo Finance</div>
             </div>
@@ -206,8 +214,16 @@
                 <h3 class="section-title">Market Cap Comparison</h3>
                 <div class="chart-wrapper"><canvas id="marketCapChart"></canvas></div>
             </div>
-            <div class="section-card">
-                <h3 class="section-title">Stock Performance Comparison (1Y)</h3>
+            <div class="section-card chart-card">
+                <div class="chart-header">
+                    <h3 class="section-title">Stock Comparison</h3>
+                    <div class="chart-controls" data-chart-id="priceCompChart">
+                        <button onclick="updateChartPeriod('priceCompChart', '1M')">1M</button>
+                        <button onclick="updateChartPeriod('priceCompChart', '6M')">6M</button>
+                        <button class="active" onclick="updateChartPeriod('priceCompChart', '1Y')">1Y</button>
+                        <button onclick="updateChartPeriod('priceCompChart', '5Y')">5Y</button>
+                    </div>
+                </div>
                 <div class="chart-wrapper"><canvas id="priceCompChart"></canvas></div>
             </div>
         </div>

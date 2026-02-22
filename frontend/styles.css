@@ -80,61 +80,49 @@ h4,
     z-index: 100;
 }
 
+/* Header & Branding */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--accent-bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .brand-group {
     display: flex;
     align-items: center;
     gap: 20px;
-    height: 60px;
-    /* Preserve vertical space */
+    min-height: 60px;
 }
 
-.main-logo {
-    height: 48px;
-    min-width: 120px;
-    /* Preserve horizontal space */
-    width: auto;
-    object-fit: contain;
-}
-
-/* Professional CSS Fallback if image fails */
-.main-logo-fallback {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-    width: 120px;
-    background: var(--accent);
-    color: var(--bg-primary);
-    font-size: 24px;
-    font-weight: 800;
-    border-radius: 4px;
-    font-family: 'Outfit', sans-serif;
+.main-logo-svg {
+    flex-shrink: 0;
 }
 
 .brand-v-divider {
-    width: 1px;
-    height: 32px;
-    background: var(--border);
+    width: 2px;
+    height: 40px;
+    background: var(--accent);
+    opacity: 0.2;
 }
 
 .brand-info h1 {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
 }
 
 .brand-info .tagline {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
 .header-right {
@@ -1354,4 +1342,4 @@ input:checked+.slider:before {
     .news-grid {
         grid-template-columns: 1fr;
     }
-}
+}$css
