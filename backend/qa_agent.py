@@ -201,6 +201,7 @@ async def serve_static(filename: str):
 
 # ─── Entry Point ─────────────────────────────────────────────────
 if __name__ == "__main__":
+    import uvicorn
     port = int(os.environ.get("PORT", 7860))
     print(f"\n[SERVER] Starting UltraTech Intelligence Hub Server...")
     print(f"   Dashboard: http://localhost:{port}")
