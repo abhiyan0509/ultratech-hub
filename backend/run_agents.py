@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-from agents import crawler_agent, financial_agent, ma_agent, competitor_agent, outlook_agent
+from agents import crawler_agent, financial_agent, ma_agent, competitor_agent, outlook_agent, macro_agent
 
 
 def main():
@@ -30,6 +30,7 @@ def main():
         ("ma", lambda: ma_agent.run()),
         ("competitor", lambda: competitor_agent.run()),
         ("outlook", lambda: outlook_agent.run(api_key=api_key)),
+        ("macro", lambda: macro_agent.run()),
     ]
 
     for name, fn in agents:

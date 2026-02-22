@@ -43,7 +43,7 @@ function switchTab(tabId) {
 // ─── Data Loading ───────────────────────────────────────────────
 async function loadAllData() {
     try {
-        const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'industry', 'outlook'];
+        const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'industry', 'outlook', 'macro'];
         const results = await Promise.allSettled(
             datasets.map(ds => fetch(`${API_BASE}/api/data/${ds}`).then(r => {
                 if (!r.ok) throw new Error(`${ds}: ${r.status}`);
@@ -60,6 +60,7 @@ async function loadAllData() {
         renderMA();
         renderFinancials();
         renderCompetitors();
+        renderMacroTicker();
         updateStatus('Live', true);
 
         // Initialize Lucide Icons
@@ -441,11 +442,32 @@ function renderFinancials() {
     ).join('');
 
     if (fin.comparison_metrics) {
-        table.querySelector('tbody').innerHTML = fin.comparison_metrics.map(row =>
-            '<tr><td>' + row.metric + '</td>' + companies.map(c =>
-                `<td class="${c === 'UltraTech Cement' ? 'highlight-col' : ''}">${row[c] || 'N/A'}</td>`
-            ).join('') + '</tr>'
-        ).join('');
+        table.querySelector('tbody').innerHTML = fin.comparison_metrics.map(row => {
+            const vals = companies.map(c => {
+                const v = row[c];
+                if (!v) return null;
+                const num = parseFloat(v.toString().replace(/[^0-9.-]/g, ''));
+                return isNaN(num) ? null : num;
+            });
+            const avg = vals.filter(v => v !== null).reduce((a, b) => a + b, 0) / vals.filter(v => v !== null).length;
+
+            return '<tr><td>' + row.metric + '</td>' + companies.map((c, i) => {
+                const val = vals[i];
+                let heatClass = '';
+                if (val !== null && avg !== 0) {
+                    const diff = (val - avg) / avg;
+                    const isHigherBetter = !['P/E', 'Debt/Equity', 'P/B'].some(m => row.metric.includes(m));
+                    const score = isHigherBetter ? diff : -diff;
+
+                    if (score > 0.4) heatClass = 'heatmap-very-positive';
+                    else if (score > 0.1) heatClass = 'heatmap-positive';
+                    else if (score < -0.4) heatClass = 'heatmap-very-negative';
+                    else if (score < -0.1) heatClass = 'heatmap-negative';
+                }
+                const highlight = c === 'UltraTech Cement' ? 'highlight-col' : '';
+                return `<td class="${highlight} ${heatClass}">${row[c] || 'N/A'}</td>`;
+            }).join('') + '</tr>';
+        }).join('');
     }
 
     // Market cap chart
@@ -689,4 +711,39 @@ function chartOptions(prefix = '', suffix = '', title = '') {
             }
         }
     };
+}
+
+// ─── PDF EXPORT ─────────────────────────────────────────────────
+async function exportBriefing() {
+    const btn = document.querySelector('.export-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Exporting...';
+    lucide.createIcons();
+
+    if (!window.html2pdf) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        document.head.appendChild(script);
+        await new Promise(r => script.onload = r);
+    }
+
+    const element = document.body.cloneNode(true);
+    element.querySelectorAll('.tabs, .market-ticker, .chat-tab-btn, .refresh-btn, .chart-controls').forEach(el => el.remove());
+
+    const opt = {
+        margin: [10, 10],
+        filename: `UltraTech_Executive_Brief.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0f172a' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    try {
+        await html2pdf().set(opt).from(element).save();
+    } catch (e) {
+        console.error('PDF Export failed:', e);
+    } finally {
+        btn.innerHTML = originalText;
+        lucide.createIcons();
+    }
 }

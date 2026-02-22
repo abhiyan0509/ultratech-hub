@@ -87,6 +87,8 @@ Generate a comprehensive strategic outlook in STRICT JSON format with these exac
 
 {{
   "executive_summary": "3-4 sentence summary of UltraTech's current position and trajectory",
+  "mood_score": 0.0, // A float from -1.0 (very bearish) to 1.0 (very bullish)
+  "sentiment_analysis": "1-2 sentences explaining the rationale behind this score",
   "future_outlook": [
     {{"title": "...", "description": "2-3 sentences", "probability": "High/Medium/Low", "timeframe": "6-12 months", "rationale": "strategic justification"}}
   ],
@@ -141,6 +143,8 @@ def build_fallback_outlook():
     """Fallback outlook if Gemini fails"""
     return {
         "executive_summary": "UltraTech Cement is India's largest cement manufacturer with 183+ MTPA capacity, aggressively consolidating the market through M&A. With India Cements and Kesoram acquisitions completed, and HeidelbergCement India in discussions, the company is on track for its 200 MTPA target by FY27. The primary competitive threat is the Adani Group's Ambuja+ACC platform at ~100 MTPA.",
+        "mood_score": 0.75,
+        "sentiment_analysis": "Highly bullish outlook driven by aggressive market consolidation (India Cements acquisition) and near-certainty of reaching 200 MTPA capacity by FY27.",
         "future_outlook": [
             {"title": "200 MTPA Target by FY27", "description": "With current capacity at 183 MTPA and HeidelbergCement India (6.6 MTPA) in discussions, UltraTech is well on track. Organic expansion will fill the remaining gap.", "probability": "High", "timeframe": "12-18 months", "rationale": "Strategic roadmap presented in recent analyst meets and current acquisition pipeline."},
             {"title": "Integration Focus in H1 2026", "description": "India Cements and Kesoram acquisitions need operational integration. Expect focus on cost optimization and capacity utilization improvement rather than new deals.", "probability": "High", "timeframe": "6-12 months", "rationale": "Recent large-scale acquisitions historically follow a 12-month optimization phase at ABG."},
