@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraTech Intelligence Hub | Interview Prep Dashboard</title>
+    <meta name="description" content="Autonomous intelligence dashboard for UltraTech Cement interview preparation">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">U</div>
+                <div>
+                    <h1>UltraTech Intelligence Hub</h1>
+                    <p class="tagline">Autonomous Interview Intelligence</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div id="statusBadge" class="status-badge">
+                <span class="status-dot"></span>
+                <span>Connecting...</span>
+            </div>
+            <div id="lastUpdated" class="last-updated"></div>
+            <button class="refresh-btn" onclick="refreshData()" title="Refresh all data">&#x21bb;</button>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="tabs">
+        <button class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" data-tab="outlook" onclick="switchTab('outlook')">Outlook</button>
+        <button class="tab" data-tab="ma" onclick="switchTab('ma')">M&amp;A Deals</button>
+        <button class="tab" data-tab="financials" onclick="switchTab('financials')">Financials</button>
+        <button class="tab" data-tab="competitors" onclick="switchTab('competitors')">Competitors</button>
+        <button class="tab" data-tab="ask" onclick="switchTab('ask')">Ask AI</button>
+    </nav>
+
+    <!-- ============ OVERVIEW TAB ============ -->
+    <div id="tab-overview" class="tab-content active">
+        <!-- Executive Summary -->
+        <div class="section-card executive-summary">
+            <h2 class="section-title">Executive Summary</h2>
+            <p id="execSummary" class="exec-text shimmer">Loading strategic overview...</p>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-row">
+            <div class="metric-card shimmer">
+                <div class="metric-label">Market Cap</div>
+                <div id="metricMarketCap" class="metric-value">--</div>
+            </div>
+            <div class="metric-card shimmer">
+                <div class="metric-label">Stock Price</div>
+                <div id="metricPrice" class="metric-value">--</div>
+            </div>
+            <div class="metric-card shimmer">
+                <div class="metric-label">Capacity</div>
+                <div id="metricCapacity" class="metric-value">--</div>
+                <div class="metric-sub">MTPA</div>
+            </div>
+            <div class="metric-card shimmer">
+                <div class="metric-label">P/E Ratio</div>
+                <div id="metricPE" class="metric-value">--</div>
+            </div>
+            <div class="metric-card shimmer">
+                <div class="metric-label">1Y Return</div>
+                <div id="metricReturn" class="metric-value">--</div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <!-- Company Info -->
+            <div class="section-card">
+                <h3 class="section-title">Company Snapshot</h3>
+                <div id="companyInfoGrid" class="info-grid"></div>
+                <div id="companyDescription" class="desc-text"></div>
+            </div>
+            <!-- Stock Chart -->
+            <div class="section-card">
+                <h3 class="section-title">Stock Performance (1Y)</h3>
+                <div class="chart-wrapper"><canvas id="stockChart"></canvas></div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <!-- Milestones -->
+            <div class="section-card">
+                <h3 class="section-title">Key Milestones</h3>
+                <div id="milestoneTimeline" class="timeline"></div>
+            </div>
+            <!-- Advantages -->
+            <div class="section-card">
+                <h3 class="section-title">Competitive Advantages</h3>
+                <ul id="advantageList" class="advantage-list"></ul>
+            </div>
+        </div>
+
+        <!-- News -->
+        <div class="section-card">
+            <h3 class="section-title">Latest News</h3>
+            <div id="newsGrid" class="news-grid"></div>
+        </div>
+    </div>
+
+    <!-- ============ OUTLOOK TAB ============ -->
+    <div id="tab-outlook" class="tab-content">
+        <div class="section-card executive-summary">
+            <h2 class="section-title">Strategic Outlook</h2>
+            <p id="outlookSummary" class="exec-text shimmer">Generating predictions...</p>
+        </div>
+
+        <div class="two-col">
+            <div class="section-card">
+                <h3 class="section-title">Predicted Next Moves</h3>
+                <div id="predictedMoves" class="prediction-list"></div>
+            </div>
+            <div class="section-card">
+                <h3 class="section-title">Future Outlook</h3>
+                <div id="futureOutlook" class="prediction-list"></div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div class="section-card">
+                <h3 class="section-title">Risk Factors</h3>
+                <div id="riskFactors" class="risk-list"></div>
+            </div>
+            <div class="section-card">
+                <h3 class="section-title">Key Metrics to Watch</h3>
+                <div id="metricsToWatch" class="metrics-watch-list"></div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3 class="section-title">Interview Talking Points</h3>
+            <div id="talkingPoints" class="talking-points"></div>
+        </div>
+    </div>
+
+    <!-- ============ M&A TAB ============ -->
+    <div id="tab-ma" class="tab-content">
+        <div class="section-card" id="maStrategySummary"></div>
+        <div id="maDealsGrid" class="deals-grid"></div>
+    </div>
+
+    <!-- ============ FINANCIALS TAB ============ -->
+    <div id="tab-financials" class="tab-content">
+        <div class="section-card">
+            <h3 class="section-title">Peer Comparison</h3>
+            <div class="table-wrapper">
+                <table id="financialTable" class="fin-table">
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="two-col">
+            <div class="section-card">
+                <h3 class="section-title">Market Cap Comparison</h3>
+                <div class="chart-wrapper"><canvas id="marketCapChart"></canvas></div>
+            </div>
+            <div class="section-card">
+                <h3 class="section-title">Stock Performance Comparison (1Y)</h3>
+                <div class="chart-wrapper"><canvas id="priceCompChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ COMPETITORS TAB ============ -->
+    <div id="tab-competitors" class="tab-content">
+        <div class="section-card">
+            <h3 class="section-title">Capacity Comparison</h3>
+            <div class="chart-wrapper"><canvas id="capacityChart"></canvas></div>
+        </div>
+        <div id="competitorCards" class="comp-grid"></div>
+        <div class="section-card">
+            <h3 class="section-title">Strategic Comparisons</h3>
+            <div id="strategicContent"></div>
+        </div>
+    </div>
+
+    <!-- ============ ASK AI TAB ============ -->
+    <div id="tab-ask" class="tab-content">
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages">
+                <div class="chat-message bot">
+                    <div class="chat-avatar">AI</div>
+                    <div class="chat-bubble">
+                        Hi! I'm your interview prep assistant. Ask me anything about UltraTech Cement — I'll answer
+                        using the latest data collected by the agents.
+                        <div class="suggestion-chips">
+                            <button onclick="askSuggestion('What is UltraTech\'s M&A strategy?')">M&A Strategy</button>
+                            <button onclick="askSuggestion('Compare UltraTech with Ambuja Cements')">vs Ambuja</button>
+                            <button onclick="askSuggestion('What are the key risks for UltraTech?')">Key Risks</button>
+                            <button onclick="askSuggestion('Tell me about the India Cements acquisition')">India Cements
+                                Deal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-row">
+                <input type="text" id="chatInput" placeholder="Ask about UltraTech..."
+                    onkeydown="if(event.key==='Enter')sendMessage()">
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
