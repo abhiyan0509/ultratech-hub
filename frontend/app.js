@@ -6,7 +6,31 @@ const API_BASE = '';
 let appData = {};
 let charts = {};
 
-document.addEventListener('DOMContentLoaded', () => { loadAllData(); });
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    loadAllData();
+});
+
+// ─── Theme Management ───────────────────────────────────────────
+function initTheme() {
+    const themeSwitch = document.querySelector('#checkbox');
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+
+    if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeSwitch.checked = true;
+    }
+
+    themeSwitch.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+}
 
 // ─── Tab Switching ──────────────────────────────────────────────
 function switchTab(tabId) {
@@ -88,16 +112,34 @@ function renderOverview() {
     }
     execEl.classList.remove('shimmer');
 
-    // Description
-    document.getElementById('companyDescription').innerHTML = `
-        <p>${ci.description || ''}</p>
-        ${ci.website_description ? `<p style="margin-top:10px">${ci.website_description}</p>` : ''}
-    `;
+    // Strategic Pillars (Replacing "essay" description)
+    if (ci.strategic_focus) {
+        document.getElementById('strategicPillars').innerHTML = ci.strategic_focus.map(p =>
+            `<div class="strategic-pill">
+                <span class="pill-icon">${p.icon || '🎯'}</span>
+                <span class="pill-text">${p.title}</span>
+            </div>`
+        ).join('');
+    } else {
+        // Fallback pillars if not in data
+        const fallbackPillars = [
+            { title: 'Capacity Leader', icon: '🏗️' },
+            { title: 'M&A Specialist', icon: '🤝' },
+            { title: 'Green Energy', icon: '🍃' },
+            { title: 'Pan-India Reach', icon: '🇮🇳' }
+        ];
+        document.getElementById('strategicPillars').innerHTML = fallbackPillars.map(p =>
+            `<div class="strategic-pill">
+                <span class="pill-icon">${p.icon}</span>
+                <span class="pill-text">${p.title}</span>
+            </div>`
+        ).join('');
+    }
 
     // Info grid
     const infoItems = [
         ['CEO', ci.ceo], ['Chairman', ci.chairman], ['Parent Group', ci.parent],
-        ['Headquarters', ci.headquarters], ['Founded', ci.founded],
+        ['Headquarters', ci.headquarters], ['Capacity', ci.capacity_mtpa],
         ['Plants', ci.plants], ['BSE', ci.bse_code], ['NSE', ci.nse_code],
     ];
     document.getElementById('companyInfoGrid').innerHTML = infoItems.map(([label, value]) =>
@@ -219,7 +261,8 @@ function renderOutlook() {
                     <span class="badge ${(o.probability || '').toLowerCase()}">${o.probability || ''}</span>
                 </div>
                 <div class="prediction-desc">${o.description || ''}</div>
-                <div class="prediction-meta">
+                ${o.rationale ? `<div class="rationale-box"><strong>Rationale:</strong> ${o.rationale}</div>` : ''}
+                <div class="prediction-meta" style="margin-top:8px">
                     <span style="font-size:11px;color:var(--text-muted)">${o.timeframe || ''}</span>
                 </div>
             </div>`
@@ -235,6 +278,7 @@ function renderOutlook() {
                     <span class="badge ${(r.severity || '').toLowerCase()}" style="margin-left:8px">${r.severity || ''}</span>
                 </div>
                 <div class="risk-detail">${r.mitigation || ''}</div>
+                ${r.rationale ? `<div class="rationale-box"><strong>Why:</strong> ${r.rationale}</div>` : ''}
             </div>`
         ).join('');
     }

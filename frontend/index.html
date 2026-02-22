@@ -26,6 +26,15 @@
             </div>
         </div>
         <div class="header-right">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round">
+                        <span class="icon sun">☀️</span>
+                        <span class="icon moon">🌙</span>
+                    </div>
+                </label>
+            </div>
             <div id="statusBadge" class="status-badge">
                 <span class="status-dot"></span>
                 <span>Connecting...</span>
@@ -51,6 +60,7 @@
         <div class="section-card executive-summary">
             <h2 class="section-title">Executive Summary</h2>
             <p id="execSummary" class="exec-text shimmer">Loading strategic overview...</p>
+            <div class="card-source">Source: Outlook Agent Analysis</div>
         </div>
 
         <!-- Key Metrics -->
@@ -81,14 +91,17 @@
         <div class="two-col">
             <!-- Company Info -->
             <div class="section-card">
-                <h3 class="section-title">Company Snapshot</h3>
+                <h3 class="section-title">Strategic Pillars</h3>
+                <div id="strategicPillars" class="pill-grid"></div>
+                <h3 class="section-title" style="margin-top:20px">Company Snapshot</h3>
                 <div id="companyInfoGrid" class="info-grid"></div>
-                <div id="companyDescription" class="desc-text"></div>
+                <div class="card-source">Source: Official Documents & Annual Reports</div>
             </div>
             <!-- Stock Chart -->
             <div class="section-card">
                 <h3 class="section-title">Stock Performance (1Y)</h3>
                 <div class="chart-wrapper"><canvas id="stockChart"></canvas></div>
+                <div class="card-source">Source: Yahoo Finance</div>
             </div>
         </div>
 

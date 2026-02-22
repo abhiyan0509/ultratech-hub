@@ -142,10 +142,10 @@ def build_fallback_outlook():
     return {
         "executive_summary": "UltraTech Cement is India's largest cement manufacturer with 183+ MTPA capacity, aggressively consolidating the market through M&A. With India Cements and Kesoram acquisitions completed, and HeidelbergCement India in discussions, the company is on track for its 200 MTPA target by FY27. The primary competitive threat is the Adani Group's Ambuja+ACC platform at ~100 MTPA.",
         "future_outlook": [
-            {"title": "200 MTPA Target by FY27", "description": "With current capacity at 183 MTPA and HeidelbergCement India (6.6 MTPA) in discussions, UltraTech is well on track. Organic expansion will fill the remaining gap.", "probability": "High", "timeframe": "12-18 months"},
-            {"title": "Integration Focus in H1 2026", "description": "India Cements and Kesoram acquisitions need operational integration. Expect focus on cost optimization and capacity utilization improvement rather than new deals.", "probability": "High", "timeframe": "6-12 months"},
-            {"title": "North-East Expansion via Star Cement", "description": "The 8.69% stake in Star Cement could be a precursor to a full acquisition, giving UltraTech access to the underserved North-East market.", "probability": "Medium", "timeframe": "12-24 months"},
-            {"title": "Margin Expansion from Scale Benefits", "description": "As integration of acquired assets completes, expect EBITDA margins to improve from current levels as synergies are realized.", "probability": "Medium", "timeframe": "12-18 months"},
+            {"title": "200 MTPA Target by FY27", "description": "With current capacity at 183 MTPA and HeidelbergCement India (6.6 MTPA) in discussions, UltraTech is well on track. Organic expansion will fill the remaining gap.", "probability": "High", "timeframe": "12-18 months", "rationale": "Strategic roadmap presented in recent analyst meets and current acquisition pipeline."},
+            {"title": "Integration Focus in H1 2026", "description": "India Cements and Kesoram acquisitions need operational integration. Expect focus on cost optimization and capacity utilization improvement rather than new deals.", "probability": "High", "timeframe": "6-12 months", "rationale": "Recent large-scale acquisitions historically follow a 12-month optimization phase at ABG."},
+            {"title": "North-East Expansion via Star Cement", "description": "The 8.69% stake in Star Cement could be a precursor to a full acquisition, giving UltraTech access to the underserved North-East market.", "probability": "Medium", "timeframe": "12-24 months", "rationale": "Initial minority stakes are often the first step in UltraTech's consolidation strategy (as seen with India Cements)."},
+            {"title": "Margin Expansion from Scale Benefits", "description": "As integration of acquired assets completes, expect EBITDA margins to improve from current levels as synergies are realized.", "probability": "Medium", "timeframe": "12-18 months", "rationale": "Synergies in logistics and procurement typically yield 5-10% cost savings in merged cement units."},
         ],
         "predicted_next_moves": [
             {"move": "Complete HeidelbergCement India acquisition", "rationale": "Negotiations are advanced, adds 6.6 MTPA capacity in Central India, HeidelbergCement AG is exiting non-core Asian markets", "probability": "High"},
@@ -154,17 +154,17 @@ def build_fallback_outlook():
             {"move": "Expand green cement and sustainability initiatives", "rationale": "ESG is increasingly important for institutional investors, and blended cement demand is growing", "probability": "High"},
         ],
         "risk_factors": [
-            {"risk": "Integration execution risk", "severity": "High", "mitigation": "UltraTech has a strong M&A integration track record from Jaypee and Century deals"},
-            {"risk": "Adani Group catching up fast", "severity": "Medium", "mitigation": "UltraTech's 80+ MTPA capacity lead provides a significant buffer"},
-            {"risk": "Regulatory/CCI scrutiny on market dominance", "severity": "Medium", "mitigation": "28% market share is high but not monopolistic - CCI has approved all recent deals"},
-            {"risk": "Cement demand slowdown", "severity": "Low", "mitigation": "Government infrastructure spending (Bharatmala, Smart Cities) provides demand floor"},
+            {"risk": "Integration execution risk", "severity": "High", "mitigation": "UltraTech has a strong M&A integration track record from Jaypee and Century deals", "rationale": "India Cements has different operational culture and legacy systems that require careful alignment."},
+            {"risk": "Adani Group catching up fast", "severity": "Medium", "mitigation": "UltraTech's 80+ MTPA capacity lead provides a significant buffer", "rationale": "Adani's aggressive capital allocation towards Ambuja and ACC poses a long-term market share threat."},
+            {"risk": "Regulatory/CCI scrutiny on market dominance", "severity": "Medium", "mitigation": "28% market share is high but not monopolistic - CCI has approved all recent deals", "rationale": "Increased concentration in certain regional markets could trigger divestment requirements."},
+            {"risk": "Cement demand slowdown", "severity": "Low", "mitigation": "Government infrastructure spending (Bharatmala, Smart Cities) provides demand floor", "rationale": "Temporary slowdowns in the real estate sector could impact retail sales volumes."},
         ],
         "interview_talking_points": [
-            {"point": "UltraTech's M&A strategy is the most disciplined in Indian cement", "supporting_data": "6 major deals since 2014 adding 65+ MTPA, each targeted at geographic gaps or distressed assets at attractive valuations"},
-            {"point": "The India Cements deal fills the South India gap", "supporting_data": "55.49% controlling stake giving access to Tamil Nadu, AP, Telangana markets where UltraTech was weaker"},
-            {"point": "Scale advantage is widening", "supporting_data": "183 MTPA vs Adani's 100 MTPA - nearly 2x the capacity of #2 player"},
-            {"point": "Industry consolidation benefits the leader", "supporting_data": "Top 5 market share grew from 54% to 59% in 2 years - UltraTech benefits most from this trend"},
-            {"point": "Path to 200 MTPA is clear", "supporting_data": "HeidelbergCement (6.6 MTPA) + organic expansion covers the remaining 17 MTPA gap from current 183 MTPA"},
+            {"point": "UltraTech's M&A strategy is the most disciplined in Indian cement", "supporting_data": "6 major deals since 2014 adding 65+ MTPA, each targeted at geographic gaps or distressed assets at attractive valuations", "rationale": "Focus on value-unlocking and regional consolidation rather than simple vanity metrics."},
+            {"point": "The India Cements deal fills the South India gap", "supporting_data": "55.49% controlling stake giving access to Tamil Nadu, AP, Telangana markets where UltraTech was weaker", "rationale": "Logistics are local in cement; having South Indian plants reduces shipping costs from Central India."},
+            {"point": "Scale advantage is widening", "supporting_data": "183 MTPA vs Adani's 100 MTPA - nearly 2x the capacity of #2 player", "rationale": "Provides immense bargaining power with coal suppliers and logistics partners."},
+            {"point": "Industry consolidation benefits the leader", "supporting_data": "Top 5 market share grew from 54% to 59% in 2 years - UltraTech benefits most from this trend", "rationale": "Consolidation leads to better price discipline across the industry."},
+            {"point": "Path to 200 MTPA is clear", "supporting_data": "HeidelbergCement (6.6 MTPA) + organic expansion covers the remaining 17 MTPA gap from current 183 MTPA", "rationale": "Consistent capital expenditure roadmap backed by strong cash flows."},
         ],
         "key_metrics_to_watch": [
             {"metric": "Capacity Utilization", "current_value": "~70-75%", "significance": "Post-acquisition integration success will show up here first"},
