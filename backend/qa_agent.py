@@ -201,10 +201,10 @@ async def serve_static(filename: str):
 
 # ─── Entry Point ─────────────────────────────────────────────────
 if __name__ == "__main__":
-    import uvicorn
-    print("\n[SERVER] Starting UltraTech Intelligence Hub Server...")
-    print("   Dashboard: http://localhost:8000")
-    print("   API docs:  http://localhost:8000/docs")
+    port = int(os.environ.get("PORT", 7860))
+    print(f"\n[SERVER] Starting UltraTech Intelligence Hub Server...")
+    print(f"   Dashboard: http://localhost:{port}")
+    print(f"   API docs:  http://localhost:{port}/docs")
     print("   Agents auto-refresh every 4 hours")
     print("   Press Ctrl+C to stop\n")
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    uvicorn.run(app, host="0.0.0.0", port=port)
