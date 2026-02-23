@@ -2,35 +2,35 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
 import {
-    LayoutDashboard,
-    TrendingUp,
-    Briefcase,
-    BarChart3,
-    Users,
-    MessageSquare,
-    FileDown,
-    RotateCw,
-    Search,
-    ArrowUpRight,
-    ArrowDownRight,
-    ChevronRight,
-    Zap,
-    ShieldCheck,
-    Target,
-    Maximize2
+  LayoutDashboard,
+  TrendingUp,
+  Briefcase,
+  BarChart3,
+  Users,
+  MessageSquare,
+  FileDown,
+  RotateCw,
+  Search,
+  ArrowUpRight,
+  ArrowDownRight,
+  ChevronRight,
+  Zap,
+  ShieldCheck,
+  Target,
+  Maximize2
 } from 'lucide-react';
 
 const html = htm.bind(React.createElement);
 
 // --- Simple Lucide Helper ---
 const Icon = ({ name: IconComp, className = "w-5 h-5" }) => {
-    return html`<${IconComp} className=${className} />`;
+  return html`<${IconComp} className=${className} />`;
 };
 
 // --- SUBSIDIARY COMPONENTS ---
 
 const Header = ({ onRefresh, onExport, status, onSearchOpen }) => {
-    return html`
+  return html`
     <header className="fixed top-0 left-0 right-0 h-16 glass-panel z-50 px-6 flex items-center justify-between">
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-3">
@@ -72,8 +72,8 @@ const Header = ({ onRefresh, onExport, status, onSearchOpen }) => {
 };
 
 const MetricCard = ({ label, value, sub, trend, loading }) => {
-    const isPositive = trend > 0;
-    return html`
+  const isPositive = trend > 0;
+  return html`
     <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500">
       <div className="flex justify-between items-start mb-4">
         <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
@@ -95,64 +95,63 @@ const MetricCard = ({ label, value, sub, trend, loading }) => {
 };
 
 const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
 
-    useEffect(() => {
-        if (loading || !chartRef.current || !data) return;
-        if (chartInstance.current) chartInstance.current.destroy();
+  useEffect(() => {
+    if (loading || !chartRef.current || !data || !Array.isArray(data.labels)) return;
+    if (chartInstance.current) chartInstance.current.destroy();
 
-        const ctx = chartRef.current.getContext('2d');
-        // Chart is available globally via the UMD script in index.html
-        chartInstance.current = new window.Chart(ctx, {
-            type: config.type || 'line',
-            data: data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#111114',
-                        titleColor: '#d4af37',
-                        bodyColor: '#fff',
-                        borderColor: '#1f1f23',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        bodyFont: { family: 'Inter', size: 10 }
-                    }
-                },
-                scales: {
-                    x: { display: false },
-                    y: { display: false }
-                },
-                interaction: { intersect: false, mode: 'index' },
-                elements: {
-                    line: {
-                        tension: 0.4,
-                        borderColor: '#d4af37',
-                        borderWidth: 2,
-                        fill: true,
-                        backgroundColor: (context) => {
-                            const chart = context.chart;
-                            const { ctx, chartArea } = chart;
-                            if (!chartArea) return null;
-                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.1)');
-                            gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
-                            return gradient;
-                        }
-                    },
-                    point: { radius: 0, hoverRadius: 5, hoverBackgroundColor: '#d4af37' }
-                }
+    const ctx = chartRef.current.getContext('2d');
+    chartInstance.current = new window.Chart(ctx, {
+      type: config.type || 'line',
+      data: data,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#111114',
+            titleColor: '#d4af37',
+            bodyColor: '#fff',
+            borderColor: '#1f1f23',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: false,
+            bodyFont: { family: 'Inter', size: 10 }
+          }
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        },
+        interaction: { intersect: false, mode: 'index' },
+        elements: {
+          line: {
+            tension: 0.4,
+            borderColor: '#d4af37',
+            borderWidth: 2,
+            fill: true,
+            backgroundColor: (context) => {
+              const chart = context.chart;
+              const { ctx, chartArea } = chart;
+              if (!chartArea) return null;
+              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.1)');
+              gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
+              return gradient;
             }
-        });
+          },
+          point: { radius: 0, hoverRadius: 5, hoverBackgroundColor: '#d4af37' }
+        }
+      }
+    });
 
-        return () => { if (chartInstance.current) chartInstance.current.destroy(); };
-    }, [loading, data]);
+    return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+  }, [loading, data]);
 
-    return html`
+  return html`
     <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all">
       <div className="flex justify-between items-start mb-6">
         <div>
@@ -175,8 +174,11 @@ const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
   `;
 };
 
-const NewsModule = ({ news = [], loading }) => {
-    return html`
+const NewsModule = ({ data, loading }) => {
+  const newsItems = Array.isArray(data) ? data : (data?.news || []);
+  const safeNews = Array.isArray(newsItems) ? newsItems : [];
+
+  return html`
     <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-white text-lg font-bold flex items-center gap-2">
@@ -188,8 +190,8 @@ const NewsModule = ({ news = [], loading }) => {
       <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
         ${loading ? html`
           ${[1, 2, 3, 4, 5].map(i => html`<div key=${i} className="animate-shimmer h-20 w-full rounded-2xl mb-4 opacity-10"></div>`)}
-        ` : (news || []).slice(0, 10).map((item, i) => html`
-          <a key=${i} href=${item.link} target="_blank" className="block p-4 rounded-2xl bg-obsidian-card border border-obsidian-border hover:border-gold/30 hover:bg-obsidian-hover transition-all group relative overflow-hidden">
+        ` : safeNews.slice(0, 10).map((item, i) => html`
+          <a key=${i} href=${item.url || item.link} target="_blank" className="block p-4 rounded-2xl bg-obsidian-card border border-obsidian-border hover:border-gold/30 hover:bg-obsidian-hover transition-all group relative overflow-hidden">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
             <div className="flex justify-between items-start mb-2">
                <span className="text-[10px] text-gold font-black uppercase tracking-widest">${item.source || 'Standard'}</span>
@@ -205,8 +207,20 @@ const NewsModule = ({ news = [], loading }) => {
   `;
 };
 
-const CompetitorGrid = ({ competitors = [], loading }) => {
-    return html`
+const CompetitorGrid = ({ data, loading }) => {
+  const compData = data?.competitors || data;
+  const compItems = useMemo(() => {
+    if (Array.isArray(compData)) return compData;
+    if (compData && typeof compData === 'object') {
+      return Object.entries(compData).map(([name, profile]) => ({
+        name: name,
+        ...profile
+      }));
+    }
+    return [];
+  }, [compData]);
+
+  return html`
     <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-white text-lg font-bold flex items-center gap-2">
@@ -218,11 +232,11 @@ const CompetitorGrid = ({ competitors = [], loading }) => {
       <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         ${loading ? html`
           ${[1, 2, 3, 4, 5, 6].map(i => html`<div key=${i} className="animate-shimmer h-24 rounded-2xl opacity-10"></div>`)}
-        ` : (competitors || []).map((comp, i) => html`
+        ` : compItems.map((comp, i) => html`
           <div key=${i} className="p-4 rounded-2xl bg-obsidian-card border border-obsidian-border flex flex-col justify-between group hover:bg-obsidian-hover hover:border-emerald-500/20 transition-all duration-500">
             <div className="text-slate-400 text-[10px] uppercase font-black tracking-tight mb-2 group-hover:text-gold transition-colors">${comp.name}</div>
             <div>
-              <div className="text-white font-black text-lg leading-none">${comp.capacity} <span className="text-[11px] text-slate-600 font-medium">MTPA</span></div>
+              <div className="text-white font-black text-lg leading-none">${comp.capacity_mtpa || comp.capacity} <span className="text-[11px] text-slate-600 font-medium">MTPA</span></div>
               <div className="text-[10px] text-slate-500 mt-2 font-medium tracking-wide">
                 ${comp.market_share ? comp.market_share + ' Market Share' : comp.valuation || 'Cement Sector'}
               </div>
@@ -235,41 +249,41 @@ const CompetitorGrid = ({ competitors = [], loading }) => {
 };
 
 const ResearchAssistant = ({ isOpen, onClose, data }) => {
-    const [messages, setMessages] = useState([
-        { role: 'bot', text: "Welcome to the Executive Research Suite. I have contextual access to UltraTech's operational, financial, and macro-economic data. How can I assist your analysis today?" }
-    ]);
-    const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const scrollRef = useRef();
+  const [messages, setMessages] = useState([
+    { role: 'bot', text: "Welcome to the Executive Research Suite. I have contextual access to UltraTech's operational, financial, and macro-economic data. How can I assist your analysis today?" }
+  ]);
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollRef = useRef();
 
-    useEffect(() => {
-        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }, [messages]);
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages]);
 
-    const handleSend = async (customMsg) => {
-        const userMsg = customMsg || input;
-        if (!userMsg.trim()) return;
+  const handleSend = async (customMsg) => {
+    const userMsg = customMsg || input;
+    if (!userMsg.trim()) return;
 
-        setInput('');
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-        setIsTyping(true);
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setIsTyping(true);
 
-        try {
-            const res = await fetch('/api/ask', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: userMsg })
-            });
-            const result = await res.json();
-            setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
-        } catch (e) {
-            setMessages(prev => [...prev, { role: 'bot', text: "⚠️ Technical interruption. The research engine is cooling down. Please retry." }]);
-        } finally {
-            setIsTyping(false);
-        }
-    };
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: userMsg })
+      });
+      const result = await res.json();
+      setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'bot', text: "⚠️ Technical interruption. The research engine is cooling down. Please retry." }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
-    return html`
+  return html`
     <div className=${`fixed inset-y-0 right-0 w-[450px] glass-panel z-[100] transform transition-transform duration-500 ease-in-out shadow-2xl flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
       <div className="p-6 border-b border-obsidian-border flex items-center justify-between bg-obsidian-card/40 backdrop-blur-3xl">
         <div className="flex items-center gap-3">
@@ -293,9 +307,9 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
         ${messages.map((msg, i) => html`
           <div key=${i} className=${`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className=${`max-w-[90%] p-4 rounded-2xl text-[13px] leading-relaxed shadow-sm ${msg.role === 'user'
-            ? 'bg-gold text-obsidian font-bold rounded-br-none'
-            : 'bg-obsidian-card border border-obsidian-border text-slate-300 rounded-bl-none'
-        }`}>
+      ? 'bg-gold text-obsidian font-bold rounded-br-none'
+      : 'bg-obsidian-card border border-obsidian-border text-slate-300 rounded-bl-none'
+    }`}>
               ${msg.text}
             </div>
           </div>
@@ -339,11 +353,11 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
 };
 
 const CommandK = ({ isOpen, onClose }) => {
-    const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('');
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    return html`
+  return html`
     <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh] px-4">
       <div className="absolute inset-0 bg-obsidian/80 backdrop-blur-md" onClick=${onClose}></div>
       <div className="w-full max-w-2xl glass-panel bg-obsidian-card relative rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] overflow-hidden border-gold/10 animate-in fade-in zoom-in duration-300">
@@ -360,11 +374,11 @@ const CommandK = ({ isOpen, onClose }) => {
         <div className="p-2 max-h-[450px] overflow-y-auto custom-scrollbar">
            <div className="px-4 py-3 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Platform Navigation</div>
            ${[
-            { icon: LayoutDashboard, label: 'Executive Overview', sub: 'Aggregated Dossier', color: 'text-gold' },
-            { icon: TrendingUp, label: 'Strategic Outlook', sub: 'Market Mood & Forecasts', color: 'text-emerald-500' },
-            { icon: BarChart3, label: 'LTM Financials', sub: 'Peer Benchmarking Scorecards', color: 'text-blue-500' },
-            { icon: MessageSquare, label: 'Interrogate AI Assistant', sub: 'Natural Language Research', color: 'text-orange-500' }
-        ].map((item, i) => html`
+      { icon: LayoutDashboard, label: 'Executive Overview', sub: 'Aggregated Dossier', color: 'text-gold' },
+      { icon: TrendingUp, label: 'Strategic Outlook', sub: 'Market Mood & Forecasts', color: 'text-emerald-500' },
+      { icon: BarChart3, label: 'LTM Financials', sub: 'Peer Benchmarking Scorecards', color: 'text-blue-500' },
+      { icon: MessageSquare, label: 'Interrogate AI Assistant', sub: 'Natural Language Research', color: 'text-orange-500' }
+    ].map((item, i) => html`
              <button key=${i} onClick=${onClose} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-obsidian-hover transition-all group text-left">
                 <div className=${`p-2.5 bg-obsidian rounded-xl border border-obsidian-border group-hover:scale-110 transition-transform ${item.color}`}>
                    <${Icon} name=${item.icon} className="w-5 h-5" />
@@ -389,16 +403,25 @@ const CommandK = ({ isOpen, onClose }) => {
 };
 
 const BentoGrid = ({ data, loading }) => {
-    const stockChartData = useMemo(() => {
-        if (!data?.financials?.timeseries) return null;
-        const ts = data.financials.timeseries;
-        return {
-            labels: ts.map(d => d.date),
-            datasets: [{ data: ts.map(d => d.value) }]
-        };
-    }, [data]);
+  const stockChartData = useMemo(() => {
+    const ts = data?.financials?.timeseries;
+    if (!Array.isArray(ts)) return null;
+    return {
+      labels: ts.map(d => d.date),
+      datasets: [{ data: ts.map(d => d.value) }]
+    };
+  }, [data]);
 
-    return html`
+  const macroItems = useMemo(() => {
+    return Array.isArray(data?.macro?.data) ? data.macro.data : [];
+  }, [data]);
+
+  const pills = useMemo(() => {
+    const p = data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars;
+    return Array.isArray(p) ? p : [];
+  }, [data]);
+
+  return html`
     <div className="mt-20 p-6 grid grid-cols-12 gap-6 max-w-[1700px] mx-auto pb-32">
         <!-- Row 1: Key Metrics -->
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
@@ -453,12 +476,12 @@ const BentoGrid = ({ data, loading }) => {
                 <div className="md:col-span-5 flex flex-col justify-between">
                     <div>
                         <div className=${`text-slate-300 text-lg leading-relaxed font-light mb-8 italic ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-10' : ''}`}>
-                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description)}"
+                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Loading strategic overview...')}"
                         </div>
                         <div className="grid grid-cols-1 gap-3">
-                            ${(data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars || []).slice(0, 3).map(pill => html`
-                                <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-obsidian-card/50 border border-obsidian-border group hover:border-gold/30 transition-all">
-                                    <div className="text-gold"><${Icon} name=${pill.title?.toLowerCase().includes('growth') ? TrendingUp : pill.title?.toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
+                            ${pills.slice(0, 3).map(pill => html`
+                                <div key=${pill.title || pill} className="flex items-center gap-4 p-3.5 rounded-2xl bg-obsidian-card/50 border border-obsidian-border group hover:border-gold/30 transition-all">
+                                    <div className="text-gold"><${Icon} name=${(pill.title || pill || '').toString().toLowerCase().includes('growth') ? TrendingUp : (pill.title || pill || '').toString().toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
                                     <div className="text-white font-bold text-[11px] uppercase tracking-[0.2em]">${pill.title || pill}</div>
                                 </div>
                             `)}
@@ -510,7 +533,7 @@ const BentoGrid = ({ data, loading }) => {
 
         <!-- Row 3: Detail Modules -->
         <div className="col-span-12 lg:col-span-4 h-[600px]">
-           <${NewsModule} news=${data?.news} loading=${loading} />
+           <${NewsModule} data=${data?.news} loading=${loading} />
         </div>
         
         <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl h-[600px] flex flex-col relative overflow-hidden">
@@ -520,11 +543,11 @@ const BentoGrid = ({ data, loading }) => {
                Macro Pulse
             </h2>
             <div className="flex-1 flex flex-col justify-center gap-4">
-                ${(data?.macro?.data || []).map((item, i) => html`
+                ${macroItems.map((item, i) => html`
                     <div key=${i} className="flex items-center justify-between p-4.5 rounded-2xl bg-obsidian-card/40 border border-obsidian-border group hover:bg-obsidian-hover hover:border-gold/20 transition-all duration-300">
                         <div className="flex items-center gap-4">
                            <div className="w-10 h-10 rounded-xl bg-obsidian border border-obsidian-border flex items-center justify-center text-slate-500 group-hover:text-gold transition-colors">
-                              <${Icon} name=${item.name.toLowerCase().includes('coal') ? Zap : item.name.toLowerCase().includes('usd') ? ShieldCheck : Target} className="w-5 h-5" />
+                              <${Icon} name=${(item.name || '').toLowerCase().includes('coal') ? Zap : (item.name || '').toLowerCase().includes('usd') ? ShieldCheck : Target} className="w-5 h-5" />
                            </div>
                            <span className="text-slate-400 text-xs font-black uppercase tracking-widest">${item.name}</span>
                         </div>
@@ -544,55 +567,56 @@ const BentoGrid = ({ data, loading }) => {
         </div>
 
         <div className="col-span-12 lg:col-span-4 h-[600px]">
-           <${CompetitorGrid} competitors=${data?.competitors?.companies} loading=${loading} />
+           <${CompetitorGrid} data=${data?.competitors} loading=${loading} />
         </div>
     </div>
     `;
 };
 
 const App = () => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isAIOpen, setIsAIOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAIOpen, setIsAIOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                setIsSearchOpen(prev => !prev);
-            }
-            if (e.key === 'Escape') setIsSearchOpen(false);
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
-                const results = await Promise.all(
-                    datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
-                );
-                const combined = {};
-                datasets.forEach((ds, i) => combined[ds] = results[i]);
-                setData(combined);
-                setLoading(false);
-            } catch (e) {
-                console.error("Data load error", e);
-            }
-        };
-        loadData();
-    }, []);
-
-    const triggerRefresh = async () => {
-        setLoading(true);
-        await fetch('/api/refresh', { method: 'POST' });
-        setTimeout(() => window.location.reload(), 2000);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') setIsSearchOpen(false);
     };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-    return html`
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
+        const results = await Promise.all(
+          datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
+        );
+        const combined = {};
+        datasets.forEach((ds, i) => combined[ds] = results[i]);
+        setData(combined);
+        setLoading(false);
+      } catch (e) {
+        console.error("Data load error", e);
+        setLoading(false); // Even if data fails, stop loading to show fallback UI or error
+      }
+    };
+    loadData();
+  }, []);
+
+  const triggerRefresh = async () => {
+    setLoading(true);
+    await fetch('/api/refresh', { method: 'POST' });
+    setTimeout(() => window.location.reload(), 2000);
+  };
+
+  return html`
     <div className="min-h-screen bg-obsidian selection:bg-gold/30">
       <${Header} 
         onRefresh=${triggerRefresh} 
@@ -634,15 +658,18 @@ const App = () => {
       <!-- Market Ticker -->
       <div className="fixed bottom-0 left-0 right-0 h-10 bg-obsidian/95 backdrop-blur-xl border-t border-obsidian-border z-40 overflow-hidden flex items-center">
         <div className="animate-ticker whitespace-nowrap flex gap-16 px-8">
-           ${(data?.macro?.data || []).concat(data?.macro?.data || []).concat(data?.macro?.data || []).map((m, i) => html`
-             <div key=${i} className="flex gap-4 items-center text-[10px] font-black tracking-[0.1em] uppercase group">
-                <span className="text-slate-500 group-hover:text-slate-300 transition-colors uppercase">${m.name}</span>
-                <span className="text-white font-black">${m.value}</span>
-                <span className=${`font-black flex items-center gap-0.5 ${m.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                   ${m.change >= 0 ? '▲' : '▼'} ${Math.abs(m.change)}%
-                </span>
-             </div>
-           `)}
+           ${(() => {
+      const mData = Array.isArray(data?.macro?.data) ? data.macro.data : [];
+      return [...mData, ...mData, ...mData].map((m, i) => html`
+                <div key=${i} className="flex gap-4 items-center text-[10px] font-black tracking-[0.1em] uppercase group">
+                    <span className="text-slate-500 group-hover:text-slate-300 transition-colors uppercase">${m.name}</span>
+                    <span className="text-white font-black">${m.value}</span>
+                    <span className=${`font-black flex items-center gap-0.5 ${m.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                       ${m.change >= 0 ? '▲' : '▼'} ${Math.abs(m.change)}%
+                    </span>
+                </div>
+             `);
+    })()}
         </div>
       </div>
     </div>
