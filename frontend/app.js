@@ -231,9 +231,9 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
           `}
         </div>
       </div>
-      <div className="flex-1 min-h-[140px] relative">
-        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-10 bg-gold/5"></div>`}
-        <canvas ref=${chartRef}></canvas>
+      <div className="flex-1 min-h-[160px] relative overflow-hidden">
+        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-10 bg-gold/5 z-10"></div>`}
+        <canvas ref=${chartRef} className="absolute inset-0 w-full h-full"></canvas>
       </div>
     </div>
   `;
