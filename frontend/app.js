@@ -56,11 +56,12 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       onClick=${onClose}
     >
       <div 
-        className="w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 scale-100" 
-        style=${{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+        className="w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden shadow-premium transition-all duration-500 scale-100" 
+        style=${{ maxHeight: '90vh', display: 'flex', flexDirection: 'column', border: '1px solid rgba(212, 175, 55, 0.2)' }}
         onClick=${e => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between bg-white dark:bg-obsidian-card">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+        <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between bg-white/80 dark:bg-obsidian-card/80 backdrop-blur-xl relative z-10">
           <h3 className="text-xl font-bold dark:text-white capitalize-first">${title}</h3>
           <button onClick=${onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-obsidian-hover rounded-xl transition-colors">
             <${Icon} name=${X} className="w-6 h-6 text-slate-500" />
@@ -129,21 +130,22 @@ const Header = ({ onRefresh, onExport, status, onSearchOpen, theme, onThemeToggl
 const MetricCard = ({ label, value, sub, trend, loading }) => {
   const isPositive = trend > 0;
   return html`
-    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500 shadow-sm hover:shadow-md h-32">
-      <div className="flex justify-between items-start mb-4">
-        <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
+    <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-gold/40 transition-all duration-500 shadow-sm hover:shadow-premium h-36 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-gold/15 transition-all duration-700"></div>
+      <div className="flex justify-between items-start mb-4 relative z-10">
+        <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-[0.2em]">${label}</span>
         ${trend && html`
-          <div className=${`flex items-center gap-1 text-[10px] font-black ${isPositive ? 'text-emerald-600 dark:text-emerald-500' : 'text-rose-600 dark:text-rose-500'}`}>
+          <div className=${`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black ${isPositive ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500' : 'bg-rose-500/10 text-rose-600 dark:text-rose-500'}`}>
             <${Icon} name=${isPositive ? ArrowUpRight : ArrowDownRight} className="w-3 h-3" />
             ${Math.abs(trend)}%
           </div>
         `}
       </div>
-      <div>
-        <div className=${`text-2xl font-black text-slate-900 dark:text-white mb-1 ${loading ? 'animate-shimmer rounded h-8 w-2/3 opacity-10 bg-gold/10' : ''}`}>
+      <div className="relative z-10">
+        <div className=${`text-3xl font-black text-slate-900 dark:text-white mb-1.5 tracking-tighter ${loading ? 'animate-shimmer rounded h-9 w-2/3 opacity-10 bg-gold/10' : ''}`}>
            ${!loading && value}
         </div>
-        <div className="text-slate-500 text-[10px] font-medium italic tracking-wide">${sub}</div>
+        <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest opacity-60">${sub}</div>
       </div>
     </div>
   `;
@@ -236,11 +238,12 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
   }, [loading, data]);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all shadow-sm bg-white/40 dark:bg-obsidian-card/40">
-      <div className="flex justify-between items-start mb-6">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/30 transition-all shadow-sm bg-white/40 dark:bg-obsidian-card/40 relative overflow-hidden">
+      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-gold/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-gold/10 transition-all duration-700"></div>
+      <div className="flex justify-between items-start mb-6 relative z-10">
         <div>
-           <h3 className="text-slate-900 dark:text-white text-xs font-bold tracking-tight">${title}</h3>
-           <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">${subtitle}</p>
+           <h3 className="text-slate-900 dark:text-white text-sm font-black tracking-tight uppercase">${title}</h3>
+           <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1 font-bold opacity-70">${subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
           ${onTimeframeChange && html`
@@ -278,13 +281,14 @@ const NewsModule = ({ data, loading }) => {
   const safeNews = Array.isArray(newsItems) ? newsItems : [];
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-slate-900 dark:text-white text-lg font-bold flex items-center gap-2">
-            <div className="w-1.5 h-6 bg-gold rounded-full"></div>
+    <div className="glass-panel p-7 rounded-3xl h-full flex flex-col shadow-sm relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-gold/10 transition-all duration-700 translate-x-1/2 -translate-y-1/2"></div>
+      <div className="flex justify-between items-center mb-7 relative z-10">
+        <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
+            <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_rgba(212,175,55,0.4)]"></div>
             Market Intelligence
         </h2>
-        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em]">Live Signals</span>
+        <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em] opacity-60">Live Signals</span>
       </div>
       <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
         ${loading ? html`
@@ -310,13 +314,14 @@ const M_A_Module = ({ data, loading }) => {
   const deals = Array.isArray(data) ? data : (data?.deals || []);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-slate-900 dark:text-white text-lg font-bold flex items-center gap-2">
-            <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+    <div className="glass-panel p-7 rounded-3xl h-full flex flex-col shadow-sm relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-700 translate-x-1/2 -translate-y-1/2"></div>
+      <div className="flex justify-between items-center mb-7 relative z-10">
+        <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
+            <div className="w-1.5 h-6 bg-emerald-500 rounded-full shadow-[0_0_12px_rgba(16,185,129,0.4)]"></div>
             M&A Pipeline
         </h2>
-        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em]">Transaction Flow</span>
+        <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em] opacity-60">Transaction Flow</span>
       </div>
       <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
         ${loading ? html`
@@ -356,13 +361,14 @@ const CompetitorGrid = ({ data, loading }) => {
   }, [compData]);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-slate-900 dark:text-white text-lg font-bold flex items-center gap-2">
-            <div className="w-1.5 h-6 bg-gold rounded-full"></div>
+    <div className="glass-panel p-7 rounded-3xl h-full flex flex-col shadow-sm relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-gold/10 transition-all duration-700 translate-x-1/2 -translate-y-1/2"></div>
+      <div className="flex justify-between items-center mb-7 relative z-10">
+        <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
+            <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_rgba(212,175,55,0.4)]"></div>
             Sector Landscape
         </h2>
-        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em] italic">Benchmark</span>
+        <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em] opacity-60">Benchmark Analysis</span>
       </div>
       <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         ${loading ? html`
@@ -587,15 +593,16 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
         </div>
 
         <!-- Strategic Dossier -->
-        <div className="col-span-12 lg:col-span-9 glass-panel p-8 rounded-3xl min-h-[450px] shadow-sm relative overflow-hidden group/dossier">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full pointer-events-none group-hover/dossier:bg-gold/10 transition-all duration-700"></div>
-            <div className="flex justify-between items-center mb-8 relative z-10">
-                <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
-                   <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_#d4af37]"></div>
+        <div className="col-span-12 lg:col-span-9 glass-panel p-10 rounded-3xl min-h-[500px] shadow-sm relative overflow-hidden group/dossier">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/5 blur-[120px] rounded-full pointer-events-none group-hover/dossier:bg-gold/10 transition-all duration-1000 -translate-y-1/2 translate-x-1/4"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none group-hover/dossier:bg-emerald-500/10 transition-all duration-1000 translate-y-1/2 -translate-x-1/4"></div>
+            <div className="flex justify-between items-center mb-10 relative z-10">
+                <h2 className="text-slate-900 dark:text-white text-xl font-black flex items-center gap-4">
+                   <div className="w-2 h-8 bg-gold rounded-full shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
                    Strategic Asset Dossier
                 </h2>
                 <div className="flex items-center gap-4">
-                   <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-[0.3em]">Confidential / V7.2 Intelligence</span>
+                   <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-[0.4em] opacity-50">Confidential | V7.5 Intelligence</span>
                 </div>
             </div>
             
@@ -628,10 +635,11 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
         </div>
 
         <!-- Sentiment Card -->
-        <div className="col-span-12 lg:col-span-3 glass-panel p-8 rounded-3xl min-h-[450px] flex flex-col justify-between overflow-hidden relative shadow-sm">
-            <h2 className="text-slate-900 dark:text-white text-lg font-black flex justify-between items-center group">
-                <span className="relative">Market Sentiment</span>
-                <${Icon} name=${TrendingUp} className="w-4 h-4 text-emerald-500" />
+        <div className="col-span-12 lg:col-span-3 glass-panel p-10 rounded-3xl min-h-[500px] flex flex-col justify-between overflow-hidden relative shadow-sm group">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+            <h2 className="text-slate-900 dark:text-white text-xl font-black flex justify-between items-center relative z-10">
+                <span className="tracking-tight">Market Momentum</span>
+                <${Icon} name=${TrendingUp} className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
             </h2>
             <div className="flex-1 flex flex-col items-center justify-center pt-2">
                 <div className="relative w-48 h-24 overflow-hidden">

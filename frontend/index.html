@@ -35,6 +35,10 @@
                     fontFamily: {
                         heading: ['Manrope', 'sans-serif'],
                         body: ['Inter', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'premium': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                        'gold-glow': '0 0 20px rgba(212, 175, 55, 0.15)'
                     }
                 }
             }
@@ -56,126 +60,76 @@
     }
     </script>
 
-    <style>
-        /* Base Reset & Core Styles */
-        html {
-            scroll-behavior: smooth;
+    <style type="text/tailwindcss">
+        @layer base {
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                @apply bg-slate-50 text-slate-800 font-body antialiased transition-colors duration-500;
+            }
+
+            .dark body {
+                @apply bg-obsidian text-slate-200;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-heading tracking-tight font-bold;
+            }
         }
 
-        body {
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background-color 0.5s, color 0.5s;
-            min-height: 101vh;
-            margin: 0;
+        @layer components {
+            .glass-panel {
+                @apply bg-white/70 dark:bg-obsidian-card/60 backdrop-blur-2xl border border-slate-200/50 dark:border-obsidian-border/50 shadow-sm transition-all duration-500;
+            }
+
+            .glass-panel:hover {
+                @apply border-gold/30 shadow-premium;
+            }
+
+            .bg-obsidian-card {
+                @apply bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border;
+            }
         }
 
-        .dark body {
-            background-color: #09090b;
-            color: #e2e8f0;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4 {
-            font-family: 'Manrope', sans-serif;
-            letter-spacing: -0.025em;
-        }
-
-        /* Platform Theme Engine (CSS Components) */
-        .glass-panel {
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            background-color: rgba(255, 255, 255, 0.7);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.5s;
-            color: #0f172a;
-        }
-
-        .dark .glass-panel {
-            background-color: rgba(17, 17, 20, 0.6);
-            border-color: #1f1f23;
-            color: #e2e8f0;
-            box-shadow: none;
-        }
-
-        .bg-obsidian-card {
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(241, 245, 249, 1);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.5s;
-        }
-
-        .dark .bg-obsidian-card {
-            background-color: #111114;
-            border-color: #1f1f23;
-            box-shadow: none;
-        }
-
+        /* Essential Animations */
         @keyframes shimmer {
-            0% {
-                background-position: -1000px 0;
-            }
-
-            100% {
-                background-position: 1000px 0;
-            }
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
-        @keyframes ticker-move {
-            0% {
-                transform: translateX(0);
-            }
-
-            100% {
-                transform: translateX(-50%);
-            }
+        .animate-shimmer {
+            background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(212,175,55,0.05) 50%, rgba(212,175,55,0) 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
         }
 
-        .animate-ticker {
-            animation: ticker-move 40s linear infinite;
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
         }
 
-        .clip-half-gauge {
-            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+        .gold-glow {
+            @apply shadow-gold-glow border-gold/20;
         }
 
         #root:empty::before {
-            content: 'Initializing Executive Platform...';
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'Manrope', sans-serif;
-            font-weight: 800;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #d4af37;
-            opacity: 0.5;
-            font-size: 10px;
+            content: 'Initializing Premium Platform...';
+            @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-heading font-black text-xs uppercase tracking-[0.3em] text-gold/40 animate-pulse;
         }
 
         /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        ::-webkit-scrollbar {
+            @apply w-1.5;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
+        ::-webkit-scrollbar-track {
+            @apply bg-transparent;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #d4af3733;
-            border-radius: 10px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #d4af3755;
+        ::-webkit-scrollbar-thumb {
+            @apply bg-gold/10 rounded-full border-4 border-transparent bg-clip-content hover:bg-gold/30 transition-colors;
         }
     </style>
 </head>
