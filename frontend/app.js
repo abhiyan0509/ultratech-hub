@@ -52,13 +52,13 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   return html`
     <div className="modal-overlay" onClick=${onClose}>
       <div className="modal-content" onClick=${e => e.stopPropagation()}>
-        <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between">
+        <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between bg-white dark:bg-obsidian-card">
           <h3 className="text-xl font-bold dark:text-white">${title}</h3>
           <button onClick=${onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-obsidian-hover rounded-xl transition-colors">
             <${Icon} name=${X} className="w-6 h-6 text-slate-500" />
           </button>
         </div>
-        <div className="p-8 max-h-[80vh] overflow-y-auto">
+        <div className="p-8 max-h-[80vh] overflow-y-auto bg-slate-50/50 dark:bg-obsidian">
           ${children}
         </div>
       </div>
@@ -262,6 +262,8 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
     </div>
   `;
 };
+
+// ... Module components remain same but I'll export them later ...
 
 const NewsModule = ({ data, loading }) => {
   const newsItems = Array.isArray(data) ? data : (data?.news || []);
@@ -509,7 +511,7 @@ const CommandK = ({ isOpen, onClose, onAction }) => {
         <div className="p-2 max-h-[450px] overflow-y-auto custom-scrollbar">
            <div className="px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em]">Platform Actions</div>
            ${items.map((item, i) => html`
-             <button key=${item.id} onClick=${() => { onAction(item.id); onClose(); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-all group text-left">
+             <button key=${item.id} onClick=${() => onAction(item.id)} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-all group text-left">
                 <div className=${`p-2.5 bg-slate-100 dark:bg-obsidian rounded-xl border border-slate-200 dark:border-obsidian-border group-hover:scale-110 transition-transform ${item.color}`}>
                    <${Icon} name=${item.icon} className="w-5 h-5" />
                 </div>
@@ -656,7 +658,7 @@ const App = () => {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('ut-theme') || 'light');
-  const [modal, setModal] = useState({ isOpen: false, title: '', children: null });
+  const [modal, setModal] = useState({ isOpen: false, type: null, title: '', extra: null });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -701,14 +703,45 @@ const App = () => {
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   const handleSearchAction = (id) => {
-    if (id === 'assistant') setIsAIOpen(true);
+    console.log('Action Triggered:', id);
+    setIsSearchOpen(false); // Close search immediately
 
-    if (id === 'overview') {
-      const company = data?.financials?.companies?.['UltraTech Cement'] || {};
-      setModal({
-        isOpen: true,
-        title: 'Executive Performance Overview',
-        children: html`
+    if (id === 'assistant') {
+      setIsAIOpen(true);
+      return;
+    }
+
+    const titles = {
+      'overview': 'Executive Performance Overview',
+      'financials': 'LTM Competitive Benchmark',
+      'outlook': 'Strategic Market Outlook',
+      'equity': 'Equity Performance Spectrum'
+    };
+
+    setModal({
+      isOpen: true,
+      type: id,
+      title: titles[id] || 'Intelligence Analysis',
+      extra: null
+    });
+  };
+
+  const showExpandedChart = (id, title, chartData) => {
+    setModal({
+      isOpen: true,
+      type: 'chart',
+      title: title,
+      extra: chartData
+    });
+  };
+
+  const renderModalContent = () => {
+    if (!data) return html`<div className="p-8 text-center text-slate-500">Synchronizing intelligence...</div>`;
+
+    switch (modal.type) {
+      case 'overview':
+        const company = data?.financials?.companies?.['UltraTech Cement'] || {};
+        return html`
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-4">
                  <div className="p-6 rounded-2xl bg-gold/5 border border-gold/20">
@@ -722,11 +755,11 @@ const App = () => {
                     <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">MTPA Active Capacity</div>
                  </div>
               </div>
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-obsidian-border/20 border border-slate-200 dark:border-obsidian-border">
+              <div className="p-6 rounded-2xl bg-white dark:bg-obsidian-border/20 border border-slate-200 dark:border-obsidian-border shadow-sm">
                 <h4 className="text-slate-900 dark:text-white font-black uppercase text-xs mb-4">Strategic Pillar Analysis</h4>
                 <div className="grid grid-cols-3 gap-4">
-                   ${(data?.company_info?.strategic_focus || []).map(f => html`
-                     <div className="text-center p-4 rounded-xl bg-white dark:bg-obsidian-card shadow-sm border border-slate-100 dark:border-obsidian-border">
+                   ${(data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars || []).map(f => html`
+                     <div className="text-center p-4 rounded-xl bg-slate-50 dark:bg-obsidian-card shadow-inner border border-slate-100 dark:border-obsidian-border">
                         <div className="text-gold mb-2 flex justify-center"><${Icon} name=${TrendingUp} className="w-5 h-5"/></div>
                         <div className="text-[10px] font-black uppercase tracking-tighter dark:text-slate-200">${f.title || f}</div>
                      </div>
@@ -734,38 +767,29 @@ const App = () => {
                 </div>
               </div>
             </div>
-          `
-      });
-    }
+          `;
 
-    if (id === 'financials') {
-      const companies = data?.financials?.companies || {};
-      const peers = Object.entries(companies).slice(0, 5);
-      setModal({
-        isOpen: true,
-        title: 'LTM Competitive Benchmark',
-        children: html`
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+      case 'financials':
+        const companies = data?.financials?.companies || {};
+        const peers = Object.entries(companies).slice(0, 5);
+        return html`
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-obsidian-border">
+              <table className="w-full text-left border-collapse bg-white dark:bg-obsidian-card">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-obsidian-border">
-                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Company</th>
-                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Market Cap</th>
-                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Price</th>
-                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">P/E Ratio</th>
-                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">YTD</th>
+                  <tr className="border-b border-slate-200 dark:border-obsidian-border bg-slate-50 dark:bg-obsidian">
+                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Company</th>
+                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Market Cap</th>
+                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">P/E Ratio</th>
+                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">YTD</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-obsidian-border">
                   ${peers.map(([name, stats]) => html`
                     <tr className="hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-colors">
-                      <td className="py-4 px-4">
-                        <div className="font-black text-xs dark:text-white">${name}</div>
-                      </td>
-                      <td className="py-4 px-4 text-[11px] font-bold dark:text-slate-300">${stats.market_cap}</td>
-                      <td className="py-4 px-4 text-[11px] font-bold dark:text-slate-300 tracking-tighter">${stats.current_price}</td>
-                      <td className="py-4 px-4 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.pe_ratio}</td>
-                      <td className=${`py-4 px-4 text-[11px] font-black text-right ${parseFloat(stats.ytd_return) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <td className="py-4 px-6 font-black text-xs dark:text-white">${name}</td>
+                      <td className="py-4 px-6 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.market_cap}</td>
+                      <td className="py-4 px-6 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.pe_ratio}</td>
+                      <td className=${`py-4 px-6 text-[11px] font-black text-right ${parseFloat(stats.ytd_return) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         ${stats.ytd_return}
                       </td>
                     </tr>
@@ -773,50 +797,48 @@ const App = () => {
                 </tbody>
               </table>
             </div>
-          `
-      });
-    }
+          `;
 
-    if (id === 'outlook') {
-      setModal({
-        isOpen: true,
-        title: 'Strategic Market Outlook',
-        children: html`
+      case 'outlook':
+        return html`
             <div className="space-y-6">
               <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
                 <h4 className="text-emerald-700 dark:text-emerald-400 font-black uppercase text-xs mb-3">Executive Summary</h4>
-                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">${data?.outlook?.executive_summary}</p>
+                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium capitalize-first">
+                    ${data?.outlook?.executive_summary || 'Synchronizing outlook details...'}
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                 <div className="p-4 rounded-xl bg-slate-100 dark:bg-obsidian-border/40 border border-slate-200 dark:border-obsidian-border">
-                    <h5 className="text-gold font-black uppercase text-[10px] mb-2 tracking-widest">Growth Catalysts</h5>
-                    <ul className="text-xs space-y-2 text-slate-600 dark:text-slate-400 font-bold">
-                       ${(data?.outlook?.catalysts || ['Infra Demand', 'Capacity Expansion', 'Green Energy Shift']).map(c => html`<li>• ${c}</li>`)}
+                 <div className="p-5 rounded-xl bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border shadow-sm">
+                    <h5 className="text-gold font-black uppercase text-[10px] mb-3 tracking-widest">Growth Catalysts</h5>
+                    <ul className="text-xs space-y-2.5 text-slate-600 dark:text-slate-400 font-bold">
+                       ${(data?.outlook?.catalysts || ['Infra-CapEx Cycle', 'Rural Modernization', 'Energy Transition']).map(c => html`
+                         <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-gold"></div> ${c}</li>
+                       `)}
                     </ul>
                  </div>
-                 <div className="p-4 rounded-xl bg-slate-100 dark:bg-obsidian-border/40 border border-slate-200 dark:border-obsidian-border">
-                    <h5 className="text-rose-500 font-black uppercase text-[10px] mb-2 tracking-widest">Macro Risks</h5>
-                    <ul className="text-xs space-y-2 text-slate-600 dark:text-slate-400 font-bold">
-                       ${(data?.outlook?.risks || ['Fuel Volatility', 'Cyclical Pricing', 'Logistics Inflation']).map(r => html`<li>• ${r}</li>`)}
+                 <div className="p-5 rounded-xl bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border shadow-sm">
+                    <h5 className="text-rose-500 font-black uppercase text-[10px] mb-3 tracking-widest">Strategic Risks</h5>
+                    <ul className="text-xs space-y-2.5 text-slate-600 dark:text-slate-400 font-bold">
+                       ${(data?.outlook?.risks || ['Fuel Volatility', 'Cyclical Demand', 'Price Sensitivity']).map(r => html`
+                         <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-rose-500"></div> ${r}</li>
+                       `)}
                     </ul>
                  </div>
               </div>
             </div>
-          `
-      });
-    }
-  };
+          `;
 
-  const showExpandedChart = (id, title, chartData) => {
-    setModal({
-      isOpen: true,
-      title: title,
-      children: html`
-          <div className="h-[500px] w-full relative">
-            <${ChartCard} title=${title} subtitle="Expanded Intelligence Analysis" data=${chartData} loading=${false} />
-          </div>
-        `
-    });
+      case 'chart':
+        return html`
+            <div className="h-[500px] w-full relative">
+              <${ChartCard} title=${modal.title} subtitle="Deep Intelligence Spectrum" data=${modal.extra} loading=${false} />
+            </div>
+          `;
+
+      default:
+        return null;
+    }
   };
 
   return html`
@@ -831,7 +853,7 @@ const App = () => {
       <${CommandK} isOpen=${isSearchOpen} onClose=${() => setIsSearchOpen(false)} onAction=${handleSearchAction} />
 
       <${Modal} isOpen=${modal.isOpen} onClose=${() => setModal({ ...modal, isOpen: false })} title=${modal.title}>
-        ${modal.children}
+        ${renderModalContent()}
       <//>
 
       <button onClick=${() => setIsAIOpen(!isAIOpen)} className=${`fixed right-6 bottom-16 z-50 p-5 rounded-2xl bg-gold text-obsidian shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 ${isAIOpen ? 'translate-x-[500px]' : 'translate-x-0'}`}>
