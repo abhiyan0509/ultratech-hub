@@ -55,7 +55,7 @@
     }
     </script>
 
-    <style>
+    <style type="text/tailwindcss">
         @layer base {
             html {
                 scroll-behavior: smooth;
@@ -94,15 +94,6 @@
 
         .dark .bg-obsidian-card {
             @apply bg-obsidian-card border-obsidian-border shadow-none;
-        }
-
-        /* Modal System */
-        .modal-overlay {
-            @apply fixed inset-0 z-[200] flex items-center justify-center p-4 bg-obsidian/60 backdrop-blur-sm animate-in fade-in duration-300;
-        }
-
-        .modal-content {
-            @apply w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden animate-in zoom-in-95 fade-in duration-300;
         }
 
         @keyframes shimmer {

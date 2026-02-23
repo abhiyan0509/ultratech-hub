@@ -50,15 +50,15 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return html`
-    <div className="modal-overlay" onClick=${onClose}>
-      <div className="modal-content" onClick=${e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-obsidian/60 backdrop-blur-sm animate-in fade-in duration-300" onClick=${onClose}>
+      <div className="w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 shadow-2xl" onClick=${e => e.stopPropagation()}>
         <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between bg-white dark:bg-obsidian-card">
-          <h3 className="text-xl font-bold dark:text-white">${title}</h3>
+          <h3 className="text-xl font-bold dark:text-white capitalize-first">${title}</h3>
           <button onClick=${onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-obsidian-hover rounded-xl transition-colors">
             <${Icon} name=${X} className="w-6 h-6 text-slate-500" />
           </button>
         </div>
-        <div className="p-8 max-h-[80vh] overflow-y-auto bg-slate-50/50 dark:bg-obsidian">
+        <div className="p-8 max-h-[85vh] overflow-y-auto custom-scrollbar bg-slate-50/50 dark:bg-obsidian/40">
           ${children}
         </div>
       </div>
@@ -743,7 +743,8 @@ const App = () => {
         case 'overview': {
           const company = data?.financials?.companies?.['UltraTech Cement'] || {};
           const focus = Array.isArray(data?.company_info?.strategic_focus) ? data.company_info.strategic_focus :
-            Array.isArray(data?.company_info?.strategic_pillars) ? data.company_info.strategic_pillars : [];
+            Array.isArray(data?.company_info?.strategic_pillars) ? data.company_info.strategic_pillars :
+              Array.isArray(data?.company_info?.competitive_advantages) ? data.company_info.competitive_advantages : [];
 
           return html`
               <div className="space-y-8">
