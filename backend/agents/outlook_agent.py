@@ -76,7 +76,7 @@ def generate_outlook_with_gemini(context, api_key):
     import google.generativeai as genai
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-flash-latest")
 
     prompt = f"""You are a senior equity research analyst covering UltraTech Cement and the Indian cement sector.
 

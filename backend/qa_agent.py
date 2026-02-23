@@ -181,7 +181,7 @@ async def ask_question(req: QuestionRequest):
 
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-flash-latest")
 
         context = build_qa_context()
         prompt = f"""You are an expert analyst preparing someone for an interview at UltraTech Cement.
