@@ -50,15 +50,23 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return html`
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-obsidian/60 backdrop-blur-sm animate-in fade-in duration-300" onClick=${onClose}>
-      <div className="w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 shadow-2xl" onClick=${e => e.stopPropagation()}>
+    <div 
+      className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300" 
+      style=${{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', zIndex: 300 }}
+      onClick=${onClose}
+    >
+      <div 
+        className="w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 scale-100" 
+        style=${{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+        onClick=${e => e.stopPropagation()}
+      >
         <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between bg-white dark:bg-obsidian-card">
           <h3 className="text-xl font-bold dark:text-white capitalize-first">${title}</h3>
           <button onClick=${onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-obsidian-hover rounded-xl transition-colors">
             <${Icon} name=${X} className="w-6 h-6 text-slate-500" />
           </button>
         </div>
-        <div className="p-8 max-h-[85vh] overflow-y-auto custom-scrollbar bg-slate-50/50 dark:bg-obsidian/40">
+        <div className="p-8 overflow-y-auto custom-scrollbar bg-slate-50/50 dark:bg-obsidian/40 flex-1">
           ${children}
         </div>
       </div>
