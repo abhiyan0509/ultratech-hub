@@ -143,17 +143,34 @@ class QuestionRequest(BaseModel):
 
 
 def build_qa_context():
-    """Build the context string from all data files"""
+    """Build a condensed, token-efficient context from research data"""
     parts = []
+    # Prioritize critical files
+    priority = ['outlook', 'macro', 'company_info', 'financials', 'ma_deals']
+    
+    for ds in priority:
+        f = os.path.join(DATA_DIR, f"{ds}.json")
+        if os.path.exists(f):
+            try:
+                with open(f, "r", encoding="utf-8") as fh:
+                    data = json.load(fh)
+                # Condense JSON: removing whitespace significantly reduces tokens
+                condensed = json.dumps(data, separators=(',', ':'))
+                parts.append(f"[{ds.upper()}]: {condensed[:3000]}")
+            except Exception: pass
+            
+    # Add snippets of others
     for f in sorted(glob.glob(os.path.join(DATA_DIR, "*.json"))):
         name = os.path.splitext(os.path.basename(f))[0]
-        try:
-            with open(f, "r", encoding="utf-8") as fh:
-                data = json.load(fh)
-            parts.append(f"=== {name.upper()} ===\n{json.dumps(data, indent=1, default=str)[:4000]}")
-        except Exception:
-            pass
-    return "\n\n".join(parts)
+        if name not in priority:
+            try:
+                with open(f, "r", encoding="utf-8") as fh:
+                    data = json.load(fh)
+                condensed = json.dumps(data, separators=(',', ':'))
+                parts.append(f"[{name.upper()}]: {condensed[:1000]}")
+            except Exception: pass
+            
+    return "\n".join(parts)
 
 
 @app.post("/api/ask")
@@ -164,7 +181,7 @@ async def ask_question(req: QuestionRequest):
 
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        model = genai.GenerativeModel("gemini-1.5-flash")
 
         context = build_qa_context()
         prompt = f"""You are an expert analyst preparing someone for an interview at UltraTech Cement.

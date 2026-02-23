@@ -692,11 +692,18 @@ async function sendMessage() {
         const data = await resp.json();
         removeEl(loadingId);
 
-        if (resp.ok) addChatMessage('bot', formatMarkdown(data.answer));
-        else addChatMessage('bot', `Error: ${data.detail || 'Unknown error'}`);
+        if (resp.ok) {
+            addChatMessage('bot', formatMarkdown(data.answer));
+        } else {
+            let msg = data.detail || 'Unknown error';
+            if (msg.includes('quota') || msg.includes('429')) {
+                msg = "⚠️ **Rate Limit Hit**: The AI is cooling down. Please wait about 30-60 seconds and try again. *Free-tier API limits apply.*";
+            }
+            addChatMessage('bot', msg);
+        }
     } catch (error) {
         removeEl(loadingId);
-        addChatMessage('bot', 'Could not reach the server. Make sure the backend is running.');
+        addChatMessage('bot', '⚠️ **Connection Error**: Could not reach the research server. Please check your internet or try again later.');
     }
     document.getElementById('sendBtn').disabled = false;
 }
