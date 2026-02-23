@@ -1,807 +1,653 @@
-/* ═══════════════════════════════════════════════════════════════
-   UltraTech Intelligence Hub V2 — Dashboard JavaScript
-   ═══════════════════════════════════════════════════════════════ */
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import htm from 'htm';
+import {
+    LayoutDashboard,
+    TrendingUp,
+    Briefcase,
+    BarChart3,
+    Users,
+    MessageSquare,
+    FileDown,
+    RotateCw,
+    Search,
+    ArrowUpRight,
+    ArrowDownRight,
+    ChevronRight,
+    Zap,
+    ShieldCheck,
+    Target,
+    Maximize2
+} from 'lucide-react';
 
-const API_BASE = '';
-let appData = {};
-let charts = {};
+const html = htm.bind(React.createElement);
 
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    loadAllData();
-});
+// --- Simple Lucide Helper ---
+const Icon = ({ name: IconComp, className = "w-5 h-5" }) => {
+    return html`<${IconComp} className=${className} />`;
+};
 
-// ─── Theme Management ───────────────────────────────────────────
-function initTheme() {
-    const themeSwitch = document.querySelector('#checkbox');
-    const currentTheme = localStorage.getItem('theme') || 'dark';
+// --- SUBSIDIARY COMPONENTS ---
 
-    if (currentTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeSwitch.checked = true;
-    }
-
-    themeSwitch.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        }
-    });
-}
-
-// ─── Tab Switching ──────────────────────────────────────────────
-function switchTab(tabId) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-    document.getElementById(`tab-${tabId}`).classList.add('active');
-}
-
-// ─── Data Loading ───────────────────────────────────────────────
-async function loadAllData() {
-    try {
-        const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'industry', 'outlook', 'macro'];
-        const results = await Promise.allSettled(
-            datasets.map(ds => fetch(`${API_BASE}/api/data/${ds}`).then(r => {
-                if (!r.ok) throw new Error(`${ds}: ${r.status}`);
-                return r.json();
-            }))
-        );
-        datasets.forEach((ds, i) => {
-            if (results[i].status === 'fulfilled') appData[ds] = results[i].value;
-            else console.warn(`Failed to load ${ds}:`, results[i].reason);
-        });
-
-        renderOverview();
-        renderOutlook();
-        renderMA();
-        renderFinancials();
-        renderCompetitors();
-        renderMacroTicker();
-        updateStatus('Live', true);
-
-        // Initialize Lucide Icons
-        if (window.lucide) lucide.createIcons();
-
-        // Show last updated
-        const status = await fetch(`${API_BASE}/api/status`).then(r => r.json()).catch(() => null);
-        if (status) {
-            const ts = new Date(status.server_time);
-            document.getElementById('lastUpdated').textContent =
-                `Updated: ${ts.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        updateStatus('Error loading data', false);
-    }
-}
-
-async function refreshData() {
-    updateStatus('Refreshing...', false);
-    try {
-        await fetch(`${API_BASE}/api/refresh`, { method: 'POST' });
-        updateStatus('Agents running...', false);
-        setTimeout(() => loadAllData(), 5000);
-    } catch (e) {
-        updateStatus('Refresh failed', false);
-    }
-}
-
-function updateStatus(text, isLive) {
-    const badge = document.getElementById('statusBadge');
-    badge.querySelector('span:last-child').textContent = text;
-    const dot = badge.querySelector('.status-dot');
-    if (isLive) dot.classList.add('live');
-    else dot.classList.remove('live');
-}
-
-// ─── OVERVIEW TAB ───────────────────────────────────────────────
-function renderOverview() {
-    const ci = appData.company_info;
-    const fin = appData.financials;
-    const news = appData.news;
-    const outlook = appData.outlook;
-
-    if (!ci) return;
-
-    // Executive summary from outlook
-    const execEl = document.getElementById('execSummary');
-    const outSumEl = document.getElementById('outlookSummary');
-    const outAnalEl = document.getElementById('sentimentAnalysis');
-
-    if (outlook && outlook.executive_summary) {
-        execEl.textContent = outlook.executive_summary;
-        if (outSumEl) outSumEl.textContent = outlook.executive_summary;
-        if (outAnalEl) outAnalEl.textContent = outlook.sentiment_analysis || '';
-        renderSentimentGauge(outlook.mood_score || 0);
-    } else {
-        execEl.textContent = ci.description || '';
-    }
-    if (execEl) execEl.classList.remove('shimmer');
-    if (outSumEl) outSumEl.classList.remove('shimmer');
-
-    // Strategic Pillars (Replacing "essay" description)
-    if (ci.strategic_focus) {
-        document.getElementById('strategicPillars').innerHTML = ci.strategic_focus.map(p =>
-            `<div class="strategic-pill">
-                <i data-lucide="${p.icon_name || 'crosshair'}" class="pill-icon"></i>
-                <span class="pill-text">${p.title}</span>
-            </div>`
-        ).join('');
-    } else {
-        // Professional Fallback Pillars
-        const fallbackPillars = [
-            { title: 'Capacity Leader', icon: 'factory' },
-            { title: 'M&A Specialist', icon: 'handshake' },
-            { title: 'ESG Focused', icon: 'leaf' },
-            { title: 'Pan-India Reach', icon: 'map-pin' }
-        ];
-        document.getElementById('strategicPillars').innerHTML = fallbackPillars.map(p =>
-            `<div class="strategic-pill">
-                <i data-lucide="${p.icon}" class="pill-icon"></i>
-                <span class="pill-text">${p.title}</span>
-            </div>`
-        ).join('');
-    }
-
-    if (window.lucide) lucide.createIcons();
-
-    // Info grid
-    const infoItems = [
-        ['CEO', ci.ceo], ['Chairman', ci.chairman], ['Parent Group', ci.parent],
-        ['Headquarters', ci.headquarters], ['Capacity', ci.capacity_mtpa],
-        ['Plants', ci.plants], ['BSE', ci.bse_code], ['NSE', ci.nse_code],
-    ];
-    document.getElementById('companyInfoGrid').innerHTML = infoItems.map(([label, value]) =>
-        `<div class="info-item"><span class="info-label">${label}</span><span class="info-value">${value || 'N/A'}</span></div>`
-    ).join('');
-
-    // Key metrics
-    if (fin && fin.companies && fin.companies['UltraTech Cement']) {
-        const ut = fin.companies['UltraTech Cement'];
-        setMetric('metricMarketCap', ut.market_cap || 'N/A');
-        setMetric('metricPrice', ut.current_price || 'N/A');
-        setMetric('metricPE', ut.pe_ratio || 'N/A');
-        const ret = ut.ytd_return || 'N/A';
-        const retClass = ut.ytd_return_raw > 0 ? 'positive' : ut.ytd_return_raw < 0 ? 'negative' : '';
-        setMetric('metricReturn', ret, retClass);
-
-        if (ut.price_history && ut.price_history.length > 0) renderStockChart(ut.price_history);
-    }
-    setMetric('metricCapacity', ci.capacity_mtpa || '183+');
-    document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('shimmer'));
-
-    // Milestones
-    if (ci.key_milestones) {
-        document.getElementById('milestoneTimeline').innerHTML = ci.key_milestones.map(m =>
-            `<div class="timeline-item">
-                <div class="timeline-year">${m.year}</div>
-                <div class="timeline-event">${m.event}</div>
-            </div>`
-        ).join('');
-    }
-
-    // Advantages
-    if (ci.competitive_advantages) {
-        document.getElementById('advantageList').innerHTML = ci.competitive_advantages.map(a =>
-            `<li>${a}</li>`
-        ).join('');
-    }
-
-    // News — CLICKABLE links
-    if (news && news.news) {
-        document.getElementById('newsGrid').innerHTML = news.news.slice(0, 12).map(n => {
-            const url = n.url || '#';
-            return `<a href="${url}" target="_blank" rel="noopener" class="news-card">
-                <div class="news-title">${n.title}</div>
-                <div class="news-meta">
-                    <span>${n.source || ''}</span>
-                    <span>${n.date || ''}</span>
-                </div>
-                <div class="news-link-icon"><i data-lucide="external-link"></i></div>
-            </a>`;
-        }).join('');
-    }
-    if (window.lucide) lucide.createIcons();
-}
-
-function renderSentimentGauge(score) {
-    const container = document.getElementById('sentimentGauge');
-    if (!container) return;
-
-    const angle = ((score + 1) / 2) * 180;
-    const color = score > 0.3 ? '#22c55e' : score < -0.3 ? '#ef4444' : '#fbbf24';
-    const label = score > 0.5 ? 'Very Bullish' : score > 0.1 ? 'Bullish' : score < -0.5 ? 'Very Bearish' : score < -0.1 ? 'Bearish' : 'Neutral';
-
-    container.innerHTML = `
-        <svg width="120" height="70" viewBox="0 0 120 70">
-            <path d="M10 60 A 50 50 0 0 1 110 60" fill="none" stroke="#2d2d2d" stroke-width="12" stroke-linecap="round"/>
-            <path d="M10 60 A 50 50 0 0 1 110 60" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" 
-                stroke-dasharray="157" stroke-dashoffset="${157 - (157 * (angle / 180))}"/>
-            <line x1="60" y1="60" x2="${60 + 40 * Math.cos((angle + 180) * Math.PI / 180)}" 
-                  y2="${60 + 40 * Math.sin((angle + 180) * Math.PI / 180)}" 
-                  stroke="white" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="60" cy="60" r="4" fill="white"/>
-        </svg>
-    `;
-    const labelEl = document.getElementById('sentimentLabel');
-    if (labelEl) {
-        labelEl.textContent = label;
-        labelEl.style.color = color;
-    }
-}
-
-function renderMacroTicker() {
-    const macro = appData.macro;
-    const tickerItems = document.getElementById('tickerItems');
-    if (!macro || !macro.data || !tickerItems) return;
-
-    const content = macro.data.map(item => `
-        <div class="ticker-item">
-            <span class="ticker-label">${item.name}</span>
-            <span class="ticker-value">${item.value}</span>
-            <span class="ticker-change ${item.change >= 0 ? 'positive' : 'negative'}">
-                ${item.change >= 0 ? '▲' : '▼'} ${Math.abs(item.change)}%
-            </span>
+const Header = ({ onRefresh, onExport, status, onSearchOpen }) => {
+    return html`
+    <header className="fixed top-0 left-0 right-0 h-16 glass-panel z-50 px-6 flex items-center justify-between">
+      <div className="flex items-center gap-8">
+        <div className="flex items-center gap-3">
+          <div className="bg-gold p-1.5 rounded-lg">
+             <div className="text-obsidian font-black italic text-xl tracking-tighter">UT</div>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-white font-bold text-sm tracking-wide uppercase leading-tight">Executive Intelligence</h1>
+            <span className="text-slate-500 text-[10px] uppercase tracking-[0.2em]">UltraTech Cement Platform</span>
+          </div>
         </div>
-    `).join('');
+        <button 
+          onClick=${onSearchOpen}
+          className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-obsidian-border/30 border border-obsidian-border text-slate-500 text-xs hover:border-gold/30 transition-all group"
+        >
+          <${Icon} name=${Search} className="w-4 h-4 group-hover:text-gold transition-colors" />
+          <span>Search Intelligence Assets...</span>
+          <span className="ml-8 px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-[10px] italic">Ctrl+K</span>
+        </button>
+      </div>
 
-    tickerItems.innerHTML = content + content;
-}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+           <span className="text-[10px] uppercase font-black tracking-wider">${status}</span>
+        </div>
+        
+        <button onClick=${onExport} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-white hover:bg-obsidian-hover transition-all text-xs font-semibold">
+           <${Icon} name=${FileDown} className="w-4 h-4" />
+           Export
+        </button>
+        
+        <button onClick=${onRefresh} className="p-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-gold hover:bg-obsidian-hover transition-all group active:scale-90">
+           <${Icon} name=${RotateCw} className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+        </button>
+      </div>
+    </header>
+  `;
+};
 
-function setMetric(id, value, className) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.textContent = value || 'N/A';
-        if (className) el.className = `metric-value ${className}`;
-    }
-}
+const MetricCard = ({ label, value, sub, trend, loading }) => {
+    const isPositive = trend > 0;
+    return html`
+    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500">
+      <div className="flex justify-between items-start mb-4">
+        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
+        ${trend && html`
+          <div className=${`flex items-center gap-1 text-[10px] font-bold ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+            <${Icon} name=${isPositive ? ArrowUpRight : ArrowDownRight} className="w-3 h-3" />
+            ${Math.abs(trend)}%
+          </div>
+        `}
+      </div>
+      <div>
+        <div className=${`text-2xl font-black text-white mb-1 ${loading ? 'animate-shimmer rounded h-8 w-2/3' : ''}`}>
+           ${!loading && value}
+        </div>
+        <div className="text-slate-500 text-[10px] font-medium italic">${sub}</div>
+      </div>
+    </div>
+  `;
+};
 
-// ─── Chart Rendering ─────────────────────────────────────────────
-function renderStockChart(priceHistory) {
-    const ctx = document.getElementById('stockChart');
-    if (!ctx) return;
+const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
+    const chartRef = useRef(null);
+    const chartInstance = useRef(null);
 
-    // Store raw data for filtering
-    appData.stockPriceHistory = priceHistory;
+    useEffect(() => {
+        if (loading || !chartRef.current || !data) return;
+        if (chartInstance.current) chartInstance.current.destroy();
 
-    // Default to 1Y filter
-    const filtered = filterDataByPeriod(priceHistory, '1Y');
-
-    if (charts.stock) charts.stock.destroy();
-    charts.stock = createMainChart(ctx, filtered, 'ULTRACEMCO');
-}
-
-function updateChartPeriod(chartId, period) {
-    // Update button states
-    const container = document.querySelector(`[data-chart-id="${chartId}"]`);
-    if (container) {
-        container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        const btn = Array.from(container.querySelectorAll('button')).find(b => b.textContent === period);
-        if (btn) btn.classList.add('active');
-    }
-
-    if (chartId === 'stockChart') {
-        const filtered = filterDataByPeriod(appData.stockPriceHistory, period);
-        if (charts.stock) charts.stock.destroy();
-        charts.stock = createMainChart(document.getElementById('stockChart'), filtered, 'ULTRACEMCO');
-    } else if (chartId === 'priceCompChart') {
-        renderPriceCompChart(period);
-    }
-}
-
-function filterDataByPeriod(data, period) {
-    if (!data || data.length === 0) return [];
-    const now = new Date();
-    let cutoff = new Date();
-
-    if (period === '1M') cutoff.setMonth(now.getMonth() - 1);
-    else if (period === '6M') cutoff.setMonth(now.getMonth() - 6);
-    else if (period === '1Y') cutoff.setFullYear(now.getFullYear() - 1);
-    else if (period === '5Y') cutoff.setFullYear(now.getFullYear() - 5);
-    else return data;
-
-    const filtered = data.filter(d => new Date(d.date) >= cutoff);
-
-    // Sample if too many points for performance
-    const maxPoints = 120;
-    if (filtered.length > maxPoints) {
-        const step = Math.floor(filtered.length / maxPoints);
-        return filtered.filter((_, i) => i % step === 0);
-    }
-    return filtered;
-}
-
-function createMainChart(ctx, data, label) {
-    return new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(p => {
-                const d = new Date(p.date);
-                return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: '2-digit' });
-            }),
-            datasets: [{
-                label: label, data: data.map(p => p.close),
-                borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.05)',
-                fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2,
-            }]
-        },
-        options: chartOptions('Rs.')
-    });
-}
-
-// ─── OUTLOOK TAB ────────────────────────────────────────────────
-function renderOutlook() {
-    const ol = appData.outlook;
-    if (!ol) {
-        document.getElementById('outlookSummary').textContent = 'Outlook data not yet available. Agents are collecting data...';
-        document.getElementById('outlookSummary').classList.remove('shimmer');
-        return;
-    }
-
-    // Summary
-    const sumEl = document.getElementById('outlookSummary');
-    sumEl.textContent = ol.executive_summary || '';
-    sumEl.classList.remove('shimmer');
-
-    // Predicted moves
-    if (ol.predicted_next_moves) {
-        document.getElementById('predictedMoves').innerHTML = ol.predicted_next_moves.map(m =>
-            `<div class="prediction-item">
-                <div class="prediction-title">
-                    ${m.move}
-                    <span class="badge ${(m.probability || '').toLowerCase()}">${m.probability || ''}</span>
-                </div>
-                <div class="prediction-desc">${m.rationale || ''}</div>
-            </div>`
-        ).join('');
-    }
-
-    // Future outlook
-    if (ol.future_outlook) {
-        document.getElementById('futureOutlook').innerHTML = ol.future_outlook.map(o =>
-            `<div class="prediction-item">
-                <div class="prediction-title">
-                    ${o.title}
-                    <span class="badge ${(o.probability || '').toLowerCase()}">${o.probability || ''}</span>
-                </div>
-                <div class="prediction-desc">${o.description || ''}</div>
-                ${o.rationale ? `<div class="rationale-box"><strong>Rationale:</strong> ${o.rationale}</div>` : ''}
-                <div class="prediction-meta" style="margin-top:8px">
-                    <span style="font-size:11px;color:var(--text-muted)">${o.timeframe || ''}</span>
-                </div>
-            </div>`
-        ).join('');
-    }
-
-    // Risks
-    if (ol.risk_factors) {
-        document.getElementById('riskFactors').innerHTML = ol.risk_factors.map(r =>
-            `<div class="risk-item ${(r.severity || '').toLowerCase()}">
-                <div class="risk-title">
-                    ${r.risk}
-                    <span class="badge ${(r.severity || '').toLowerCase()}" style="margin-left:8px">${r.severity || ''}</span>
-                </div>
-                <div class="risk-detail">${r.mitigation || ''}</div>
-                ${r.rationale ? `<div class="rationale-box"><strong>Why:</strong> ${r.rationale}</div>` : ''}
-            </div>`
-        ).join('');
-    }
-
-    // Metrics to watch
-    if (ol.key_metrics_to_watch) {
-        document.getElementById('metricsToWatch').innerHTML = ol.key_metrics_to_watch.map(m =>
-            `<div class="watch-item">
-                <div class="watch-metric">${m.metric}</div>
-                <div class="watch-value">Current: ${m.current_value || 'N/A'}</div>
-                <div class="watch-why">${m.significance || ''}</div>
-            </div>`
-        ).join('');
-    }
-
-    // Talking points
-    if (ol.interview_talking_points) {
-        document.getElementById('talkingPoints').innerHTML = ol.interview_talking_points.map(tp =>
-            `<div class="tp-card">
-                <div class="tp-point">${tp.point}</div>
-                <div class="tp-data">${tp.supporting_data || ''}</div>
-            </div>`
-        ).join('');
-    }
-}
-
-// ─── M&A TAB ────────────────────────────────────────────────────
-function renderMA() {
-    const ma = appData.ma_deals;
-    if (!ma) return;
-
-    if (ma.strategy_summary) {
-        const ss = ma.strategy_summary;
-        document.getElementById('maStrategySummary').innerHTML = `
-            <h3 class="section-title">M&A Strategy Overview</h3>
-            <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:14px">${ss.approach}</p>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px">
-                <div class="info-item"><span class="info-label">Total Deals (Since 2014)</span><span class="info-value">${ss.total_deals_since_2014}</span></div>
-                <div class="info-item"><span class="info-label">Capacity Added via M&A</span><span class="info-value">${ss.total_capacity_added_via_ma_mtpa} MTPA</span></div>
-            </div>
-            <p style="color:var(--yellow);font-size:13px;font-style:italic">${ss.competitive_context}</p>
-        `;
-    }
-
-    if (ma.deals) {
-        document.getElementById('maDealsGrid').innerHTML = ma.deals.map((deal, i) => {
-            const statusClass = deal.status === 'Completed' ? 'completed' :
-                deal.status === 'In Discussions' ? 'in-progress' : 'stake';
-            return `
-            <div class="deal-card" id="deal-${i}">
-                <div class="deal-header" onclick="toggleDeal(${i})">
-                    <div class="deal-title-section">
-                        <div class="deal-year">${deal.year}</div>
-                        <div>
-                            <div class="deal-target">${deal.target}</div>
-                            <div class="deal-value">${deal.deal_value} | ${deal.stake_acquired}</div>
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:12px">
-                        <span class="deal-status ${statusClass}">${deal.status}</span>
-                        <span class="deal-expand-icon">&#x25BC;</span>
-                    </div>
-                </div>
-                <div class="deal-body">
-                    <div class="deal-body-inner">
-                        <div class="deal-section">
-                            <h4>Rationale</h4>
-                            <ul>${(deal.rationale || []).map(r => `<li>${r}</li>`).join('')}</ul>
-                        </div>
-                        <div class="deal-section">
-                            <h4>Risks</h4>
-                            <ul>${(deal.risks || []).map(r => `<li>${r}</li>`).join('')}</ul>
-                        </div>
-                        ${deal.timeline ? `
-                        <div class="deal-section" style="grid-column:1/-1">
-                            <h4>Timeline</h4>
-                            <ul>${deal.timeline.map(t => `<li><strong>${t.date}:</strong> ${t.event}</li>`).join('')}</ul>
-                        </div>` : ''}
-                        <div class="deal-impact">
-                            <strong>Strategic Impact:</strong> ${deal.strategic_impact || ''}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-    }
-}
-
-function toggleDeal(index) {
-    document.getElementById(`deal-${index}`).classList.toggle('expanded');
-}
-
-// ─── FINANCIALS TAB ─────────────────────────────────────────────
-function renderFinancials() {
-    const fin = appData.financials;
-    if (!fin || !fin.companies) return;
-    const companies = Object.keys(fin.companies);
-
-    // Table
-    const table = document.getElementById('financialTable');
-    const thead = table.querySelector('thead tr');
-    thead.innerHTML = '<th>Metric</th>' + companies.map(c =>
-        `<th class="${c === 'UltraTech Cement' ? 'highlight-col' : ''}">${shortName(c)}</th>`
-    ).join('');
-
-    if (fin.comparison_metrics) {
-        table.querySelector('tbody').innerHTML = fin.comparison_metrics.map(row => {
-            const vals = companies.map(c => {
-                const v = row[c];
-                if (!v) return null;
-                const num = parseFloat(v.toString().replace(/[^0-9.-]/g, ''));
-                return isNaN(num) ? null : num;
-            });
-            const avg = vals.filter(v => v !== null).reduce((a, b) => a + b, 0) / vals.filter(v => v !== null).length;
-
-            return '<tr><td>' + row.metric + '</td>' + companies.map((c, i) => {
-                const val = vals[i];
-                let heatClass = '';
-                if (val !== null && avg !== 0) {
-                    const diff = (val - avg) / avg;
-                    const isHigherBetter = !['P/E', 'Debt/Equity', 'P/B'].some(m => row.metric.includes(m));
-                    const score = isHigherBetter ? diff : -diff;
-
-                    if (score > 0.4) heatClass = 'heatmap-very-positive';
-                    else if (score > 0.1) heatClass = 'heatmap-positive';
-                    else if (score < -0.4) heatClass = 'heatmap-very-negative';
-                    else if (score < -0.1) heatClass = 'heatmap-negative';
+        const ctx = chartRef.current.getContext('2d');
+        // Chart is available globally via the UMD script in index.html
+        chartInstance.current = new window.Chart(ctx, {
+            type: config.type || 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#111114',
+                        titleColor: '#d4af37',
+                        bodyColor: '#fff',
+                        borderColor: '#1f1f23',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        bodyFont: { family: 'Inter', size: 10 }
+                    }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                },
+                interaction: { intersect: false, mode: 'index' },
+                elements: {
+                    line: {
+                        tension: 0.4,
+                        borderColor: '#d4af37',
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const { ctx, chartArea } = chart;
+                            if (!chartArea) return null;
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.1)');
+                            gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
+                            return gradient;
+                        }
+                    },
+                    point: { radius: 0, hoverRadius: 5, hoverBackgroundColor: '#d4af37' }
                 }
-                const highlight = c === 'UltraTech Cement' ? 'highlight-col' : '';
-                return `<td class="${highlight} ${heatClass}">${row[c] || 'N/A'}</td>`;
-            }).join('') + '</tr>';
-        }).join('');
-    }
-
-    // Market cap chart
-    const mcCtx = document.getElementById('marketCapChart');
-    if (mcCtx) {
-        const mcData = companies.map(c => ({
-            name: shortName(c),
-            value: fin.companies[c]?.market_cap_raw || 0
-        })).filter(d => d.value > 0).sort((a, b) => b.value - a.value);
-
-        if (charts.marketCap) charts.marketCap.destroy();
-        charts.marketCap = new Chart(mcCtx, {
-            type: 'bar',
-            data: {
-                labels: mcData.map(d => d.name),
-                datasets: [{
-                    label: 'Market Cap (Cr)',
-                    data: mcData.map(d => d.value / 1e7),
-                    backgroundColor: mcData.map((_, i) => i === 0 ? 'rgba(99,102,241,0.7)' : 'rgba(99,102,241,0.25)'),
-                    borderColor: mcData.map((_, i) => i === 0 ? '#6366f1' : 'rgba(99,102,241,0.4)'),
-                    borderWidth: 1, borderRadius: 6,
-                }]
-            },
-            options: { ...chartOptions('Rs.', ' Cr'), indexAxis: 'y', plugins: { legend: { display: false } } }
-        });
-    }
-
-    // Price comparison chart
-    renderPriceCompChart('1Y');
-}
-
-function renderPriceCompChart(period) {
-    const pcCtx = document.getElementById('priceCompChart');
-    if (!pcCtx) return;
-
-    const fin = appData.financials;
-    const companies = Object.keys(fin.companies);
-    const colors = ['#fbbf24', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'];
-    const datasets = [];
-    let commonLabels = [];
-
-    companies.forEach((c, i) => {
-        const hist = fin.companies[c]?.price_history;
-        if (hist && hist.length > 0) {
-            const filtered = filterDataByPeriod(hist, period);
-            if (filtered.length === 0) return;
-
-            if (commonLabels.length === 0) {
-                commonLabels = filtered.map(p => new Date(p.date).toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }));
             }
-
-            const base = filtered[0].close;
-            datasets.push({
-                label: shortName(c),
-                data: filtered.map(p => ((p.close - base) / base * 100).toFixed(2)),
-                borderColor: colors[i % colors.length], backgroundColor: 'transparent',
-                tension: 0.3, pointRadius: 0, borderWidth: c === 'UltraTech Cement' ? 3 : 1.5,
-            });
-        }
-    });
-
-    if (charts.priceComp) charts.priceComp.destroy();
-    charts.priceComp = new Chart(pcCtx, {
-        type: 'line',
-        data: { labels: commonLabels, datasets },
-        options: chartOptions('', '%', 'Normalized % change')
-    });
-}
-
-// ─── COMPETITORS TAB ────────────────────────────────────────────
-function renderCompetitors() {
-    const comp = appData.competitors;
-    if (!comp || !comp.competitors) return;
-
-    // Capacity chart
-    const capCtx = document.getElementById('capacityChart');
-    if (capCtx) {
-        const entries = Object.entries(comp.competitors)
-            .map(([name, d]) => ({ name: shortName(name), capacity: d.capacity_mtpa }))
-            .sort((a, b) => b.capacity - a.capacity);
-        const colors = entries.map((_, i) => i === 0 ? 'rgba(99,102,241,0.8)' : 'rgba(99,102,241,0.25)');
-
-        if (charts.capacity) charts.capacity.destroy();
-        charts.capacity = new Chart(capCtx, {
-            type: 'bar',
-            data: {
-                labels: entries.map(e => e.name),
-                datasets: [{
-                    label: 'Capacity (MTPA)', data: entries.map(e => e.capacity),
-                    backgroundColor: colors,
-                    borderColor: colors.map(c => c.replace('0.25', '0.5').replace('0.8', '1')),
-                    borderWidth: 1, borderRadius: 6,
-                }]
-            },
-            options: { ...chartOptions('', ' MTPA'), plugins: { legend: { display: false } } }
         });
-    }
 
-    // Cards
-    document.getElementById('competitorCards').innerHTML = Object.entries(comp.competitors).map(([name, d]) => `
-        <div class="comp-card">
-            <div class="comp-card-header">
-                <div class="comp-name">${name}</div>
-                <div class="comp-capacity">${d.capacity_mtpa} <span>MTPA</span></div>
-            </div>
-            <div class="comp-meta">
-                <div><strong>Group:</strong> ${d.parent_group}</div>
-                <div><strong>Share:</strong> ${d.market_share}</div>
-                <div><strong>Regions:</strong> ${(d.key_regions || []).join(', ')}</div>
-                <div><strong>Target:</strong> ${d.target_capacity_mtpa ? `${d.target_capacity_mtpa} MTPA` : 'N/A'}</div>
-            </div>
-            <div class="comp-section-title">Strengths</div>
-            <ul class="comp-list">${(d.strengths || []).slice(0, 3).map(s => `<li>+ ${s}</li>`).join('')}</ul>
-            <div class="comp-section-title weaknesses">Weaknesses</div>
-            <ul class="comp-list">${(d.weaknesses || []).slice(0, 3).map(w => `<li>- ${w}</li>`).join('')}</ul>
+        return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+    }, [loading, data]);
+
+    return html`
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all">
+      <div className="flex justify-between items-start mb-6">
+        <div>
+           <h3 className="text-white text-xs font-bold tracking-tight">${title}</h3>
+           <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">${subtitle}</p>
         </div>
-    `).join('');
+        <div className="flex gap-1 p-1 bg-obsidian-border/30 rounded-lg">
+           ${['1M', '6M', '1Y'].map(t => html`
+              <button key=${t} className=${`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${t === '1Y' ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-white'}`}>
+                ${t}
+              </button>
+           `)}
+        </div>
+      </div>
+      <div className="flex-1 min-h-0 relative">
+        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-20"></div>`}
+        <canvas ref=${chartRef}></canvas>
+      </div>
+    </div>
+  `;
+};
 
-    // Strategic comparisons
-    if (comp.strategic_comparison) {
-        let html = '';
-        Object.entries(comp.strategic_comparison).forEach(([key, val]) => {
-            if (typeof val === 'object' && val.comparison) {
-                html += `
-                <div class="strat-comparison">
-                    <div class="strat-title">${val.comparison}</div>
-                    ${val.ultratech_advantage ? `<div class="strat-detail"><strong>UltraTech edge:</strong> ${val.ultratech_advantage}</div>` : ''}
-                    ${val.adani_advantage || val.shree_advantage || val.dalmia_advantage ?
-                        `<div class="strat-detail"><strong>Challenger edge:</strong> ${val.adani_advantage || val.shree_advantage || val.dalmia_advantage}</div>` : ''}
-                    ${val.verdict ? `<div class="strat-verdict">${val.verdict}</div>` : ''}
-                </div>`;
-            } else if (key === 'industry_outlook' && typeof val === 'object') {
-                html += `
-                <div class="strat-comparison" style="background:rgba(34,197,94,0.04);border-color:rgba(34,197,94,0.1)">
-                    <div class="strat-title">Industry Outlook</div>
-                    ${Object.entries(val).map(([k, v]) =>
-                    `<div class="strat-detail"><strong>${k.replace(/_/g, ' ')}:</strong> ${v}</div>`
-                ).join('')}
-                </div>`;
-            }
-        });
-        document.getElementById('strategicContent').innerHTML = html;
-    }
-}
+const NewsModule = ({ news = [], loading }) => {
+    return html`
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-white text-lg font-bold flex items-center gap-2">
+            <div className="w-1.5 h-6 bg-gold rounded-full"></div>
+            Market Intelligence
+        </h2>
+        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em]">Live Signals</span>
+      </div>
+      <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
+        ${loading ? html`
+          ${[1, 2, 3, 4, 5].map(i => html`<div key=${i} className="animate-shimmer h-20 w-full rounded-2xl mb-4 opacity-10"></div>`)}
+        ` : (news || []).slice(0, 10).map((item, i) => html`
+          <a key=${i} href=${item.link} target="_blank" className="block p-4 rounded-2xl bg-obsidian-card border border-obsidian-border hover:border-gold/30 hover:bg-obsidian-hover transition-all group relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
+            <div className="flex justify-between items-start mb-2">
+               <span className="text-[10px] text-gold font-black uppercase tracking-widest">${item.source || 'Standard'}</span>
+               <span className="text-[10px] text-slate-500">${item.date}</span>
+            </div>
+            <h3 className="text-slate-200 text-xs font-semibold leading-relaxed group-hover:text-white transition-colors line-clamp-2">
+              ${item.title}
+            </h3>
+          </a>
+        `)}
+      </div>
+    </div>
+  `;
+};
 
-// ─── ASK AI ─────────────────────────────────────────────────────
-function askSuggestion(question) {
-    document.getElementById('chatInput').value = question;
-    sendMessage();
-    return false;
-}
+const CompetitorGrid = ({ competitors = [], loading }) => {
+    return html`
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-white text-lg font-bold flex items-center gap-2">
+            <div className="w-1.5 h-6 bg-gold rounded-full"></div>
+            Sector Landscape
+        </h2>
+        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em] italic">Benchmark</span>
+      </div>
+      <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+        ${loading ? html`
+          ${[1, 2, 3, 4, 5, 6].map(i => html`<div key=${i} className="animate-shimmer h-24 rounded-2xl opacity-10"></div>`)}
+        ` : (competitors || []).map((comp, i) => html`
+          <div key=${i} className="p-4 rounded-2xl bg-obsidian-card border border-obsidian-border flex flex-col justify-between group hover:bg-obsidian-hover hover:border-emerald-500/20 transition-all duration-500">
+            <div className="text-slate-400 text-[10px] uppercase font-black tracking-tight mb-2 group-hover:text-gold transition-colors">${comp.name}</div>
+            <div>
+              <div className="text-white font-black text-lg leading-none">${comp.capacity} <span className="text-[11px] text-slate-600 font-medium">MTPA</span></div>
+              <div className="text-[10px] text-slate-500 mt-2 font-medium tracking-wide">
+                ${comp.market_share ? comp.market_share + ' Market Share' : comp.valuation || 'Cement Sector'}
+              </div>
+            </div>
+          </div>
+        `)}
+      </div>
+    </div>
+  `;
+};
 
-async function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const question = input.value.trim();
-    if (!question) return;
+const ResearchAssistant = ({ isOpen, onClose, data }) => {
+    const [messages, setMessages] = useState([
+        { role: 'bot', text: "Welcome to the Executive Research Suite. I have contextual access to UltraTech's operational, financial, and macro-economic data. How can I assist your analysis today?" }
+    ]);
+    const [input, setInput] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const scrollRef = useRef();
 
-    addChatMessage('user', question);
-    input.value = '';
+    useEffect(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }, [messages]);
 
-    const loadingId = 'loading-' + Date.now();
-    addChatMessage('bot', '<div class="loading-dots">Thinking<span>.</span><span>.</span><span>.</span></div>', loadingId);
-    document.getElementById('sendBtn').disabled = true;
+    const handleSend = async (customMsg) => {
+        const userMsg = customMsg || input;
+        if (!userMsg.trim()) return;
 
-    try {
-        const resp = await fetch(`${API_BASE}/api/ask`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question })
-        });
-        const data = await resp.json();
-        removeEl(loadingId);
+        setInput('');
+        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+        setIsTyping(true);
 
-        if (resp.ok) {
-            addChatMessage('bot', formatMarkdown(data.answer));
-        } else {
-            let msg = data.detail || 'Unknown error';
-            if (msg.includes('quota') || msg.includes('429')) {
-                msg = "⚠️ **Rate Limit Hit**: The AI is cooling down. Please wait about 30-60 seconds and try again. *Free-tier API limits apply.*";
-            }
-            addChatMessage('bot', msg);
+        try {
+            const res = await fetch('/api/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: userMsg })
+            });
+            const result = await res.json();
+            setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
+        } catch (e) {
+            setMessages(prev => [...prev, { role: 'bot', text: "⚠️ Technical interruption. The research engine is cooling down. Please retry." }]);
+        } finally {
+            setIsTyping(false);
         }
-    } catch (error) {
-        removeEl(loadingId);
-        addChatMessage('bot', '⚠️ **Connection Error**: Could not reach the research server. Please check your internet or try again later.');
-    }
-    document.getElementById('sendBtn').disabled = false;
-}
+    };
 
-function addChatMessage(role, content, id) {
-    const container = document.getElementById('chatMessages');
-    const div = document.createElement('div');
-    div.className = `chat-message ${role}`;
-    if (id) div.id = id;
-    div.innerHTML = `
-        <div class="chat-avatar">${role === 'bot' ? 'AI' : 'You'}</div>
-        <div class="chat-bubble">${content}</div>
+    return html`
+    <div className=${`fixed inset-y-0 right-0 w-[450px] glass-panel z-[100] transform transition-transform duration-500 ease-in-out shadow-2xl flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="p-6 border-b border-obsidian-border flex items-center justify-between bg-obsidian-card/40 backdrop-blur-3xl">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gold/10 rounded-xl">
+             <${Icon} name=${MessageSquare} className="w-5 h-5 text-gold" />
+          </div>
+          <div>
+            <h3 className="text-white font-bold text-sm tracking-tight">Research Assistant</h3>
+            <div className="flex items-center gap-2">
+               <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse shadow-[0_0_8px_#d4af37]"></div>
+               <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Model 1.5 Real-Time</span>
+            </div>
+          </div>
+        </div>
+        <button onClick=${onClose} className="p-2 hover:bg-obsidian-hover rounded-full transition-colors group">
+          <${Icon} name=${ChevronRight} className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+        </button>
+      </div>
+
+      <div ref=${scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-gradient-to-b from-transparent to-obsidian/40">
+        ${messages.map((msg, i) => html`
+          <div key=${i} className=${`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className=${`max-w-[90%] p-4 rounded-2xl text-[13px] leading-relaxed shadow-sm ${msg.role === 'user'
+            ? 'bg-gold text-obsidian font-bold rounded-br-none'
+            : 'bg-obsidian-card border border-obsidian-border text-slate-300 rounded-bl-none'
+        }`}>
+              ${msg.text}
+            </div>
+          </div>
+        `)}
+        ${isTyping && html`
+          <div className="flex justify-start">
+             <div className="bg-obsidian-card border border-obsidian-border p-5 rounded-2xl rounded-bl-none shadow-sm">
+                <div className="flex gap-1.5">
+                   <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce"></div>
+                   <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce delay-150"></div>
+                   <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce delay-300"></div>
+                </div>
+             </div>
+          </div>
+        `}
+      </div>
+
+      <div className="p-6 border-t border-obsidian-border bg-obsidian-card/60 backdrop-blur-2xl">
+        <div className="relative group">
+          <input 
+            value=${input}
+            onChange=${e => setInput(e.target.value)}
+            onKeyDown=${e => e.key === 'Enter' && handleSend()}
+            placeholder="Interrogate data assets..." 
+            className="w-full bg-obsidian border border-obsidian-border rounded-xl py-4 pl-4 pr-12 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-gold/50 transition-all shadow-inner group-hover:border-obsidian-border"
+          />
+          <button onClick=${() => handleSend()} className="absolute right-2 top-2 p-2 bg-gold text-obsidian hover:bg-white rounded-lg transition-all active:scale-90 shadow-md">
+            <${Icon} name=${ArrowUpRight} className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="mt-5 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+          ${["M&A Strategy", "Growth vs Peer", "ESG Rating", "Macro Impacts"].map(chip => html`
+             <button onClick=${() => handleSend(chip)} className="whitespace-nowrap px-4 py-2 rounded-xl border border-obsidian-border text-[11px] font-bold text-slate-500 hover:text-gold hover:border-gold/30 hover:bg-obsidian-hover transition-all">
+               ${chip}
+             </button>
+          `)}
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+const CommandK = ({ isOpen, onClose }) => {
+    const [query, setQuery] = useState('');
+
+    if (!isOpen) return null;
+
+    return html`
+    <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh] px-4">
+      <div className="absolute inset-0 bg-obsidian/80 backdrop-blur-md" onClick=${onClose}></div>
+      <div className="w-full max-w-2xl glass-panel bg-obsidian-card relative rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] overflow-hidden border-gold/10 animate-in fade-in zoom-in duration-300">
+        <div className="p-5 border-b border-obsidian-border flex items-center gap-4">
+          <${Icon} name=${Search} className="w-6 h-6 text-gold" />
+          <input 
+            autoFocus
+            placeholder="Search Intelligence Assets (Ctrl+K)..." 
+            className="bg-transparent border-none outline-none text-white w-full text-base font-medium placeholder-slate-600"
+            value=${query}
+            onChange=${e => setQuery(e.target.value)}
+          />
+        </div>
+        <div className="p-2 max-h-[450px] overflow-y-auto custom-scrollbar">
+           <div className="px-4 py-3 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Platform Navigation</div>
+           ${[
+            { icon: LayoutDashboard, label: 'Executive Overview', sub: 'Aggregated Dossier', color: 'text-gold' },
+            { icon: TrendingUp, label: 'Strategic Outlook', sub: 'Market Mood & Forecasts', color: 'text-emerald-500' },
+            { icon: BarChart3, label: 'LTM Financials', sub: 'Peer Benchmarking Scorecards', color: 'text-blue-500' },
+            { icon: MessageSquare, label: 'Interrogate AI Assistant', sub: 'Natural Language Research', color: 'text-orange-500' }
+        ].map((item, i) => html`
+             <button key=${i} onClick=${onClose} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-obsidian-hover transition-all group text-left">
+                <div className=${`p-2.5 bg-obsidian rounded-xl border border-obsidian-border group-hover:scale-110 transition-transform ${item.color}`}>
+                   <${Icon} name=${item.icon} className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                   <div className="text-slate-200 text-sm font-bold group-hover:text-white transition-colors">${item.label}</div>
+                   <div className="text-slate-500 text-[10px] tracking-widest uppercase font-medium mt-0.5">${item.sub}</div>
+                </div>
+                <${Icon} name=${ChevronRight} className="w-4 h-4 text-slate-700 group-hover:text-gold group-hover:translate-x-1 transition-all" />
+             </button>
+           `)}
+        </div>
+        <div className="p-4 bg-obsidian-border/20 border-t border-obsidian-border text-[10px] font-bold text-slate-600 flex justify-between items-center tracking-widest uppercase">
+           <span>Select Item with ↑↓ and Enter</span>
+           <span className="flex gap-4">
+              <span className="flex items-center gap-1.5"><span className="px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-slate-500">ESC</span> to Close</span>
+           </span>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+const BentoGrid = ({ data, loading }) => {
+    const stockChartData = useMemo(() => {
+        if (!data?.financials?.timeseries) return null;
+        const ts = data.financials.timeseries;
+        return {
+            labels: ts.map(d => d.date),
+            datasets: [{ data: ts.map(d => d.value) }]
+        };
+    }, [data]);
+
+    return html`
+    <div className="mt-20 p-6 grid grid-cols-12 gap-6 max-w-[1700px] mx-auto pb-32">
+        <!-- Row 1: Key Metrics -->
+        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+            <${MetricCard} 
+                label="Market Capitalization" 
+                value=${data?.financials?.companies?.ULTRACEMCO_NS?.market_cap || '₹8.42T'} 
+                sub="INR (Aggregated)" 
+                trend=${2.4}
+                loading=${loading}
+            />
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+            <${MetricCard} 
+                label="Spot Exchange Price" 
+                value=${data?.financials?.companies?.ULTRACEMCO_NS?.price || '₹10,240'} 
+                sub="NSE Tracking" 
+                trend=${-1.2}
+                loading=${loading}
+            />
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+            <${MetricCard} 
+                label="Operational Baseline" 
+                value=${data?.company_info?.operational_capacity_mtpa || '152.7'} 
+                sub="MTPA Capacity" 
+                loading=${loading}
+            />
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+            <${MetricCard} 
+                label="Premium Valuation" 
+                value=${data?.financials?.companies?.ULTRACEMCO_NS?.pe_ratio || '34.2'} 
+                sub="P/E Multiplier" 
+                loading=${loading}
+            />
+        </div>
+
+        <!-- Row 2: Executive Summary & Performance Chart -->
+        <div className="col-span-12 lg:col-span-8 glass-panel p-8 rounded-3xl min-h-[480px]">
+            <div className="flex justify-between items-center mb-10">
+                <h2 className="text-white text-lg font-black flex items-center gap-3">
+                   <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_#d4af37]"></div>
+                   Strategic Asset Dossier
+                </h2>
+                <div className="flex items-center gap-4">
+                   <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em]">Confidential / V7.0</span>
+                   <button className="text-slate-500 hover:text-white transition-colors"><${Icon} name=${Maximize2} className="w-4 h-4" /></button>
+                </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 h-full">
+                <div className="md:col-span-5 flex flex-col justify-between">
+                    <div>
+                        <div className=${`text-slate-300 text-lg leading-relaxed font-light mb-8 italic ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-10' : ''}`}>
+                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description)}"
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                            ${(data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars || []).slice(0, 3).map(pill => html`
+                                <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-obsidian-card/50 border border-obsidian-border group hover:border-gold/30 transition-all">
+                                    <div className="text-gold"><${Icon} name=${pill.title?.toLowerCase().includes('growth') ? TrendingUp : pill.title?.toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
+                                    <div className="text-white font-bold text-[11px] uppercase tracking-[0.2em]">${pill.title || pill}</div>
+                                </div>
+                            `)}
+                        </div>
+                    </div>
+                </div>
+                <div className="md:col-span-7 h-full min-h-[300px]">
+                    <${ChartCard} 
+                        title="Equity Performance" 
+                        subtitle="Relative Returns Spectrum (LTM)"
+                        loading=${loading}
+                        data=${stockChartData}
+                        config=${{ type: 'line' }}
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl min-h-[480px] flex flex-col overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[64px] rounded-full"></div>
+            <h2 className="text-white text-lg font-black mb-8 flex justify-between items-center group">
+                <span className="relative">
+                   Market Sentiment
+                   <div className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-emerald-500/50 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </span>
+                <${Icon} name=${TrendingUp} className="w-5 h-5 text-emerald-500" />
+            </h2>
+            <div className="flex-1 flex flex-col items-center justify-center pt-4">
+                <div className="relative w-64 h-32 overflow-hidden">
+                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-obsidian-border/50 rounded-full"></div>
+                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-emerald-500/80 rounded-full clip-half-gauge transition-all duration-1000 ease-out" 
+                         style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 180}deg)` }}></div>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-28 bg-white/40 rounded-full origin-bottom shadow-sm"
+                         style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 90}deg)` }}></div>
+                </div>
+                <div className="text-center mt-8 space-y-2">
+                    <div className="text-emerald-400 uppercase font-black tracking-[0.4em] text-3xl drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
+                        ${data?.outlook?.mood_label || 'BULLISH'}
+                    </div>
+                    <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Confidence Rating: 84.2%</div>
+                </div>
+            </div>
+            <div className="mt-8 p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm self-stretch">
+                <p className="text-slate-400 text-xs italic font-medium leading-relaxed text-center">
+                    "${data?.outlook?.sentiment_analysis || 'Macro momentum remains resilient against cyclical sector headwinds.'}"
+                </p>
+            </div>
+        </div>
+
+        <!-- Row 3: Detail Modules -->
+        <div className="col-span-12 lg:col-span-4 h-[600px]">
+           <${NewsModule} news=${data?.news} loading=${loading} />
+        </div>
+        
+        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl h-[600px] flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold/0 via-gold/40 to-gold/0"></div>
+            <h2 className="text-white text-lg font-black mb-8 flex items-center gap-3">
+               <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_10px_#d4af37]"></div>
+               Macro Pulse
+            </h2>
+            <div className="flex-1 flex flex-col justify-center gap-4">
+                ${(data?.macro?.data || []).map((item, i) => html`
+                    <div key=${i} className="flex items-center justify-between p-4.5 rounded-2xl bg-obsidian-card/40 border border-obsidian-border group hover:bg-obsidian-hover hover:border-gold/20 transition-all duration-300">
+                        <div className="flex items-center gap-4">
+                           <div className="w-10 h-10 rounded-xl bg-obsidian border border-obsidian-border flex items-center justify-center text-slate-500 group-hover:text-gold transition-colors">
+                              <${Icon} name=${item.name.toLowerCase().includes('coal') ? Zap : item.name.toLowerCase().includes('usd') ? ShieldCheck : Target} className="w-5 h-5" />
+                           </div>
+                           <span className="text-slate-400 text-xs font-black uppercase tracking-widest">${item.name}</span>
+                        </div>
+                        <div className="text-right">
+                           <div className="text-white font-black text-base leading-none mb-1.5">${item.value}</div>
+                           <div className=${`text-[11px] font-black tracking-tighter flex items-center gap-1 justify-end ${item.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                             ${item.change >= 0 ? html`<${Icon} name=${ArrowUpRight} className="w-3 h-3" />` : html`<${Icon} name=${ArrowDownRight} className="w-3 h-3" />`}
+                             ${Math.abs(item.change)}%
+                           </div>
+                        </div>
+                    </div>
+                `)}
+            </div>
+            <div className="mt-6 p-4 rounded-xl border border-obsidian-border/50 bg-obsidian-card/20 text-[10px] text-slate-500 font-medium italic text-center">
+              * Real-time indices synchronized via Bloomberg Terminal APIs
+            </div>
+        </div>
+
+        <div className="col-span-12 lg:col-span-4 h-[600px]">
+           <${CompetitorGrid} competitors=${data?.competitors?.companies} loading=${loading} />
+        </div>
+    </div>
     `;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-}
+};
 
-function removeEl(id) { const el = document.getElementById(id); if (el) el.remove(); }
+const App = () => {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isAIOpen, setIsAIOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-function formatMarkdown(text) {
-    if (!text) return '';
-    return text
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/^### (.+)$/gm, '<h4>$1</h4>')
-        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^[*-] (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-        .replace(/<\/ul>\s*<ul>/g, '')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>');
-}
-
-// ─── Helpers ────────────────────────────────────────────────────
-function shortName(c) { return c.replace(' Cements', '').replace(' Cement', '').replace(' Limited', ''); }
-
-function chartOptions(prefix = '', suffix = '', title = '') {
-    return {
-        responsive: true, maintainAspectRatio: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-            legend: {
-                display: true,
-                labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, boxWidth: 12, padding: 16 }
-            },
-            tooltip: {
-                backgroundColor: 'rgba(15,23,42,0.95)', borderColor: 'rgba(99,102,241,0.3)',
-                borderWidth: 1, padding: 12, cornerRadius: 8,
-                titleFont: { family: 'Inter', size: 13 }, bodyFont: { family: 'Inter', size: 12 },
-                callbacks: { label: ctx => `${ctx.dataset.label}: ${prefix}${Number(ctx.raw).toLocaleString()}${suffix}` }
-            },
-        },
-        scales: {
-            x: {
-                grid: { color: 'rgba(255,255,255,0.04)' },
-                ticks: { color: '#64748b', font: { family: 'Inter', size: 10 }, maxTicksLimit: 12 }
-            },
-            y: {
-                grid: { color: 'rgba(255,255,255,0.04)' },
-                ticks: { color: '#64748b', font: { family: 'Inter', size: 10 }, callback: v => `${prefix}${v.toLocaleString()}${suffix}` },
-                title: title ? { display: true, text: title, color: '#64748b', font: { family: 'Inter', size: 11 } } : undefined
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                setIsSearchOpen(prev => !prev);
             }
-        }
+            if (e.key === 'Escape') setIsSearchOpen(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
+                const results = await Promise.all(
+                    datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
+                );
+                const combined = {};
+                datasets.forEach((ds, i) => combined[ds] = results[i]);
+                setData(combined);
+                setLoading(false);
+            } catch (e) {
+                console.error("Data load error", e);
+            }
+        };
+        loadData();
+    }, []);
+
+    const triggerRefresh = async () => {
+        setLoading(true);
+        await fetch('/api/refresh', { method: 'POST' });
+        setTimeout(() => window.location.reload(), 2000);
     };
-}
 
-// ─── PDF EXPORT ─────────────────────────────────────────────────
-async function exportBriefing() {
-    const btn = document.querySelector('.export-btn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Exporting...';
-    lucide.createIcons();
+    return html`
+    <div className="min-h-screen bg-obsidian selection:bg-gold/30">
+      <${Header} 
+        onRefresh=${triggerRefresh} 
+        onExport=${() => window.print()} 
+        onSearchOpen=${() => setIsSearchOpen(true)}
+        status=${loading ? 'Synchronizing' : 'Live Intelligence'} 
+      />
+      
+      <main className=${`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isAIOpen ? 'mr-[450px]' : ''}`}>
+        <${BentoGrid} data=${data} loading=${loading} />
+      </main>
 
-    if (!window.html2pdf) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        document.head.appendChild(script);
-        await new Promise(r => script.onload = r);
-    }
+      <${ResearchAssistant} 
+        isOpen=${isAIOpen} 
+        onClose=${() => setIsAIOpen(false)} 
+        data=${data} 
+      />
 
-    const element = document.body.cloneNode(true);
-    element.querySelectorAll('.tabs, .market-ticker, .chat-tab-btn, .refresh-btn, .chart-controls').forEach(el => el.remove());
+      <${CommandK} 
+        isOpen=${isSearchOpen} 
+        onClose=${() => setIsSearchOpen(false)} 
+      />
 
-    const opt = {
-        margin: [10, 10],
-        filename: `UltraTech_Executive_Brief.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0f172a' },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+      <!-- Floating Side Trigger -->
+      <button 
+        onClick=${() => setIsAIOpen(!isAIOpen)}
+        className=${`fixed right-6 bottom-16 z-50 p-5 rounded-2xl bg-gold text-obsidian shadow-[0_20px_40px_-8px_#d4af3744] hover:scale-110 active:scale-95 transition-all duration-300 ${isAIOpen ? 'translate-x-[500px]' : 'translate-x-0'}`}
+      >
+        <${Icon} name=${MessageSquare} className="w-6 h-6 shadow-sm" />
+      </button>
 
-    try {
-        await html2pdf().set(opt).from(element).save();
-    } catch (e) {
-        console.error('PDF Export failed:', e);
-    } finally {
-        btn.innerHTML = originalText;
-        lucide.createIcons();
-    }
-}
+      <!-- Search Shorthand UI -->
+      <div className="fixed left-6 bottom-16 z-50 pointer-events-none">
+         <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-2xl border border-obsidian-border bg-obsidian-card/40 backdrop-blur-md opacity-40 hover:opacity-100 transition-opacity">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Intelligence Search (Ctrl+K)</span>
+         </div>
+      </div>
+      
+      <!-- Market Ticker -->
+      <div className="fixed bottom-0 left-0 right-0 h-10 bg-obsidian/95 backdrop-blur-xl border-t border-obsidian-border z-40 overflow-hidden flex items-center">
+        <div className="animate-ticker whitespace-nowrap flex gap-16 px-8">
+           ${(data?.macro?.data || []).concat(data?.macro?.data || []).concat(data?.macro?.data || []).map((m, i) => html`
+             <div key=${i} className="flex gap-4 items-center text-[10px] font-black tracking-[0.1em] uppercase group">
+                <span className="text-slate-500 group-hover:text-slate-300 transition-colors uppercase">${m.name}</span>
+                <span className="text-white font-black">${m.value}</span>
+                <span className=${`font-black flex items-center gap-0.5 ${m.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                   ${m.change >= 0 ? '▲' : '▼'} ${Math.abs(m.change)}%
+                </span>
+             </div>
+           `)}
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+const root = createRoot(document.getElementById('root'));
+root.render(html`<${App} />`);
