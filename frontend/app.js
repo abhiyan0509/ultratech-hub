@@ -495,9 +495,9 @@ const CommandK = ({ isOpen, onClose, onAction }) => {
   ];
 
   return html`
-    <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh] px-4">
-      <div className="absolute inset-0 bg-slate-900/40 dark:bg-obsidian/80 backdrop-blur-md" onClick=${onClose}></div>
-      <div className="w-full max-w-2xl glass-panel bg-white dark:bg-obsidian-card relative rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh] px-4" onClick=${onClose}>
+      <div className="absolute inset-0 bg-slate-900/40 dark:bg-obsidian/80 backdrop-blur-md"></div>
+      <div className="w-full max-w-2xl glass-panel bg-white dark:bg-obsidian-card relative rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300" onClick=${e => e.stopPropagation()}>
         <div className="p-5 border-b border-slate-200 dark:border-obsidian-border/50 flex items-center gap-4">
           <${Icon} name=${Search} className="w-6 h-6 text-gold" />
           <input 
@@ -736,108 +736,129 @@ const App = () => {
   };
 
   const renderModalContent = () => {
-    if (!data) return html`<div className="p-8 text-center text-slate-500">Synchronizing intelligence...</div>`;
+    if (!data) return html`<div className="p-12 text-center text-slate-500 font-bold uppercase tracking-[0.2em] animate-pulse">Synchronizing intelligence assets...</div>`;
 
-    switch (modal.type) {
-      case 'overview':
-        const company = data?.financials?.companies?.['UltraTech Cement'] || {};
-        return html`
-            <div className="space-y-8">
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="p-6 rounded-2xl bg-gold/5 border border-gold/20">
-                    <h4 className="text-gold font-black uppercase text-xs mb-3">Market Position</h4>
-                    <div className="text-3xl font-black dark:text-white tabular-nums">${company.market_cap || '₹3.75T'}</div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">Consolidated Valuation</div>
-                 </div>
-                 <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
-                    <h4 className="text-emerald-500 font-black uppercase text-xs mb-3">Operational Efficiency</h4>
-                    <div className="text-3xl font-black dark:text-white tabular-nums">${data?.company_info?.capacity_mtpa || '183.1'}</div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">MTPA Active Capacity</div>
-                 </div>
-              </div>
-              <div className="p-6 rounded-2xl bg-white dark:bg-obsidian-border/20 border border-slate-200 dark:border-obsidian-border shadow-sm">
-                <h4 className="text-slate-900 dark:text-white font-black uppercase text-xs mb-4">Strategic Pillar Analysis</h4>
-                <div className="grid grid-cols-3 gap-4">
-                   ${(data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars || []).map(f => html`
-                     <div className="text-center p-4 rounded-xl bg-slate-50 dark:bg-obsidian-card shadow-inner border border-slate-100 dark:border-obsidian-border">
-                        <div className="text-gold mb-2 flex justify-center"><${Icon} name=${TrendingUp} className="w-5 h-5"/></div>
-                        <div className="text-[10px] font-black uppercase tracking-tighter dark:text-slate-200">${f.title || f}</div>
-                     </div>
-                   `)}
+    try {
+      switch (modal.type) {
+        case 'overview': {
+          const company = data?.financials?.companies?.['UltraTech Cement'] || {};
+          const focus = Array.isArray(data?.company_info?.strategic_focus) ? data.company_info.strategic_focus :
+            Array.isArray(data?.company_info?.strategic_pillars) ? data.company_info.strategic_pillars : [];
+
+          return html`
+              <div className="space-y-8">
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="p-6 rounded-2xl bg-gold/5 border border-gold/20">
+                      <h4 className="text-gold font-black uppercase text-[10px] mb-3 tracking-widest">Market Position</h4>
+                      <div className="text-3xl font-black dark:text-white tabular-nums">${company.market_cap || '₹3.75T'}</div>
+                      <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">Consolidated Valuation</div>
+                   </div>
+                   <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                      <h4 className="text-emerald-500 font-black uppercase text-[10px] mb-3 tracking-widest">Operational Efficiency</h4>
+                      <div className="text-3xl font-black dark:text-white tabular-nums">${data?.company_info?.capacity_mtpa || '183.1'}</div>
+                      <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">MTPA Active Capacity</div>
+                   </div>
+                </div>
+                <div className="p-6 rounded-2xl bg-white dark:bg-obsidian-border/20 border border-slate-200 dark:border-obsidian-border shadow-sm">
+                  <h4 className="text-slate-900 dark:text-white font-black uppercase text-[10px] mb-4 tracking-widest">Strategic Pillar Analysis</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                     ${focus.slice(0, 6).map(f => html`
+                       <div key=${f.title || f} className="text-center p-4 rounded-xl bg-slate-50 dark:bg-obsidian-card shadow-inner border border-slate-100 dark:border-obsidian-border">
+                          <div className="text-gold mb-2 flex justify-center"><${Icon} name=${TrendingUp} className="w-5 h-5"/></div>
+                          <div className="text-[10px] font-black uppercase tracking-tighter dark:text-slate-200">${f.title || f}</div>
+                       </div>
+                     `)}
+                  </div>
                 </div>
               </div>
-            </div>
-          `;
+            `;
+        }
 
-      case 'financials':
-        const companies = data?.financials?.companies || {};
-        const peers = Object.entries(companies).slice(0, 5);
-        return html`
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-obsidian-border">
-              <table className="w-full text-left border-collapse bg-white dark:bg-obsidian-card">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-obsidian-border bg-slate-50 dark:bg-obsidian">
-                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Company</th>
-                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Market Cap</th>
-                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">P/E Ratio</th>
-                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">YTD</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-obsidian-border">
-                  ${peers.map(([name, stats]) => html`
-                    <tr className="hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-colors">
-                      <td className="py-4 px-6 font-black text-xs dark:text-white">${name}</td>
-                      <td className="py-4 px-6 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.market_cap}</td>
-                      <td className="py-4 px-6 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.pe_ratio}</td>
-                      <td className=${`py-4 px-6 text-[11px] font-black text-right ${parseFloat(stats.ytd_return) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        ${stats.ytd_return}
-                      </td>
+        case 'financials': {
+          const companies = data?.financials?.companies || {};
+          const peers = Object.entries(companies).slice(0, 10);
+          return html`
+              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-obsidian-border">
+                <table className="w-full text-left border-collapse bg-white dark:bg-obsidian-card">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-obsidian-border bg-slate-50 dark:bg-obsidian">
+                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Corporation</th>
+                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Market Cap</th>
+                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">P/E Ratio</th>
+                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">YTD Performance</th>
                     </tr>
-                  `)}
-                </tbody>
-              </table>
-            </div>
-          `;
-
-      case 'outlook':
-        return html`
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
-                <h4 className="text-emerald-700 dark:text-emerald-400 font-black uppercase text-xs mb-3">Executive Summary</h4>
-                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium capitalize-first">
-                    ${data?.outlook?.executive_summary || 'Synchronizing outlook details...'}
-                </p>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-obsidian-border">
+                    ${peers.map(([name, stats]) => html`
+                      <tr key=${name} className="hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-colors">
+                        <td className="py-4 px-6 font-black text-xs dark:text-white">${name}</td>
+                        <td className="py-4 px-6 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.market_cap}</td>
+                        <td className="py-4 px-6 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.pe_ratio}</td>
+                        <td className=${`py-4 px-6 text-[11px] font-black text-right ${parseFloat(stats.ytd_return) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                          ${stats.ytd_return}
+                        </td>
+                      </tr>
+                    `)}
+                  </tbody>
+                </table>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="p-5 rounded-xl bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border shadow-sm">
-                    <h5 className="text-gold font-black uppercase text-[10px] mb-3 tracking-widest">Growth Catalysts</h5>
-                    <ul className="text-xs space-y-2.5 text-slate-600 dark:text-slate-400 font-bold">
-                       ${(data?.outlook?.catalysts || ['Infra-CapEx Cycle', 'Rural Modernization', 'Energy Transition']).map(c => html`
-                         <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-gold"></div> ${c}</li>
-                       `)}
-                    </ul>
-                 </div>
-                 <div className="p-5 rounded-xl bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border shadow-sm">
-                    <h5 className="text-rose-500 font-black uppercase text-[10px] mb-3 tracking-widest">Strategic Risks</h5>
-                    <ul className="text-xs space-y-2.5 text-slate-600 dark:text-slate-400 font-bold">
-                       ${(data?.outlook?.risks || ['Fuel Volatility', 'Cyclical Demand', 'Price Sensitivity']).map(r => html`
-                         <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-rose-500"></div> ${r}</li>
-                       `)}
-                    </ul>
-                 </div>
+            `;
+        }
+
+        case 'outlook': {
+          const outlook = data?.outlook || {};
+          const forecasts = Array.isArray(outlook.future_outlook) ? outlook.future_outlook : [];
+          const risks = Array.isArray(outlook.risk_factors) ? outlook.risk_factors : [];
+
+          return html`
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 shadow-sm">
+                  <h4 className="text-emerald-700 dark:text-emerald-400 font-black uppercase text-[10px] mb-3 tracking-widest">Executive Summary</h4>
+                  <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">
+                      ${outlook.executive_summary || 'Synchronizing outlook details...'}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="p-5 rounded-xl bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border shadow-sm">
+                      <h5 className="text-gold font-black uppercase text-[10px] mb-4 tracking-widest">Forward Forecasts</h5>
+                      <div className="space-y-4">
+                         ${forecasts.slice(0, 4).map((f, i) => html`
+                           <div key=${i} className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-obsidian-border pl-3">
+                              <div className="text-[11px] font-black dark:text-slate-200 uppercase tracking-tighter">${f.title || f}</div>
+                              <div className="text-[10px] text-slate-500 line-clamp-2">${f.description || ''}</div>
+                           </div>
+                         `)}
+                      </div>
+                   </div>
+                   <div className="p-5 rounded-xl bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border shadow-sm">
+                      <h5 className="text-rose-500 font-black uppercase text-[10px] mb-4 tracking-widest">Strategic Risks</h5>
+                      <div className="space-y-4">
+                         ${risks.slice(0, 4).map((r, i) => html`
+                           <div key=${i} className="flex flex-col gap-1 border-l-2 border-rose-500/20 pl-3">
+                              <div className="text-[11px] font-black dark:text-rose-400/80 uppercase tracking-tighter">${r.risk || r}</div>
+                              <div className="text-[10px] text-slate-500 line-clamp-2">${r.severity ? `[${r.severity}] ` : ''}${r.rationale || r.mitigation || ''}</div>
+                           </div>
+                         `)}
+                      </div>
+                   </div>
+                </div>
               </div>
-            </div>
-          `;
+            `;
+        }
 
-      case 'chart':
-        return html`
-            <div className="h-[500px] w-full relative">
-              <${ChartCard} title=${modal.title} subtitle="Deep Intelligence Spectrum" data=${modal.extra} loading=${false} />
-            </div>
-          `;
+        case 'chart':
+          return html`
+              <div className="h-[500px] w-full relative">
+                <${ChartCard} title=${modal.title} subtitle="Deep Intelligence Spectrum" data=${modal.extra} loading=${false} />
+              </div>
+            `;
 
-      default:
-        return null;
+        default:
+          return null;
+      }
+    } catch (e) {
+      console.error("Modal Render Error:", e);
+      return html`<div className="p-8 text-rose-500 font-bold text-center">Intelligence processing error. Assets recalibrating...</div>`;
     }
   };
 
@@ -853,7 +874,7 @@ const App = () => {
       <${CommandK} isOpen=${isSearchOpen} onClose=${() => setIsSearchOpen(false)} onAction=${handleSearchAction} />
 
       <${Modal} isOpen=${modal.isOpen} onClose=${() => setModal({ ...modal, isOpen: false })} title=${modal.title}>
-        ${renderModalContent()}
+        ${modal.isOpen && renderModalContent()}
       <//>
 
       <button onClick=${() => setIsAIOpen(!isAIOpen)} className=${`fixed right-6 bottom-16 z-50 p-5 rounded-2xl bg-gold text-obsidian shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 ${isAIOpen ? 'translate-x-[500px]' : 'translate-x-0'}`}>
