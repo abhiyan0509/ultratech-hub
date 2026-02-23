@@ -121,7 +121,7 @@ const Header = ({ onRefresh, onExport, status, onSearchOpen, theme, onThemeToggl
 const MetricCard = ({ label, value, sub, trend, loading }) => {
   const isPositive = trend > 0;
   return html`
-    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500 shadow-sm hover:shadow-md">
+    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500 shadow-sm hover:shadow-md h-32">
       <div className="flex justify-between items-start mb-4">
         <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
         ${trend && html`
@@ -150,20 +150,27 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
     if (chartInstance.current) chartInstance.current.destroy();
 
     const ctx = chartRef.current.getContext('2d');
+    const isDark = document.documentElement.classList.contains('dark');
+    const accentColor = '#d4af37';
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+    const textColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+
     chartInstance.current = new window.Chart(ctx, {
       type: config.type || 'line',
       data: data,
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 300 },
+        layout: {
+          padding: { left: 0, right: 10, top: 10, bottom: 0 }
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
             backgroundColor: '#111114',
-            titleColor: '#d4af37',
+            titleColor: accentColor,
             bodyColor: '#fff',
-            borderColor: '#1f1f23',
+            borderColor: 'rgba(212,175,55,0.2)',
             borderWidth: 1,
             padding: 12,
             displayColors: false,
@@ -171,18 +178,35 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
           }
         },
         scales: {
-          x: { display: false },
+          x: {
+            display: true,
+            grid: { display: false },
+            ticks: {
+              display: true,
+              color: textColor,
+              font: { size: 9, weight: 'bold' },
+              maxRotation: 0,
+              autoSkip: true,
+              maxTicksLimit: 6
+            }
+          },
           y: {
             display: true,
-            grid: { color: 'rgba(255,255,255,0.02)' },
-            ticks: { display: false }
+            position: 'right',
+            grid: { color: gridColor },
+            ticks: {
+              display: true,
+              color: textColor,
+              font: { size: 9, weight: 'bold' },
+              callback: (value) => '₹' + (value / 1000).toFixed(1) + 'k'
+            }
           }
         },
         interaction: { intersect: false, mode: 'index' },
         elements: {
           line: {
             tension: 0.4,
-            borderColor: '#d4af37',
+            borderColor: accentColor,
             borderWidth: 2,
             fill: true,
             backgroundColor: (context) => {
@@ -190,12 +214,12 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
               const { ctx, chartArea } = chart;
               if (!chartArea) return null;
               const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.08)');
+              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.15)');
               gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
               return gradient;
             }
           },
-          point: { radius: 0, hoverRadius: 4, hoverBackgroundColor: '#d4af37', hoverBorderColor: '#fff', hoverBorderWidth: 2 }
+          point: { radius: 0, hoverRadius: 5, hoverBackgroundColor: accentColor, hoverBorderColor: '#fff', hoverBorderWidth: 2 }
         }
       }
     });
@@ -204,15 +228,15 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
   }, [loading, data]);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all shadow-sm bg-obsidian-card/40">
-      <div className="flex justify-between items-start mb-4">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all shadow-sm bg-white/40 dark:bg-obsidian-card/40">
+      <div className="flex justify-between items-start mb-6">
         <div>
            <h3 className="text-slate-900 dark:text-white text-xs font-bold tracking-tight">${title}</h3>
            <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">${subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
           ${onTimeframeChange && html`
-            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-obsidian-border/30 rounded-lg">
+            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-obsidian-border/30 rounded-lg shadow-inner">
                ${['1M', '6M', '1Y'].map(t => html`
                   <button 
                     key=${t} 
@@ -231,7 +255,7 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, acti
           `}
         </div>
       </div>
-      <div className="flex-1 min-h-[160px] relative overflow-hidden">
+      <div className="flex-1 min-h-[180px] relative overflow-hidden">
         ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-10 bg-gold/5 z-10"></div>`}
         <canvas ref=${chartRef} className="absolute inset-0 w-full h-full"></canvas>
       </div>
@@ -553,7 +577,7 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
         </div>
 
         <!-- Strategic Dossier -->
-        <div className="col-span-12 lg:col-span-9 glass-panel p-8 rounded-3xl min-h-[420px] shadow-sm relative overflow-hidden group/dossier">
+        <div className="col-span-12 lg:col-span-9 glass-panel p-8 rounded-3xl min-h-[450px] shadow-sm relative overflow-hidden group/dossier">
             <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full pointer-events-none group-hover/dossier:bg-gold/10 transition-all duration-700"></div>
             <div className="flex justify-between items-center mb-8 relative z-10">
                 <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
@@ -579,7 +603,7 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
                         `)}
                     </div>
                 </div>
-                <div className="md:col-span-8 h-full min-h-[300px]">
+                <div className="md:col-span-8 h-full min-h-[350px]">
                     <${ChartCard} 
                         title="Equity Performance" 
                         subtitle="Relative Returns Spectrum"
@@ -594,7 +618,7 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
         </div>
 
         <!-- Sentiment Card -->
-        <div className="col-span-12 lg:col-span-3 glass-panel p-8 rounded-3xl min-h-[420px] flex flex-col justify-between overflow-hidden relative shadow-sm">
+        <div className="col-span-12 lg:col-span-3 glass-panel p-8 rounded-3xl min-h-[450px] flex flex-col justify-between overflow-hidden relative shadow-sm">
             <h2 className="text-slate-900 dark:text-white text-lg font-black flex justify-between items-center group">
                 <span className="relative">Market Sentiment</span>
                 <${Icon} name=${TrendingUp} className="w-4 h-4 text-emerald-500" />
@@ -678,6 +702,81 @@ const App = () => {
 
   const handleSearchAction = (id) => {
     if (id === 'assistant') setIsAIOpen(true);
+
+    if (id === 'overview') {
+      const company = data?.financials?.companies?.['UltraTech Cement'] || {};
+      setModal({
+        isOpen: true,
+        title: 'Executive Performance Overview',
+        children: html`
+            <div className="space-y-8">
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="p-6 rounded-2xl bg-gold/5 border border-gold/20">
+                    <h4 className="text-gold font-black uppercase text-xs mb-3">Market Position</h4>
+                    <div className="text-3xl font-black dark:text-white tabular-nums">${company.market_cap || '₹3.75T'}</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">Consolidated Valuation</div>
+                 </div>
+                 <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                    <h4 className="text-emerald-500 font-black uppercase text-xs mb-3">Operational Efficiency</h4>
+                    <div className="text-3xl font-black dark:text-white tabular-nums">${data?.company_info?.capacity_mtpa || '183.1'}</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">MTPA Active Capacity</div>
+                 </div>
+              </div>
+              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-obsidian-border/20 border border-slate-200 dark:border-obsidian-border">
+                <h4 className="text-slate-900 dark:text-white font-black uppercase text-xs mb-4">Strategic Pillar Analysis</h4>
+                <div className="grid grid-cols-3 gap-4">
+                   ${(data?.company_info?.strategic_focus || []).map(f => html`
+                     <div className="text-center p-4 rounded-xl bg-white dark:bg-obsidian-card shadow-sm border border-slate-100 dark:border-obsidian-border">
+                        <div className="text-gold mb-2 flex justify-center"><${Icon} name=${TrendingUp} className="w-5 h-5"/></div>
+                        <div className="text-[10px] font-black uppercase tracking-tighter dark:text-slate-200">${f.title || f}</div>
+                     </div>
+                   `)}
+                </div>
+              </div>
+            </div>
+          `
+      });
+    }
+
+    if (id === 'financials') {
+      const companies = data?.financials?.companies || {};
+      const peers = Object.entries(companies).slice(0, 5);
+      setModal({
+        isOpen: true,
+        title: 'LTM Competitive Benchmark',
+        children: html`
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-obsidian-border">
+                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Company</th>
+                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Market Cap</th>
+                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Price</th>
+                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400">P/E Ratio</th>
+                    <th className="py-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">YTD</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-obsidian-border">
+                  ${peers.map(([name, stats]) => html`
+                    <tr className="hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="font-black text-xs dark:text-white">${name}</div>
+                      </td>
+                      <td className="py-4 px-4 text-[11px] font-bold dark:text-slate-300">${stats.market_cap}</td>
+                      <td className="py-4 px-4 text-[11px] font-bold dark:text-slate-300 tracking-tighter">${stats.current_price}</td>
+                      <td className="py-4 px-4 text-[11px] font-bold dark:text-slate-300 tabular-nums">${stats.pe_ratio}</td>
+                      <td className=${`py-4 px-4 text-[11px] font-black text-right ${parseFloat(stats.ytd_return) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        ${stats.ytd_return}
+                      </td>
+                    </tr>
+                  `)}
+                </tbody>
+              </table>
+            </div>
+          `
+      });
+    }
+
     if (id === 'outlook') {
       setModal({
         isOpen: true,
