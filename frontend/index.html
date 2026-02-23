@@ -4,304 +4,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Intelligence Hub | UltraTech Cement</title>
-    <meta name="description" content="Autonomous intelligence dashboard for UltraTech Cement executive analysis">
+    <title>UltraTech Executive Intelligence | V7</title>
+    <meta name="description" content="Premium executive intelligence platform for UltraTech Cement">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Tailwind CSS (Play CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: {
+                            DEFAULT: '#09090b',
+                            card: '#111114',
+                            border: '#1f1f23',
+                            hover: '#27272a'
+                        },
+                        gold: {
+                            DEFAULT: '#d4af37',
+                            muted: '#b8922e'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Manrope', 'sans-serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- React & Dependencies via ESM -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom": "https://esm.sh/react-dom@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.344.0",
+            "framer-motion": "https://esm.sh/framer-motion@11.0.8",
+            "chart.js": "https://esm.sh/chart.js@4.4.0",
+            "clsx": "https://esm.sh/clsx@2.1.0",
+            "tailwind-merge": "https://esm.sh/tailwind-merge@2.2.1"
+        }
+    }
+    </script>
+
+    <style>
+        @layer base {
+            body {
+                @apply bg-obsidian text-slate-200 font-body antialiased;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                @apply font-heading tracking-tight;
+            }
+        }
+
+        /* Custom scrollbar to match Obsidian theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+
+        .glass-panel {
+            @apply bg-obsidian-card/60 backdrop-blur-xl border border-obsidian-border;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes ticker-move {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .animate-ticker {
+            animation: ticker-move 40s linear infinite;
+        }
+
+        .animate-ticker:hover {
+            animation-play-state: paused;
+        }
+
+        .clip-half-gauge {
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+        }
+    </style>
 </head>
 
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <div class="brand-group">
-                <div class="main-logo-svg">
-                    <svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <text x="5" y="28" font-family="Arial Black, Arial, sans-serif" font-weight="900"
-                            font-style="italic" font-size="34" fill="#fbbf24">UltraTech</text>
-                        <path d="M5 34H215L210 50H0L5 34Z" fill="#1a1a1b" />
-                        <text x="107.5" y="46" font-family="Arial Black, Arial, sans-serif" font-weight="900"
-                            font-style="italic" font-size="14" fill="#fbbf24" text-anchor="middle"
-                            letter-spacing="4">CEMENT</text>
-                        <text x="5" y="58" font-family="Arial, sans-serif" font-weight="500" font-style="italic"
-                            font-size="11" fill="#f8fafc">The Engineer's Choice</text>
-                    </svg>
-                </div>
-                <div class="brand-v-divider"></div>
-                <div class="brand-info">
-                    <h1>Executive Intelligence Hub</h1>
-                    <p class="tagline">Strategic Research & Market Analysis</p>
-                </div>
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="theme-switch-wrapper">
-                <label class="theme-switch" for="checkbox">
-                    <input type="checkbox" id="checkbox" />
-                    <div class="slider round">
-                        <span class="icon sun">☀️</span>
-                        <span class="icon moon">🌙</span>
-                    </div>
-                </label>
-            </div>
-            <div id="statusBadge" class="status-badge">
-                <span class="status-dot"></span>
-                <span class="status-text">Connecting...</span>
-            </div>
-            <div id="lastUpdated" class="last-updated"></div>
-            <button class="export-btn" onclick="exportBriefing()" title="Export Executive Briefing">
-                <i data-lucide="file-down"></i> Export
-            </button>
-            <button class="refresh-btn" onclick="refreshData()" title="Refresh all data"><i
-                    data-lucide="rotate-cw"></i></button>
-        </div>
-    </header>
+<body class="dark overflow-x-hidden">
+    <div id="root"></div>
 
-    <!-- Navigation -->
-    <nav class="tabs">
-        <button class="tab active" data-tab="overview" onclick="switchTab('overview')"><i
-                data-lucide="layout-dashboard"></i> Overview</button>
-        <button class="tab" data-tab="outlook" onclick="switchTab('outlook')"><i data-lucide="trending-up"></i>
-            Outlook</button>
-        <button class="tab" data-tab="ma" onclick="switchTab('ma')"><i data-lucide="briefcase"></i> M&amp;A
-            Strategy</button>
-        <button class="tab" data-tab="financials" onclick="switchTab('financials')"><i data-lucide="bar-chart-3"></i>
-            Financials</button>
-        <button class="tab" data-tab="competitors" onclick="switchTab('competitors')"><i data-lucide="users"></i> Market
-            Share</button>
-        <button class="tab" data-tab="ask" onclick="switchTab('ask')"><i data-lucide="message-square"></i> Ask
-            AI</button>
-    </nav>
+    <!-- Legacy script fallbacks or helper constants -->
+    <script>
+        window.API_BASE = '';
+    </script>
 
-    <!-- Market Ticker -->
-    <div class="market-ticker" id="marketTicker">
-        <div class="ticker-content" id="tickerItems">
-            <span class="ticker-loading">Initializing Market Data...</span>
-        </div>
-    </div>
-
-    <main class="main-container">
-        <!-- ============ OVERVIEW TAB ============ -->
-        <div id="tab-overview" class="tab-content active">
-            <!-- Executive Summary -->
-            <div class="section-card executive-summary">
-                <h2 class="section-title">Executive Summary</h2>
-                <p id="execSummary" class="exec-text shimmer">Loading strategic overview...</p>
-                <div class="card-source">Source: Outlook Agent Analysis</div>
-            </div>
-
-            <!-- Key Metrics -->
-            <div class="metrics-row">
-                <div class="metric-card shimmer">
-                    <div class="metric-label">Market Cap</div>
-                    <div id="metricMarketCap" class="metric-value">--</div>
-                </div>
-                <div class="metric-card shimmer">
-                    <div class="metric-label">Stock Price</div>
-                    <div id="metricPrice" class="metric-value">--</div>
-                </div>
-                <div class="metric-card shimmer">
-                    <div class="metric-label">Capacity</div>
-                    <div id="metricCapacity" class="metric-value">--</div>
-                    <div class="metric-sub">MTPA</div>
-                </div>
-                <div class="metric-card shimmer">
-                    <div class="metric-label">P/E Ratio</div>
-                    <div id="metricPE" class="metric-value">--</div>
-                </div>
-                <div class="metric-card shimmer">
-                    <div class="metric-label">1Y Return</div>
-                    <div id="metricReturn" class="metric-value">--</div>
-                </div>
-            </div>
-
-            <div class="two-col">
-                <!-- Company Info -->
-                <div class="section-card">
-                    <h3 class="section-title">Strategic Pillars</h3>
-                    <div id="strategicPillars" class="pill-grid"></div>
-                    <h3 class="section-title" style="margin-top:20px">Company Snapshot</h3>
-                    <div id="companyInfoGrid" class="info-grid"></div>
-                    <div class="card-source">Source: Official Documents & Annual Reports</div>
-                </div>
-                <!-- Stock Chart -->
-                <div class="section-card chart-card">
-                    <div class="chart-header">
-                        <h3 class="section-title">Stock Performance</h3>
-                        <div class="chart-controls" data-chart-id="stockChart">
-                            <button onclick="updateChartPeriod('stockChart', '1M')">1M</button>
-                            <button onclick="updateChartPeriod('stockChart', '6M')">6M</button>
-                            <button class="active" onclick="updateChartPeriod('stockChart', '1Y')">1Y</button>
-                            <button onclick="updateChartPeriod('stockChart', '5Y')">5Y</button>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="stockChart"></canvas></div>
-                    <div class="card-source">Source: Yahoo Finance</div>
-                </div>
-            </div>
-
-            <div class="two-col">
-                <!-- Milestones -->
-                <div class="section-card">
-                    <h3 class="section-title">Key Milestones</h3>
-                    <div id="milestoneTimeline" class="timeline"></div>
-                </div>
-                <!-- Advantages -->
-                <div class="section-card">
-                    <h3 class="section-title">Competitive Advantages</h3>
-                    <ul id="advantageList" class="advantage-list"></ul>
-                </div>
-            </div>
-
-            <!-- News -->
-            <div class="section-card">
-                <h3 class="section-title">Latest News</h3>
-                <div id="newsGrid" class="news-grid"></div>
-            </div>
-        </div>
-
-        <!-- ============ OUTLOOK TAB ============ -->
-        <div id="tab-outlook" class="tab-content">
-            <div class="section-card executive-summary">
-                <div class="mood-header">
-                    <div class="mood-info">
-                        <h2 class="section-title">Strategic Outlook</h2>
-                        <p id="outlookSummary" class="exec-text shimmer">Generating predictions...</p>
-                    </div>
-                    <div class="sentiment-gauge-wrapper">
-                        <div id="sentimentGauge" class="sentiment-gauge">
-                            <!-- SVG Gauge will be injected here -->
-                            <div class="gauge-loading">...</div>
-                        </div>
-                        <span id="sentimentLabel" class="sentiment-label">Neutral</span>
-                    </div>
-                </div>
-                <div id="sentimentAnalysis" class="sentiment-analysis"></div>
-            </div>
-
-            <div class="two-col">
-                <div class="section-card">
-                    <h3 class="section-title">Predicted Next Moves</h3>
-                    <div id="predictedMoves" class="prediction-list"></div>
-                </div>
-                <div class="section-card">
-                    <h3 class="section-title">Future Outlook</h3>
-                    <div id="futureOutlook" class="prediction-list"></div>
-                </div>
-            </div>
-
-            <div class="two-col">
-                <div class="section-card">
-                    <h3 class="section-title">Risk Factors</h3>
-                    <div id="riskFactors" class="risk-list"></div>
-                </div>
-                <div class="section-card">
-                    <h3 class="section-title">Key Metrics to Watch</h3>
-                    <div id="metricsToWatch" class="metrics-watch-list"></div>
-                </div>
-            </div>
-
-            <div class="section-card">
-                <h3 class="section-title">Interview Talking Points</h3>
-                <div id="talkingPoints" class="talking-points"></div>
-            </div>
-        </div>
-
-        <!-- ============ M&A TAB ============ -->
-        <div id="tab-ma" class="tab-content">
-            <div class="section-card" id="maStrategySummary"></div>
-            <div id="maDealsGrid" class="deals-grid"></div>
-        </div>
-
-        <!-- ============ FINANCIALS TAB ============ -->
-        <div id="tab-financials" class="tab-content">
-            <div class="section-card">
-                <h3 class="section-title">Peer Comparison</h3>
-                <div class="table-wrapper">
-                    <table id="financialTable" class="fin-table">
-                        <thead>
-                            <tr></tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="two-col">
-                <div class="section-card">
-                    <h3 class="section-title">Market Cap Comparison</h3>
-                    <div class="chart-wrapper"><canvas id="marketCapChart"></canvas></div>
-                </div>
-                <div class="section-card chart-card">
-                    <div class="chart-header">
-                        <h3 class="section-title">Stock Comparison</h3>
-                        <div class="chart-controls" data-chart-id="priceCompChart">
-                            <button onclick="updateChartPeriod('priceCompChart', '1M')">1M</button>
-                            <button onclick="updateChartPeriod('priceCompChart', '6M')">6M</button>
-                            <button class="active" onclick="updateChartPeriod('priceCompChart', '1Y')">1Y</button>
-                            <button onclick="updateChartPeriod('priceCompChart', '5Y')">5Y</button>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="priceCompChart"></canvas></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============ COMPETITORS TAB ============ -->
-        <div id="tab-competitors" class="tab-content">
-            <div class="section-card">
-                <h3 class="section-title">Capacity Comparison</h3>
-                <div class="chart-wrapper"><canvas id="capacityChart"></canvas></div>
-            </div>
-            <div id="competitorCards" class="comp-grid"></div>
-            <div class="section-card">
-                <h3 class="section-title">Strategic Comparisons</h3>
-                <div id="strategicContent"></div>
-            </div>
-        </div>
-
-        <!-- ============ ASK AI TAB ============ -->
-        <div id="tab-ask" class="tab-content">
-            <div class="chat-container">
-                <div id="chatMessages" class="chat-messages">
-                    <div class="chat-message bot">
-                        <div class="chat-avatar">AI</div>
-                        <div class="chat-bubble">
-                            Hi! I'm your interview prep assistant. Ask me anything about UltraTech Cement — I'll answer
-                            using the latest data collected by the agents.
-                            <div class="suggestion-chips">
-                                <button onclick="askSuggestion('What is UltraTech\'s M&A strategy?')">M&A
-                                    Strategy</button>
-                                <button onclick="askSuggestion('Compare UltraTech with Ambuja Cements')">vs
-                                    Ambuja</button>
-                                <button onclick="askSuggestion('What are the key risks for UltraTech?')">Key
-                                    Risks</button>
-                                <button onclick="askSuggestion('Tell me about the India Cements acquisition')">India
-                                    Cements
-                                    Deal</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="chat-input-row">
-                    <input type="text" id="chatInput" placeholder="Ask about UltraTech..."
-                        onkeydown="if(event.key==='Enter')sendMessage()">
-                    <button id="sendBtn" onclick="sendMessage()">Send</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Floating AI Button -->
-        <div class="chat-tab-btn" onclick="switchTab('ask')" title="AI Research Assistant">
-            <i data-lucide="message-square"></i>
-        </div>
-
-        <script src="app.js"></script>
+    <!-- React App Launch -->
+    <script type="module" src="App.jsx"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
+
+</html>
 
 </html>
