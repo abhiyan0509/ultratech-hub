@@ -55,45 +55,65 @@
     }
     </script>
 
-    <style type="text/tailwindcss">
-        @layer base {
-            html {
-                scroll-behavior: smooth;
-            }
-
-            body {
-                @apply bg-slate-50 text-slate-800 font-body antialiased transition-colors duration-500;
-                min-height: 101vh;
-                /* Forces scrollbar to be always present to prevent layout shifts */
-            }
-
-            .dark body {
-                @apply bg-obsidian text-slate-200;
-            }
-
-            h1,
-            h2,
-            h3,
-            h4 {
-                @apply font-heading tracking-tight;
-            }
+    <style>
+        /* Base Reset & Core Styles */
+        html {
+            scroll-behavior: smooth;
         }
 
-        /* Platform Theme Engine */
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.5s, color 0.5s;
+            min-height: 101vh;
+            margin: 0;
+        }
+
+        .dark body {
+            background-color: #09090b;
+            color: #e2e8f0;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Manrope', sans-serif;
+            letter-spacing: -0.025em;
+        }
+
+        /* Platform Theme Engine (CSS Components) */
         .glass-panel {
-            @apply backdrop-blur-xl border transition-all duration-500 bg-white/70 border-slate-200 shadow-sm text-slate-900;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.5s;
+            color: #0f172a;
         }
 
         .dark .glass-panel {
-            @apply bg-obsidian-card/60 border-obsidian-border text-slate-200 shadow-none;
+            background-color: rgba(17, 17, 20, 0.6);
+            border-color: #1f1f23;
+            color: #e2e8f0;
+            box-shadow: none;
         }
 
         .bg-obsidian-card {
-            @apply bg-white/80 border border-slate-100 shadow-sm transition-all duration-500;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(241, 245, 249, 1);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.5s;
         }
 
         .dark .bg-obsidian-card {
-            @apply bg-obsidian-card border-obsidian-border shadow-none;
+            background-color: #111114;
+            border-color: #1f1f23;
+            box-shadow: none;
         }
 
         @keyframes shimmer {
@@ -137,6 +157,24 @@
             color: #d4af37;
             opacity: 0.5;
             font-size: 10px;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d4af3733;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #d4af3755;
         }
     </style>
 </head>
