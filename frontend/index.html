@@ -58,7 +58,11 @@
     <style>
         @layer base {
             body {
-                @apply bg-obsidian text-slate-200 font-body antialiased transition-colors duration-500;
+                @apply bg-slate-50 text-slate-800 font-body antialiased transition-colors duration-500;
+            }
+
+            .dark body {
+                @apply bg-obsidian text-slate-200;
             }
 
             h1,
@@ -70,48 +74,29 @@
         }
 
         /* Platform Theme Engine */
-        .dark body {
-            @apply bg-obsidian text-slate-200;
-        }
-
-        .light body {
-            @apply bg-slate-50 text-slate-800;
-        }
-
         .glass-panel {
-            @apply backdrop-blur-xl border transition-all duration-500;
+            @apply backdrop-blur-xl border transition-all duration-500 bg-white/70 border-slate-200 shadow-sm text-slate-900;
         }
 
         .dark .glass-panel {
-            @apply bg-obsidian-card/60 border-obsidian-border;
+            @apply bg-obsidian-card/60 border-obsidian-border text-slate-200 shadow-none;
         }
 
-        .light .glass-panel {
-            @apply bg-white/70 border-slate-200 shadow-sm text-slate-900;
+        .bg-obsidian-card {
+            @apply bg-white/80 border border-slate-100 shadow-sm transition-all duration-500;
         }
 
         .dark .bg-obsidian-card {
-            @apply bg-obsidian-card;
+            @apply bg-obsidian-card border-obsidian-border shadow-none;
         }
 
-        .light .bg-obsidian-card {
-            @apply bg-white/80 border-slate-100 shadow-sm;
+        /* Modal System */
+        .modal-overlay {
+            @apply fixed inset-0 z-[200] flex items-center justify-center p-4 bg-obsidian/60 backdrop-blur-sm animate-in fade-in duration-300;
         }
 
-        .dark .text-white {
-            @apply text-white;
-        }
-
-        .light .text-white {
-            @apply text-slate-900;
-        }
-
-        .dark .text-slate-200 {
-            @apply text-slate-200;
-        }
-
-        .light .text-slate-200 {
-            @apply text-slate-700;
+        .modal-content {
+            @apply w-full max-w-5xl glass-panel relative rounded-3xl overflow-hidden animate-in zoom-in-95 fade-in duration-300;
         }
 
         @keyframes shimmer {

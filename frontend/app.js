@@ -20,62 +20,92 @@ import {
   Maximize2,
   Moon,
   Sun,
-  Handshake
+  Handshake,
+  X
 } from 'lucide-react';
 
 const html = htm.bind(React.createElement);
 
-// --- Simple Lucide Helper ---
+// --- Global UI Components ---
+
 const Icon = ({ name: IconComp, className = "w-5 h-5" }) => {
   return html`<${IconComp} className=${className} />`;
+};
+
+const Modal = ({ isOpen, onClose, title, children }) => {
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return html`
+    <div className="modal-overlay" onClick=${onClose}>
+      <div className="modal-content" onClick=${e => e.stopPropagation()}>
+        <div className="p-6 border-b border-slate-200 dark:border-obsidian-border flex items-center justify-between">
+          <h3 className="text-xl font-bold dark:text-white">${title}</h3>
+          <button onClick=${onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-obsidian-hover rounded-xl transition-colors">
+            <${Icon} name=${X} className="w-6 h-6 text-slate-500" />
+          </button>
+        </div>
+        <div className="p-8 max-h-[80vh] overflow-y-auto">
+          ${children}
+        </div>
+      </div>
+    </div>
+  `;
 };
 
 // --- SUBSIDIARY COMPONENTS ---
 
 const Header = ({ onRefresh, onExport, status, onSearchOpen, theme, onThemeToggle }) => {
   return html`
-    <header className="fixed top-0 left-0 right-0 h-16 glass-panel z-50 px-6 flex items-center justify-between border-b border-obsidian-border/50">
+    <header className="fixed top-0 left-0 right-0 h-16 glass-panel z-50 px-6 flex items-center justify-between border-b border-slate-200/50 dark:border-obsidian-border/50">
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-3">
-          <div className="bg-gold p-1.5 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+          <div className="bg-gold p-1.5 rounded-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)]">
              <div className="text-obsidian font-black italic text-xl tracking-tighter">UT</div>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-white dark:text-white font-bold text-sm tracking-wide uppercase leading-tight">Executive Intelligence</h1>
+            <h1 className="text-slate-900 dark:text-white font-bold text-sm tracking-wide uppercase leading-tight">Executive Intelligence</h1>
             <span className="text-slate-500 text-[10px] uppercase tracking-[0.2em]">UltraTech Cement Platform</span>
           </div>
         </div>
         <button 
           onClick=${onSearchOpen}
-          className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-obsidian-border/30 border border-obsidian-border text-slate-500 text-xs hover:border-gold/30 transition-all group shadow-inner"
+          className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-100/50 dark:bg-obsidian-border/30 border border-slate-200 dark:border-obsidian-border text-slate-500 text-xs hover:border-gold/30 transition-all group shadow-sm"
         >
           <${Icon} name=${Search} className="w-4 h-4 group-hover:text-gold transition-colors" />
           <span>Search Intelligence Assets...</span>
-          <span className="ml-8 px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-[10px] italic font-mono">Ctrl+K</span>
+          <span className="ml-8 px-1.5 py-0.5 rounded bg-white dark:bg-obsidian border border-slate-200 dark:border-obsidian-border text-[10px] italic font-mono">Ctrl+K</span>
         </button>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-500">
            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
            <span className="text-[10px] uppercase font-black tracking-wider">${status}</span>
         </div>
 
         <button 
           onClick=${onThemeToggle}
-          className="p-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-gold hover:bg-obsidian-hover transition-all active:scale-95"
+          className="p-2 rounded-xl border border-slate-200 dark:border-obsidian-border text-slate-500 dark:text-slate-400 hover:text-gold dark:hover:text-gold hover:bg-slate-100 dark:hover:bg-obsidian-hover transition-all active:scale-95 shadow-sm"
           title=${`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
-          <${Icon} name=${theme === 'dark' ? Sun : Moon} className="w-4 h-4" />
+          <${Icon} name=${theme === 'dark' ? Sun : Moon} className="w-4.5 h-4.5" />
         </button>
         
-        <button onClick=${onExport} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-white hover:bg-obsidian-hover transition-all text-xs font-semibold">
+        <button onClick=${onExport} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-obsidian-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-obsidian-hover transition-all text-xs font-bold shadow-sm">
            <${Icon} name=${FileDown} className="w-4 h-4" />
            Export
         </button>
         
-        <button onClick=${onRefresh} className="p-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-gold hover:bg-obsidian-hover transition-all group active:scale-90">
-           <${Icon} name=${RotateCw} className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+        <button onClick=${onRefresh} className="p-2 rounded-xl border border-slate-200 dark:border-obsidian-border text-slate-500 dark:text-slate-400 hover:text-gold hover:bg-slate-100 dark:hover:bg-obsidian-hover transition-all group active:scale-90 shadow-sm">
+           <${Icon} name=${RotateCw} className="w-4.5 h-4.5 group-hover:rotate-180 transition-transform duration-500" />
         </button>
       </div>
     </header>
@@ -85,18 +115,18 @@ const Header = ({ onRefresh, onExport, status, onSearchOpen, theme, onThemeToggl
 const MetricCard = ({ label, value, sub, trend, loading }) => {
   const isPositive = trend > 0;
   return html`
-    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500 shadow-lg">
+    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500 shadow-sm hover:shadow-md">
       <div className="flex justify-between items-start mb-4">
-        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
+        <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
         ${trend && html`
-          <div className=${`flex items-center gap-1 text-[10px] font-bold ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+          <div className=${`flex items-center gap-1 text-[10px] font-black ${isPositive ? 'text-emerald-600 dark:text-emerald-500' : 'text-rose-600 dark:text-rose-500'}`}>
             <${Icon} name=${isPositive ? ArrowUpRight : ArrowDownRight} className="w-3 h-3" />
             ${Math.abs(trend)}%
           </div>
         `}
       </div>
       <div>
-        <div className=${`text-2xl font-black text-white dark:text-white mb-1 ${loading ? 'animate-shimmer rounded h-8 w-2/3 opacity-10' : ''}`}>
+        <div className=${`text-2xl font-black text-slate-900 dark:text-white mb-1 ${loading ? 'animate-shimmer rounded h-8 w-2/3 opacity-10 bg-gold/10' : ''}`}>
            ${!loading && value}
         </div>
         <div className="text-slate-500 text-[10px] font-medium italic tracking-wide">${sub}</div>
@@ -105,7 +135,7 @@ const MetricCard = ({ label, value, sub, trend, loading }) => {
   `;
 };
 
-const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
+const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
@@ -134,14 +164,8 @@ const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
           }
         },
         scales: {
-          x: {
-            display: false,
-            grid: { display: false }
-          },
-          y: {
-            display: false,
-            grid: { display: false }
-          }
+          x: { display: false },
+          y: { display: false }
         },
         interaction: { intersect: false, mode: 'index' },
         elements: {
@@ -169,22 +193,29 @@ const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
   }, [loading, data]);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all shadow-sm">
       <div className="flex justify-between items-start mb-6">
         <div>
-           <h3 className="text-white dark:text-white text-xs font-bold tracking-tight">${title}</h3>
+           <h3 className="text-slate-900 dark:text-white text-xs font-bold tracking-tight">${title}</h3>
            <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">${subtitle}</p>
         </div>
-        <div className="flex gap-1 p-1 bg-obsidian-border/30 rounded-lg">
-           ${['1M', '6M', '1Y'].map(t => html`
-              <button key=${t} className=${`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${t === '1Y' ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-white'}`}>
-                ${t}
-              </button>
-           `)}
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-obsidian-border/30 rounded-lg">
+             ${['1M', '6M', '1Y'].map(t => html`
+                <button key=${t} className=${`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${t === '1Y' ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
+                  ${t}
+                </button>
+             `)}
+          </div>
+          ${onExpand && html`
+            <button onClick=${onExpand} className="p-2 text-slate-400 hover:text-gold transition-colors active:scale-90" title="Expand Analysis">
+              <${Icon} name=${Maximize2} className="w-3.5 h-3.5" />
+            </button>
+          `}
         </div>
       </div>
       <div className="flex-1 min-h-0 relative">
-        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-20 bg-gold/5"></div>`}
+        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-10 bg-gold/5"></div>`}
         <canvas ref=${chartRef}></canvas>
       </div>
     </div>
@@ -196,9 +227,9 @@ const NewsModule = ({ data, loading }) => {
   const safeNews = Array.isArray(newsItems) ? newsItems : [];
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col shadow-sm">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-white dark:text-white text-lg font-bold flex items-center gap-2">
+        <h2 className="text-slate-900 dark:text-white text-lg font-bold flex items-center gap-2">
             <div className="w-1.5 h-6 bg-gold rounded-full"></div>
             Market Intelligence
         </h2>
@@ -208,13 +239,13 @@ const NewsModule = ({ data, loading }) => {
         ${loading ? html`
           ${[1, 2, 3, 4, 5].map(i => html`<div key=${i} className="animate-shimmer h-20 w-full rounded-2xl mb-4 opacity-5 bg-gold/5"></div>`)}
         ` : safeNews.slice(0, 10).map((item, i) => html`
-          <a key=${i} href=${item.url || item.link} target="_blank" className="block p-4 rounded-2xl bg-obsidian-card/40 border border-obsidian-border hover:border-gold/30 hover:bg-obsidian-hover transition-all group relative overflow-hidden shadow-sm">
+          <a key=${i} href=${item.url || item.link} target="_blank" className="block p-4 rounded-2xl bg-white/50 dark:bg-obsidian-card/40 border border-slate-200 dark:border-obsidian-border hover:border-gold/30 hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-all group relative overflow-hidden shadow-sm">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
             <div className="flex justify-between items-start mb-2">
                <span className="text-[10px] text-gold font-black uppercase tracking-widest">${item.source || 'Standard'}</span>
-               <span className="text-[10px] text-slate-500">${item.date}</span>
+               <span className="text-[10px] text-slate-500 font-medium">${item.date}</span>
             </div>
-            <h3 className="text-slate-200 dark:text-slate-200 text-xs font-semibold leading-relaxed group-hover:text-white transition-colors line-clamp-2">
+            <h3 className="text-slate-700 dark:text-slate-200 text-xs font-bold leading-relaxed group-hover:text-slate-900 dark:group-hover:text-white transition-colors line-clamp-2">
               ${item.title}
             </h3>
           </a>
@@ -228,9 +259,9 @@ const M_A_Module = ({ data, loading }) => {
   const deals = Array.isArray(data) ? data : (data?.deals || []);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col shadow-sm">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-white dark:text-white text-lg font-bold flex items-center gap-2">
+        <h2 className="text-slate-900 dark:text-white text-lg font-bold flex items-center gap-2">
             <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
             M&A Pipeline
         </h2>
@@ -240,17 +271,17 @@ const M_A_Module = ({ data, loading }) => {
         ${loading ? html`
           ${[1, 2, 3].map(i => html`<div key=${i} className="animate-shimmer h-28 rounded-2xl bg-emerald-500/5 opacity-10"></div>`)}
         ` : (deals || []).map((deal, i) => html`
-          <div key=${i} className="p-4 rounded-2xl bg-obsidian-card/40 border border-obsidian-border relative group">
+          <div key=${i} className="p-4 rounded-2xl bg-white/50 dark:bg-obsidian-card/40 border border-slate-200 dark:border-obsidian-border relative group shadow-sm transition-all hover:border-emerald-500/30">
             <div className="flex justify-between items-start mb-2">
-               <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">${deal.status || 'Active'}</span>
-               <span className="text-[10px] text-slate-500">${deal.date}</span>
+               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest">${deal.status || 'Active'}</span>
+               <span className="text-[10px] text-slate-500 font-medium">${deal.date}</span>
             </div>
-            <h3 className="text-white text-xs font-bold mb-2">${deal.target || deal.title}</h3>
+            <h3 className="text-slate-900 dark:text-white text-xs font-black mb-2">${deal.target || deal.title}</h3>
             <div className="flex items-center gap-4">
-              <div className="text-[10px] text-slate-400 font-medium">Value: <span className="text-emerald-400 font-black tracking-tighter">${deal.value}</span></div>
-              <div className="text-[10px] text-slate-400 font-medium italic">${deal.advisor || 'Multi-Source'}</div>
+              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Value: <span className="text-emerald-600 dark:text-emerald-400 font-black">${deal.value}</span></div>
+              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic">${deal.advisor || 'Multi-Source'}</div>
             </div>
-            <div className="mt-3 text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+            <div className="mt-3 text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
               ${deal.impact || deal.details}
             </div>
           </div>
@@ -274,9 +305,9 @@ const CompetitorGrid = ({ data, loading }) => {
   }, [compData]);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col shadow-sm">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-white dark:text-white text-lg font-bold flex items-center gap-2">
+        <h2 className="text-slate-900 dark:text-white text-lg font-bold flex items-center gap-2">
             <div className="w-1.5 h-6 bg-gold rounded-full"></div>
             Sector Landscape
         </h2>
@@ -284,16 +315,16 @@ const CompetitorGrid = ({ data, loading }) => {
       </div>
       <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         ${loading ? html`
-          ${[1, 2, 3, 4, 5, 6].map(i => html`<div key=${i} className="animate-shimmer h-24 rounded-2xl bg-gold/5 opacity-10"></div>`)}
+          ${[1, 2, 3, 4, 5, 6].map(i => html`<div key=${i} className="animate-shimmer h-24 rounded-2xl bg-gold/5 opacity-5"></div>`)}
         ` : compItems.map((comp, i) => html`
-          <div key=${i} className="p-4 rounded-2xl bg-obsidian-card/40 border border-obsidian-border flex flex-col justify-between group hover:bg-obsidian-hover hover:border-emerald-500/20 transition-all duration-500 shadow-sm relative overflow-hidden">
+          <div key=${i} className="p-4 rounded-2xl bg-white/50 dark:bg-obsidian-card/40 border border-slate-200 dark:border-obsidian-border flex flex-col justify-between group hover:bg-slate-50 dark:hover:bg-obsidian-hover hover:border-emerald-500/20 transition-all duration-500 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-20 transition-opacity">
-               <${Icon} name=${Target} className="w-8 h-8 text-white" />
+               <${Icon} name=${Target} className="w-8 h-8 text-slate-400 dark:text-white" />
             </div>
-            <div className="text-slate-400 text-[10px] uppercase font-black tracking-tight mb-2 group-hover:text-gold transition-colors">${comp.name}</div>
+            <div className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-black tracking-tight mb-2 group-hover:text-gold transition-colors">${comp.name}</div>
             <div>
-              <div className="text-white font-black text-lg leading-none group-hover:scale-105 transition-transform origin-left">${comp.capacity_mtpa || comp.capacity || 'N/A'} <span className="text-[11px] text-slate-600 font-medium">MTPA</span></div>
-              <div className="text-[10px] text-slate-500 mt-2 font-medium tracking-wide">
+              <div className="text-slate-900 dark:text-white font-black text-lg leading-none group-hover:scale-105 transition-transform origin-left lowercase tabular-nums">${comp.capacity_mtpa || comp.capacity || 'N/A'} <span className="text-[11px] text-slate-500 font-medium uppercase">MTPA</span></div>
+              <div className="text-[10px] text-slate-500 mt-2 font-bold tracking-wide">
                 ${comp.market_share ? comp.market_share + ' Market Share' : comp.valuation || 'Cement Sector'}
               </div>
             </div>
@@ -306,7 +337,7 @@ const CompetitorGrid = ({ data, loading }) => {
 
 const ResearchAssistant = ({ isOpen, onClose, data }) => {
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Welcome to the Executive Research Suite. I have contextual access to UltraTech's operational, financial, and macro-economic data. How can I assist your analysis today?" }
+    { role: 'bot', text: "Welcome to the Research Assistant. I have interrogated UltraTech's operational, financial, and macro intelligence feeds. How can I assist your analysis?" }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -333,38 +364,38 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
       const result = await res.json();
       setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
     } catch (e) {
-      setMessages(prev => [...prev, { role: 'bot', text: "⚠️ Technical interruption. The research engine is cooling down. Please retry." }]);
+      setMessages(prev => [...prev, { role: 'bot', text: "⚠️ Intelligence engine offline. Please retry." }]);
     } finally {
       setIsTyping(false);
     }
   };
 
   return html`
-    <div className=${`fixed inset-y-0 right-0 w-[450px] glass-panel z-[100] transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-2xl flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-      <div className="p-6 border-b border-obsidian-border/50 flex items-center justify-between bg-obsidian-card/40 backdrop-blur-3xl">
+    <div className=${`fixed inset-y-0 right-0 w-[450px] glass-panel z-[100] transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-2xl flex flex-col border-l border-slate-200 dark:border-obsidian-border ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="p-6 border-b border-slate-200 dark:border-obsidian-border/50 flex items-center justify-between bg-white dark:bg-obsidian-card/40 backdrop-blur-3xl">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gold/10 rounded-xl">
              <${Icon} name=${MessageSquare} className="w-5 h-5 text-gold" />
           </div>
           <div>
-            <h3 className="text-white dark:text-white font-bold text-sm tracking-tight">Research Assistant</h3>
+            <h3 className="text-slate-900 dark:text-white font-black text-sm tracking-tight uppercase">Intelligence Assistant</h3>
             <div className="flex items-center gap-2">
                <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse shadow-[0_0_8px_#d4af37]"></div>
-               <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Model 1.5 Real-Time</span>
+               <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Model 1.5 Live</span>
             </div>
           </div>
         </div>
-        <button onClick=${onClose} className="p-2 hover:bg-obsidian-hover rounded-full transition-colors group">
-          <${Icon} name=${ChevronRight} className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+        <button onClick=${onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-obsidian-hover rounded-full transition-colors group">
+          <${Icon} name=${ChevronRight} className="w-5 h-5 text-slate-500 group-hover:text-gold transition-colors" />
         </button>
       </div>
 
-      <div ref=${scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-gradient-to-b from-transparent to-obsidian/40">
+      <div ref=${scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-gradient-to-b from-transparent to-slate-100/50 dark:to-obsidian/40">
         ${messages.map((msg, i) => html`
           <div key=${i} className=${`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className=${`max-w-[90%] p-4 rounded-2xl text-[13px] leading-relaxed shadow-sm ${msg.role === 'user'
+            <div className=${`max-w-[90%] p-4 rounded-2xl text-[13px] leading-relaxed shadow-sm font-medium ${msg.role === 'user'
       ? 'bg-gold text-obsidian font-bold rounded-br-none'
-      : 'bg-obsidian-card border border-obsidian-border text-slate-300 rounded-bl-none'
+      : 'bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border text-slate-700 dark:text-slate-300 rounded-bl-none'
     }`}>
               ${msg.text}
             </div>
@@ -372,7 +403,7 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
         `)}
         ${isTyping && html`
           <div className="flex justify-start">
-             <div className="bg-obsidian-card border border-obsidian-border p-5 rounded-2xl rounded-bl-none shadow-sm">
+             <div className="bg-white dark:bg-obsidian-card border border-slate-200 dark:border-obsidian-border p-5 rounded-2xl rounded-bl-none shadow-sm">
                 <div className="flex gap-1.5">
                    <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce"></div>
                    <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce delay-150"></div>
@@ -383,22 +414,22 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
         `}
       </div>
 
-      <div className="p-6 border-t border-obsidian-border/50 bg-obsidian-card/60 backdrop-blur-2xl">
+      <div className="p-6 border-t border-slate-200 dark:border-obsidian-border/50 bg-white/80 dark:bg-obsidian-card/60 backdrop-blur-2xl">
         <div className="relative group">
           <input 
             value=${input}
             onChange=${e => setInput(e.target.value)}
             onKeyDown=${e => e.key === 'Enter' && handleSend()}
-            placeholder="Interrogate data assets..." 
-            className="w-full bg-obsidian border border-obsidian-border rounded-xl py-4 pl-4 pr-12 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-gold/50 transition-all shadow-inner group-hover:border-obsidian-border"
+            placeholder="Interrogate intelligence assets..." 
+            className="w-full bg-slate-100 dark:bg-obsidian border border-slate-200 dark:border-obsidian-border rounded-xl py-4 pl-4 pr-12 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-gold/50 transition-all shadow-inner"
           />
-          <button onClick=${() => handleSend()} className="absolute right-2 top-2 p-2 bg-gold text-obsidian hover:bg-white rounded-lg transition-all active:scale-90 shadow-md">
+          <button onClick=${() => handleSend()} className="absolute right-2 top-2 p-2 bg-gold text-obsidian hover:bg-obsidian-hover hover:text-white rounded-lg transition-all active:scale-90 shadow-md">
             <${Icon} name=${ArrowUpRight} className="w-5 h-5" />
           </button>
         </div>
         <div className="mt-5 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-          ${["M&A Strategy", "Growth vs Peer", "ESG Rating", "Macro Impacts"].map(chip => html`
-             <button key=${chip} onClick=${() => handleSend(chip)} className="whitespace-nowrap px-4 py-2 rounded-xl border border-obsidian-border text-[11px] font-bold text-slate-500 hover:text-gold hover:border-gold/30 hover:bg-obsidian-hover transition-all shadow-sm">
+          ${["M&A Outlook", "Risk Analysis", "ESG Scorecard", "Market Pulse"].map(chip => html`
+             <button key=${chip} onClick=${() => handleSend(chip)} className="whitespace-nowrap px-4 py-2 rounded-xl border border-slate-200 dark:border-obsidian-border text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-gold hover:border-gold/30 hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-all shadow-sm">
                ${chip}
              </button>
           `)}
@@ -408,49 +439,51 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
   `;
 };
 
-const CommandK = ({ isOpen, onClose }) => {
+const CommandK = ({ isOpen, onClose, onAction }) => {
   const [query, setQuery] = useState('');
 
   if (!isOpen) return null;
 
+  const items = [
+    { id: 'overview', icon: LayoutDashboard, label: 'Executive Overview', sub: 'Aggregated Portfolio Dossier', color: 'text-gold' },
+    { id: 'outlook', icon: TrendingUp, label: 'Strategic Outlook', sub: 'Market Mood & Signals', color: 'text-emerald-500' },
+    { id: 'financials', icon: BarChart3, label: 'LTM Financials', sub: 'Peer Benchmarking Scorecards', color: 'text-blue-500' },
+    { id: 'assistant', icon: MessageSquare, label: 'Interrogate AI Assistant', sub: 'Contextual Research Feed', color: 'text-orange-500' }
+  ];
+
   return html`
     <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh] px-4">
-      <div className="absolute inset-0 bg-obsidian/80 backdrop-blur-md" onClick=${onClose}></div>
-      <div className="w-full max-w-2xl glass-panel bg-obsidian-card relative rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] overflow-hidden border-gold/10 animate-in fade-in zoom-in duration-300">
-        <div className="p-5 border-b border-obsidian-border/50 flex items-center gap-4">
+      <div className="absolute inset-0 bg-slate-900/40 dark:bg-obsidian/80 backdrop-blur-md" onClick=${onClose}></div>
+      <div className="w-full max-w-2xl glass-panel bg-white dark:bg-obsidian-card relative rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-5 border-b border-slate-200 dark:border-obsidian-border/50 flex items-center gap-4">
           <${Icon} name=${Search} className="w-6 h-6 text-gold" />
           <input 
             autoFocus
             placeholder="Search Intelligence Assets (Ctrl+K)..." 
-            className="bg-transparent border-none outline-none text-white w-full text-base font-medium placeholder-slate-600"
+            className="bg-transparent border-none outline-none text-slate-900 dark:text-white w-full text-lg font-bold placeholder-slate-400 dark:placeholder-slate-600"
             value=${query}
             onChange=${e => setQuery(e.target.value)}
           />
         </div>
         <div className="p-2 max-h-[450px] overflow-y-auto custom-scrollbar">
-           <div className="px-4 py-3 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Platform Navigation</div>
-           ${[
-      { icon: LayoutDashboard, label: 'Executive Overview', sub: 'Aggregated Dossier', color: 'text-gold' },
-      { icon: TrendingUp, label: 'Strategic Outlook', sub: 'Market Mood & Forecasts', color: 'text-emerald-500' },
-      { icon: BarChart3, label: 'LTM Financials', sub: 'Peer Benchmarking Scorecards', color: 'text-blue-500' },
-      { icon: MessageSquare, label: 'Interrogate AI Assistant', sub: 'Natural Language Research', color: 'text-orange-500' }
-    ].map((item, i) => html`
-             <button key=${i} onClick=${onClose} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-obsidian-hover transition-all group text-left">
-                <div className=${`p-2.5 bg-obsidian rounded-xl border border-obsidian-border group-hover:scale-110 transition-transform ${item.color}`}>
+           <div className="px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em]">Platform Actions</div>
+           ${items.map((item, i) => html`
+             <button key=${item.id} onClick=${() => { onAction(item.id); onClose(); }} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-slate-50 dark:hover:bg-obsidian-hover transition-all group text-left">
+                <div className=${`p-2.5 bg-slate-100 dark:bg-obsidian rounded-xl border border-slate-200 dark:border-obsidian-border group-hover:scale-110 transition-transform ${item.color}`}>
                    <${Icon} name=${item.icon} className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                   <div className="text-slate-200 text-sm font-bold group-hover:text-white transition-colors">${item.label}</div>
-                   <div className="text-slate-500 text-[10px] tracking-widest uppercase font-medium mt-0.5">${item.sub}</div>
+                   <div className="text-slate-900 dark:text-slate-200 text-sm font-black group-hover:text-gold transition-colors">${item.label}</div>
+                   <div className="text-slate-500 text-[10px] tracking-widest uppercase font-bold mt-0.5">${item.sub}</div>
                 </div>
-                <${Icon} name=${ChevronRight} className="w-4 h-4 text-slate-700 group-hover:text-gold group-hover:translate-x-1 transition-all" />
+                <${Icon} name=${ChevronRight} className="w-4 h-4 text-slate-300 dark:text-slate-700 group-hover:text-gold group-hover:translate-x-1 transition-all" />
              </button>
            `)}
         </div>
-        <div className="p-4 bg-obsidian-border/20 border-t border-obsidian-border/50 text-[10px] font-bold text-slate-600 flex justify-between items-center tracking-widest uppercase">
+        <div className="p-4 bg-slate-50 dark:bg-obsidian-border/20 border-t border-slate-200 dark:border-obsidian-border text-[10px] font-black text-slate-400 dark:text-slate-600 flex justify-between items-center tracking-widest uppercase">
            <span>Select Item with ↑↓ and Enter</span>
            <span className="flex gap-4">
-              <span className="flex items-center gap-1.5 font-mono"><span className="px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-slate-500">ESC</span> to Close</span>
+              <span className="flex items-center gap-1.5 font-mono"><span className="px-1.5 py-0.5 rounded bg-white dark:bg-obsidian border border-slate-200 dark:border-obsidian-border text-slate-400 uppercase">ESC</span> to Close</span>
            </span>
         </div>
       </div>
@@ -458,12 +491,10 @@ const CommandK = ({ isOpen, onClose }) => {
   `;
 };
 
-const BentoGrid = ({ data, loading }) => {
+const BentoGrid = ({ data, loading, onShowChart }) => {
   const stockChartData = useMemo(() => {
     const history = data?.financials?.companies?.['UltraTech Cement']?.price_history;
     if (!Array.isArray(history)) return null;
-
-    // Use last 30 intervals for better visual
     const recent = history.slice(-30);
     return {
       labels: recent.map(d => d.date),
@@ -472,10 +503,6 @@ const BentoGrid = ({ data, loading }) => {
         label: 'Price (NSE)'
       }]
     };
-  }, [data]);
-
-  const macroItems = useMemo(() => {
-    return Array.isArray(data?.macro?.data) ? data.macro.data : [];
   }, [data]);
 
   const pills = useMemo(() => {
@@ -487,67 +514,43 @@ const BentoGrid = ({ data, loading }) => {
 
   return html`
     <div className="mt-20 p-6 grid grid-cols-12 gap-6 max-w-[1700px] mx-auto pb-32">
-        <!-- Row 1: Key Metrics -->
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
-            <${MetricCard} 
-                label="Market Capitalization" 
-                value=${company.market_cap || '₹3.75T'} 
-                sub="INR (Consolidated)" 
-                trend=${2.4}
-                loading=${loading}
-            />
+            <${MetricCard} label="Market Capitalization" value=${company.market_cap || '₹3.75T'} sub="INR (Consolidated)" trend=${2.4} loading=${loading} />
         </div>
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
-            <${MetricCard} 
-                label="Spot Exchange Price" 
-                value=${company.current_price || '₹12,748'} 
-                sub="NSE: ULTRACEMCO" 
-                trend=${company.ytd_return_raw || 1.2}
-                loading=${loading}
-            />
+            <${MetricCard} label="Spot Exchange Price" value=${company.current_price || '₹12,748'} sub="NSE: ULTRACEMCO" trend=${company.ytd_return_raw || 1.2} loading=${loading} />
         </div>
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
-            <${MetricCard} 
-                label="Operational Baseline" 
-                value=${data?.company_info?.capacity_mtpa || '183.1'} 
-                sub="MTPA Capacity (FY25)" 
-                loading=${loading}
-            />
+            <${MetricCard} label="Operational Baseline" value=${data?.company_info?.capacity_mtpa || '183.1'} sub="MTPA Capacity (FY25)" loading=${loading} />
         </div>
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
-            <${MetricCard} 
-                label="Premium Valuation" 
-                value=${company.pe_ratio || '48.9'} 
-                sub="P/E Multiplier (LTM)" 
-                loading=${loading}
-            />
+            <${MetricCard} label="Premium Valuation" value=${company.pe_ratio || '48.9'} sub="P/E Multiplier (LTM)" loading=${loading} />
         </div>
 
-        <!-- Row 2: Executive Summary & Performance Chart -->
-        <div className="col-span-12 lg:col-span-8 glass-panel p-8 rounded-3xl min-h-[480px] shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full pointer-events-none"></div>
+        <!-- Strategic Dossier -->
+        <div className="col-span-12 lg:col-span-8 glass-panel p-8 rounded-3xl min-h-[480px] shadow-sm relative overflow-hidden group/dossier">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full pointer-events-none group-hover/dossier:bg-gold/10 transition-all duration-700"></div>
             <div className="flex justify-between items-center mb-10 relative z-10">
-                <h2 className="text-white dark:text-white text-lg font-black flex items-center gap-3">
+                <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
                    <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_#d4af37]"></div>
                    Strategic Asset Dossier
                 </h2>
                 <div className="flex items-center gap-4">
-                   <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em]">Confidential / V7.1</span>
-                   <button className="text-slate-500 hover:text-white transition-colors active:scale-90"><${Icon} name=${Maximize2} className="w-4 h-4" /></button>
+                   <span className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-[0.3em]">Confidential / V7.2 Intelligence</span>
                 </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10 h-full relative z-10">
                 <div className="md:col-span-5 flex flex-col justify-between">
                     <div className="flex flex-col h-full">
-                        <div className=${`text-slate-300 text-sm leading-relaxed font-light mb-8 italic border-l-2 border-gold/20 pl-4 py-1 flex-1 ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-5 bg-gold/5' : ''}`}>
-                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Synchronizing strategic intelligence datasets...')}"
+                        <div className=${`text-slate-600 dark:text-slate-300 text-sm leading-relaxed font-bold mb-8 italic border-l-2 border-gold/40 pl-4 py-1 flex-1 ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-5' : ''}`}>
+                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Synchronizing platform assets...')}"
                         </div>
                         <div className="grid grid-cols-1 gap-3 mt-auto">
                             ${pills.slice(0, 3).map(pill => html`
-                                <div key=${pill.title || pill} className="flex items-center gap-4 p-3.5 rounded-2xl bg-obsidian-card/40 border border-obsidian-border group hover:border-gold/30 hover:bg-obsidian-hover transition-all cursor-default">
-                                    <div className="text-gold group-hover:scale-110 transition-transform"><${Icon} name=${(pill.title || pill || '').toString().toLowerCase().includes('growth') ? TrendingUp : (pill.title || pill || '').toString().toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
-                                    <div className="text-white font-bold text-[10px] uppercase tracking-[0.2em] line-clamp-1">${pill.title || pill}</div>
+                                <div key=${pill.title || pill} className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-obsidian-card/40 border border-slate-200 dark:border-obsidian-border group/pill hover:border-gold/30 hover:bg-white dark:hover:bg-obsidian-hover transition-all cursor-default shadow-sm">
+                                    <div className="text-gold group-hover/pill:scale-110 transition-transform"><${Icon} name=${(pill.title || pill || '').toString().toLowerCase().includes('growth') ? TrendingUp : (pill.title || pill || '').toString().toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
+                                    <div className="text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-[0.2em] line-clamp-1">${pill.title || pill}</div>
                                 </div>
                             `)}
                         </div>
@@ -556,62 +559,44 @@ const BentoGrid = ({ data, loading }) => {
                 <div className="md:col-span-7 h-full min-h-[300px]">
                     <${ChartCard} 
                         title="Equity Performance" 
-                        subtitle="Relative Returns Spectrum (LTM Historical)"
+                        subtitle="Relative Returns Spectrum (LTM)"
                         loading=${loading}
                         data=${stockChartData}
-                        config=${{ type: 'line' }}
+                        onExpand=${() => onShowChart('equity', 'Equity Performance Spectrum', stockChartData)}
                     />
                 </div>
             </div>
         </div>
 
         <!-- Sentiment Card -->
-        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl min-h-[480px] flex flex-col overflow-hidden relative shadow-2xl">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[64px] rounded-full"></div>
-            <h2 className="text-white dark:text-white text-lg font-black mb-8 flex justify-between items-center group">
-                <span className="relative">
-                   Market Sentiment
-                   <div className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-emerald-500/50 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-                </span>
+        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl min-h-[480px] flex flex-col overflow-hidden relative shadow-sm">
+            <h2 className="text-slate-900 dark:text-white text-lg font-black mb-8 flex justify-between items-center group">
+                <span className="relative">Market Sentiment</span>
                 <${Icon} name=${TrendingUp} className="w-5 h-5 text-emerald-500" />
             </h2>
             <div className="flex-1 flex flex-col items-center justify-center pt-4">
                 <div className="relative w-64 h-32 overflow-hidden">
-                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-obsidian-border/50 rounded-full shadow-inner"></div>
-                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-emerald-500/80 rounded-full clip-half-gauge transition-all duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)]" 
+                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-slate-200 dark:border-obsidian-border/50 rounded-full"></div>
+                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-emerald-500 rounded-full clip-half-gauge transition-all duration-1000 ease-out" 
                          style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 180}deg)` }}></div>
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-28 bg-white/40 rounded-full origin-bottom shadow-md"
-                         style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 90}deg)` }}></div>
                 </div>
                 <div className="text-center mt-8 space-y-2">
-                    <div className="text-emerald-400 uppercase font-black tracking-[0.4em] text-3xl drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
+                    <div className="text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-[0.4em] text-3xl">
                         ${data?.outlook?.mood_label || 'BULLISH'}
                     </div>
-                    <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 justify-center">
-                      <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-                      Confidence Rating: 84.2%
-                    </div>
+                    <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Confidence: 84.2%</div>
                 </div>
             </div>
-            <div className="mt-8 p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm self-stretch group hover:bg-emerald-500/10 transition-colors">
-                <p className="text-slate-400 text-xs italic font-medium leading-relaxed text-center">
-                    "${data?.outlook?.sentiment_analysis || 'Macro momentum remains resilient against cyclical sector headwinds, supported by aggressive infra-led demand.'}"
+            <div className="mt-8 p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm shadow-sm">
+                <p className="text-slate-600 dark:text-slate-400 text-xs italic font-bold leading-relaxed text-center">
+                    "${data?.outlook?.sentiment_analysis || 'Macro momentum remains resilient against cyclical sector headwinds.'}"
                 </p>
             </div>
         </div>
 
-        <!-- Row 3: Detail Modules -->
-        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-xl">
-           <${NewsModule} data=${data?.news} loading=${loading} />
-        </div>
-        
-        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-xl">
-           <${M_A_Module} data=${data?.ma_deals} loading=${loading} />
-        </div>
-
-        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-xl">
-           <${CompetitorGrid} data=${data?.competitors} loading=${loading} />
-        </div>
+        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-sm"><${NewsModule} data=${data?.news} loading=${loading} /></div>
+        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-sm"><${M_A_Module} data=${data?.ma_deals} loading=${loading} /></div>
+        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-sm"><${CompetitorGrid} data=${data?.competitors} loading=${loading} /></div>
     </div>
     `;
 };
@@ -621,7 +606,8 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('ut-theme') || 'dark');
+  const [theme, setTheme] = useState(localStorage.getItem('ut-theme') || 'light');
+  const [modal, setModal] = useState({ isOpen: false, title: '', data: null });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -629,7 +615,10 @@ const App = () => {
         e.preventDefault();
         setIsSearchOpen(prev => !prev);
       }
-      if (e.key === 'Escape') setIsSearchOpen(false);
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+        setModal(m => ({ ...m, isOpen: false }));
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -662,68 +651,78 @@ const App = () => {
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
-  const triggerRefresh = async () => {
-    setLoading(true);
-    await fetch('/api/refresh', { method: 'POST' });
-    setTimeout(() => window.location.reload(), 2000);
+  const handleSearchAction = (id) => {
+    if (id === 'assistant') setIsAIOpen(true);
+    if (id === 'outlook') {
+      setModal({
+        isOpen: true,
+        title: 'Strategic Market Outlook',
+        children: html`
+            <div className="space-y-6">
+              <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                <h4 className="text-emerald-700 dark:text-emerald-400 font-black uppercase text-xs mb-3">Executive Summary</h4>
+                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed font-medium">${data?.outlook?.executive_summary}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="p-4 rounded-xl bg-slate-100 dark:bg-obsidian-border/40 border border-slate-200 dark:border-obsidian-border">
+                    <h5 className="text-gold font-black uppercase text-[10px] mb-2 tracking-widest">Growth Catalysts</h5>
+                    <ul className="text-xs space-y-2 text-slate-600 dark:text-slate-400 font-bold">
+                       ${(data?.outlook?.catalysts || ['Infra Demand', 'Capacity Expansion', 'Green Energy Shift']).map(c => html`<li>• ${c}</li>`)}
+                    </ul>
+                 </div>
+                 <div className="p-4 rounded-xl bg-slate-100 dark:bg-obsidian-border/40 border border-slate-200 dark:border-obsidian-border">
+                    <h5 className="text-rose-500 font-black uppercase text-[10px] mb-2 tracking-widest">Macro Risks</h5>
+                    <ul className="text-xs space-y-2 text-slate-600 dark:text-slate-400 font-bold">
+                       ${(data?.outlook?.risks || ['Fuel Volatility', 'Cyclical Pricing', 'Logistics Inflation']).map(r => html`<li>• ${r}</li>`)}
+                    </ul>
+                 </div>
+              </div>
+            </div>
+          `
+      });
+    }
+  };
+
+  const showExpandedChart = (id, title, chartData) => {
+    setModal({
+      isOpen: true,
+      title: title,
+      children: html`
+          <div className="h-[500px] w-full relative">
+            <${ChartCard} title=${title} subtitle="Expanded Intelligence Analysis" data=${chartData} loading=${false} />
+          </div>
+        `
+    });
   };
 
   return html`
-    <div className="min-h-screen bg-obsidian dark:bg-obsidian light:bg-slate-50 selection:bg-gold/30 transition-colors duration-500">
-      <${Header} 
-        onRefresh=${triggerRefresh} 
-        onExport=${() => window.print()} 
-        onSearchOpen=${() => setIsSearchOpen(true)}
-        status=${loading ? 'Synchronizing' : 'Live Intelligence'} 
-        theme=${theme}
-        onThemeToggle=${toggleTheme}
-      />
+    <div className="min-h-screen bg-slate-50 dark:bg-obsidian selection:bg-gold/30 transition-colors duration-500">
+      <${Header} onRefresh=${() => window.location.reload()} onExport=${() => window.print()} onSearchOpen=${() => setIsSearchOpen(true)} status=${loading ? 'Synchronizing' : 'Live Intelligence'} theme=${theme} onThemeToggle=${toggleTheme} />
       
       <main className=${`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isAIOpen ? 'mr-[450px]' : ''}`}>
-        <${BentoGrid} data=${data} loading=${loading} />
+        <${BentoGrid} data=${data} loading=${loading} onShowChart=${showExpandedChart} />
       </main>
 
-      <${ResearchAssistant} 
-        isOpen=${isAIOpen} 
-        onClose=${() => setIsAIOpen(false)} 
-        data=${data} 
-      />
+      <${ResearchAssistant} isOpen=${isAIOpen} onClose=${() => setIsAIOpen(false)} data=${data} />
+      <${CommandK} isOpen=${isSearchOpen} onClose=${() => setIsSearchOpen(false)} onAction=${handleSearchAction} />
 
-      <${CommandK} 
-        isOpen=${isSearchOpen} 
-        onClose=${() => setIsSearchOpen(false)} 
-      />
+      <${Modal} isOpen=${modal.isOpen} onClose=${() => setModal({ ...modal, isOpen: false })} title=${modal.title}>
+        ${modal.children}
+      <//>
 
-      <!-- Floating Side Trigger -->
-      <button 
-        onClick=${() => setIsAIOpen(!isAIOpen)}
-        className=${`fixed right-6 bottom-16 z-50 p-5 rounded-2xl bg-gold text-obsidian shadow-[0_20px_40px_-8px_#d4af3744] hover:scale-110 active:scale-95 transition-all duration-300 ${isAIOpen ? 'translate-x-[500px]' : 'translate-x-0'}`}
-      >
-        <${Icon} name=${MessageSquare} className="w-6 h-6 shadow-sm" />
+      <button onClick=${() => setIsAIOpen(!isAIOpen)} className=${`fixed right-6 bottom-16 z-50 p-5 rounded-2xl bg-gold text-obsidian shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 ${isAIOpen ? 'translate-x-[500px]' : 'translate-x-0'}`}>
+        <${Icon} name=${MessageSquare} className="w-6 h-6" />
       </button>
 
-      <!-- Search Shorthand UI -->
-      <div className="fixed left-6 bottom-16 z-50 pointer-events-none">
-         <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-2xl border border-obsidian-border bg-obsidian-card/40 backdrop-blur-md opacity-40 hover:opacity-100 transition-opacity">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">Global Intelligence Search (Ctrl+K)</span>
-         </div>
-      </div>
-      
-      <!-- Market Ticker -->
-      <div className="fixed bottom-0 left-0 right-0 h-10 bg-obsidian/95 dark:bg-obsidian/95 light:bg-white/95 backdrop-blur-xl border-t border-obsidian-border z-40 overflow-hidden flex items-center shadow-[0_-4px_20px_rgba(0,0,0,0.1)] transition-colors duration-500">
-        <div className="animate-ticker whitespace-nowrap flex gap-16 px-8">
-           ${(() => {
-      const mData = Array.isArray(data?.macro?.data) ? data.macro.data : [];
-      return [...mData, ...mData, ...mData].map((m, i) => html`
+      <div className="fixed bottom-0 left-0 right-0 h-10 bg-white/95 dark:bg-obsidian/95 backdrop-blur-xl border-t border-slate-200 dark:border-obsidian-border z-40 overflow-hidden flex items-center shadow-lg transition-colors duration-500">
+        <div className="animate-ticker whitespace-nowrap flex gap-12 px-8">
+           ${Array.isArray(data?.macro?.data) ? data.macro.data.map((m, i) => html`
                 <div key=${i} className="flex gap-4 items-center text-[10px] font-black tracking-[0.1em] uppercase group">
-                    <span className="text-slate-500 group-hover:text-slate-300 transition-colors uppercase">${m.name}</span>
-                    <span className="text-white dark:text-white light:text-obsidian font-black">${m.value}</span>
-                    <span className=${`font-black flex items-center gap-0.5 ${m.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                       ${m.change >= 0 ? '▲' : '▼'} ${Math.abs(m.change)}%
-                    </span>
+                    <span className="text-slate-500 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">${m.name}</span>
+                    <span className="text-slate-900 dark:text-white">${m.value}</span>
+                    <span className=${`flex items-center gap-0.5 ${m.change >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>${m.change >= 0 ? '▲' : '▼'} ${Math.abs(m.change)}%</span>
                 </div>
-             `);
-    })()}
+             `) : null}
         </div>
       </div>
     </div>
