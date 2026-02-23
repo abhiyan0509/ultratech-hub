@@ -58,7 +58,7 @@
     <style>
         @layer base {
             body {
-                @apply bg-obsidian text-slate-200 font-body antialiased;
+                @apply bg-obsidian text-slate-200 font-body antialiased transition-colors duration-500;
             }
 
             h1,
@@ -69,8 +69,49 @@
             }
         }
 
+        /* Platform Theme Engine */
+        .dark body {
+            @apply bg-obsidian text-slate-200;
+        }
+
+        .light body {
+            @apply bg-slate-50 text-slate-800;
+        }
+
         .glass-panel {
-            @apply bg-obsidian-card/60 backdrop-blur-xl border border-obsidian-border;
+            @apply backdrop-blur-xl border transition-all duration-500;
+        }
+
+        .dark .glass-panel {
+            @apply bg-obsidian-card/60 border-obsidian-border;
+        }
+
+        .light .glass-panel {
+            @apply bg-white/70 border-slate-200 shadow-sm text-slate-900;
+        }
+
+        .dark .bg-obsidian-card {
+            @apply bg-obsidian-card;
+        }
+
+        .light .bg-obsidian-card {
+            @apply bg-white/80 border-slate-100 shadow-sm;
+        }
+
+        .dark .text-white {
+            @apply text-white;
+        }
+
+        .light .text-white {
+            @apply text-slate-900;
+        }
+
+        .dark .text-slate-200 {
+            @apply text-slate-200;
+        }
+
+        .light .text-slate-200 {
+            @apply text-slate-700;
         }
 
         @keyframes shimmer {
@@ -118,7 +159,7 @@
     </style>
 </head>
 
-<body class="dark overflow-x-hidden">
+<body class="overflow-x-hidden">
     <div id="root"></div>
 
     <script>

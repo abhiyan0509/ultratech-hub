@@ -17,7 +17,10 @@ import {
   Zap,
   ShieldCheck,
   Target,
-  Maximize2
+  Maximize2,
+  Moon,
+  Sun,
+  Handshake
 } from 'lucide-react';
 
 const html = htm.bind(React.createElement);
@@ -29,26 +32,26 @@ const Icon = ({ name: IconComp, className = "w-5 h-5" }) => {
 
 // --- SUBSIDIARY COMPONENTS ---
 
-const Header = ({ onRefresh, onExport, status, onSearchOpen }) => {
+const Header = ({ onRefresh, onExport, status, onSearchOpen, theme, onThemeToggle }) => {
   return html`
-    <header className="fixed top-0 left-0 right-0 h-16 glass-panel z-50 px-6 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 h-16 glass-panel z-50 px-6 flex items-center justify-between border-b border-obsidian-border/50">
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-3">
-          <div className="bg-gold p-1.5 rounded-lg">
+          <div className="bg-gold p-1.5 rounded-lg shadow-[0_0_15px_rgba(212,175,55,0.2)]">
              <div className="text-obsidian font-black italic text-xl tracking-tighter">UT</div>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-white font-bold text-sm tracking-wide uppercase leading-tight">Executive Intelligence</h1>
+            <h1 className="text-white dark:text-white font-bold text-sm tracking-wide uppercase leading-tight">Executive Intelligence</h1>
             <span className="text-slate-500 text-[10px] uppercase tracking-[0.2em]">UltraTech Cement Platform</span>
           </div>
         </div>
         <button 
           onClick=${onSearchOpen}
-          className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-obsidian-border/30 border border-obsidian-border text-slate-500 text-xs hover:border-gold/30 transition-all group"
+          className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-obsidian-border/30 border border-obsidian-border text-slate-500 text-xs hover:border-gold/30 transition-all group shadow-inner"
         >
           <${Icon} name=${Search} className="w-4 h-4 group-hover:text-gold transition-colors" />
           <span>Search Intelligence Assets...</span>
-          <span className="ml-8 px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-[10px] italic">Ctrl+K</span>
+          <span className="ml-8 px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-[10px] italic font-mono">Ctrl+K</span>
         </button>
       </div>
 
@@ -57,6 +60,14 @@ const Header = ({ onRefresh, onExport, status, onSearchOpen }) => {
            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
            <span className="text-[10px] uppercase font-black tracking-wider">${status}</span>
         </div>
+
+        <button 
+          onClick=${onThemeToggle}
+          className="p-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-gold hover:bg-obsidian-hover transition-all active:scale-95"
+          title=${`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          <${Icon} name=${theme === 'dark' ? Sun : Moon} className="w-4 h-4" />
+        </button>
         
         <button onClick=${onExport} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-obsidian-border text-slate-400 hover:text-white hover:bg-obsidian-hover transition-all text-xs font-semibold">
            <${Icon} name=${FileDown} className="w-4 h-4" />
@@ -74,7 +85,7 @@ const Header = ({ onRefresh, onExport, status, onSearchOpen }) => {
 const MetricCard = ({ label, value, sub, trend, loading }) => {
   const isPositive = trend > 0;
   return html`
-    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500">
+    <div className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:border-gold/30 transition-all duration-500 shadow-lg">
       <div className="flex justify-between items-start mb-4">
         <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.1em]">${label}</span>
         ${trend && html`
@@ -85,10 +96,10 @@ const MetricCard = ({ label, value, sub, trend, loading }) => {
         `}
       </div>
       <div>
-        <div className=${`text-2xl font-black text-white mb-1 ${loading ? 'animate-shimmer rounded h-8 w-2/3' : ''}`}>
+        <div className=${`text-2xl font-black text-white dark:text-white mb-1 ${loading ? 'animate-shimmer rounded h-8 w-2/3 opacity-10' : ''}`}>
            ${!loading && value}
         </div>
-        <div className="text-slate-500 text-[10px] font-medium italic">${sub}</div>
+        <div className="text-slate-500 text-[10px] font-medium italic tracking-wide">${sub}</div>
       </div>
     </div>
   `;
@@ -123,27 +134,33 @@ const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
           }
         },
         scales: {
-          x: { display: false },
-          y: { display: false }
+          x: {
+            display: false,
+            grid: { display: false }
+          },
+          y: {
+            display: false,
+            grid: { display: false }
+          }
         },
         interaction: { intersect: false, mode: 'index' },
         elements: {
           line: {
             tension: 0.4,
             borderColor: '#d4af37',
-            borderWidth: 2,
+            borderWidth: 3,
             fill: true,
             backgroundColor: (context) => {
               const chart = context.chart;
               const { ctx, chartArea } = chart;
               if (!chartArea) return null;
               const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.1)');
+              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.15)');
               gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
               return gradient;
             }
           },
-          point: { radius: 0, hoverRadius: 5, hoverBackgroundColor: '#d4af37' }
+          point: { radius: 0, hoverRadius: 6, hoverBackgroundColor: '#d4af37', hoverBorderColor: '#fff', hoverBorderWidth: 2 }
         }
       }
     });
@@ -155,19 +172,19 @@ const ChartCard = ({ title, subtitle, loading, data, config = {} }) => {
     <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all">
       <div className="flex justify-between items-start mb-6">
         <div>
-           <h3 className="text-white text-xs font-bold tracking-tight">${title}</h3>
+           <h3 className="text-white dark:text-white text-xs font-bold tracking-tight">${title}</h3>
            <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">${subtitle}</p>
         </div>
         <div className="flex gap-1 p-1 bg-obsidian-border/30 rounded-lg">
            ${['1M', '6M', '1Y'].map(t => html`
-              <button key=${t} className=${`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${t === '1Y' ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-white'}`}>
+              <button key=${t} className=${`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${t === '1Y' ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-white'}`}>
                 ${t}
               </button>
            `)}
         </div>
       </div>
       <div className="flex-1 min-h-0 relative">
-        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-20"></div>`}
+        ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-20 bg-gold/5"></div>`}
         <canvas ref=${chartRef}></canvas>
       </div>
     </div>
@@ -181,7 +198,7 @@ const NewsModule = ({ data, loading }) => {
   return html`
     <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-white text-lg font-bold flex items-center gap-2">
+        <h2 className="text-white dark:text-white text-lg font-bold flex items-center gap-2">
             <div className="w-1.5 h-6 bg-gold rounded-full"></div>
             Market Intelligence
         </h2>
@@ -189,18 +206,54 @@ const NewsModule = ({ data, loading }) => {
       </div>
       <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
         ${loading ? html`
-          ${[1, 2, 3, 4, 5].map(i => html`<div key=${i} className="animate-shimmer h-20 w-full rounded-2xl mb-4 opacity-10"></div>`)}
+          ${[1, 2, 3, 4, 5].map(i => html`<div key=${i} className="animate-shimmer h-20 w-full rounded-2xl mb-4 opacity-5 bg-gold/5"></div>`)}
         ` : safeNews.slice(0, 10).map((item, i) => html`
-          <a key=${i} href=${item.url || item.link} target="_blank" className="block p-4 rounded-2xl bg-obsidian-card border border-obsidian-border hover:border-gold/30 hover:bg-obsidian-hover transition-all group relative overflow-hidden">
+          <a key=${i} href=${item.url || item.link} target="_blank" className="block p-4 rounded-2xl bg-obsidian-card/40 border border-obsidian-border hover:border-gold/30 hover:bg-obsidian-hover transition-all group relative overflow-hidden shadow-sm">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
             <div className="flex justify-between items-start mb-2">
                <span className="text-[10px] text-gold font-black uppercase tracking-widest">${item.source || 'Standard'}</span>
                <span className="text-[10px] text-slate-500">${item.date}</span>
             </div>
-            <h3 className="text-slate-200 text-xs font-semibold leading-relaxed group-hover:text-white transition-colors line-clamp-2">
+            <h3 className="text-slate-200 dark:text-slate-200 text-xs font-semibold leading-relaxed group-hover:text-white transition-colors line-clamp-2">
               ${item.title}
             </h3>
           </a>
+        `)}
+      </div>
+    </div>
+  `;
+};
+
+const M_A_Module = ({ data, loading }) => {
+  const deals = Array.isArray(data) ? data : (data?.deals || []);
+
+  return html`
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-white dark:text-white text-lg font-bold flex items-center gap-2">
+            <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+            M&A Pipeline
+        </h2>
+        <span className="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em]">Transaction Flow</span>
+      </div>
+      <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
+        ${loading ? html`
+          ${[1, 2, 3].map(i => html`<div key=${i} className="animate-shimmer h-28 rounded-2xl bg-emerald-500/5 opacity-10"></div>`)}
+        ` : (deals || []).map((deal, i) => html`
+          <div key=${i} className="p-4 rounded-2xl bg-obsidian-card/40 border border-obsidian-border relative group">
+            <div className="flex justify-between items-start mb-2">
+               <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">${deal.status || 'Active'}</span>
+               <span className="text-[10px] text-slate-500">${deal.date}</span>
+            </div>
+            <h3 className="text-white text-xs font-bold mb-2">${deal.target || deal.title}</h3>
+            <div className="flex items-center gap-4">
+              <div className="text-[10px] text-slate-400 font-medium">Value: <span className="text-emerald-400 font-black tracking-tighter">${deal.value}</span></div>
+              <div className="text-[10px] text-slate-400 font-medium italic">${deal.advisor || 'Multi-Source'}</div>
+            </div>
+            <div className="mt-3 text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+              ${deal.impact || deal.details}
+            </div>
+          </div>
         `)}
       </div>
     </div>
@@ -212,7 +265,7 @@ const CompetitorGrid = ({ data, loading }) => {
   const compItems = useMemo(() => {
     if (Array.isArray(compData)) return compData;
     if (compData && typeof compData === 'object') {
-      return Object.entries(compData).map(([name, profile]) => ({
+      return Object.entries(compData).sort((a, b) => (b[1].capacity_mtpa || 0) - (a[1].capacity_mtpa || 0)).map(([name, profile]) => ({
         name: name,
         ...profile
       }));
@@ -223,7 +276,7 @@ const CompetitorGrid = ({ data, loading }) => {
   return html`
     <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-white text-lg font-bold flex items-center gap-2">
+        <h2 className="text-white dark:text-white text-lg font-bold flex items-center gap-2">
             <div className="w-1.5 h-6 bg-gold rounded-full"></div>
             Sector Landscape
         </h2>
@@ -231,12 +284,15 @@ const CompetitorGrid = ({ data, loading }) => {
       </div>
       <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         ${loading ? html`
-          ${[1, 2, 3, 4, 5, 6].map(i => html`<div key=${i} className="animate-shimmer h-24 rounded-2xl opacity-10"></div>`)}
+          ${[1, 2, 3, 4, 5, 6].map(i => html`<div key=${i} className="animate-shimmer h-24 rounded-2xl bg-gold/5 opacity-10"></div>`)}
         ` : compItems.map((comp, i) => html`
-          <div key=${i} className="p-4 rounded-2xl bg-obsidian-card border border-obsidian-border flex flex-col justify-between group hover:bg-obsidian-hover hover:border-emerald-500/20 transition-all duration-500">
+          <div key=${i} className="p-4 rounded-2xl bg-obsidian-card/40 border border-obsidian-border flex flex-col justify-between group hover:bg-obsidian-hover hover:border-emerald-500/20 transition-all duration-500 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-20 transition-opacity">
+               <${Icon} name=${Target} className="w-8 h-8 text-white" />
+            </div>
             <div className="text-slate-400 text-[10px] uppercase font-black tracking-tight mb-2 group-hover:text-gold transition-colors">${comp.name}</div>
             <div>
-              <div className="text-white font-black text-lg leading-none">${comp.capacity_mtpa || comp.capacity} <span className="text-[11px] text-slate-600 font-medium">MTPA</span></div>
+              <div className="text-white font-black text-lg leading-none group-hover:scale-105 transition-transform origin-left">${comp.capacity_mtpa || comp.capacity || 'N/A'} <span className="text-[11px] text-slate-600 font-medium">MTPA</span></div>
               <div className="text-[10px] text-slate-500 mt-2 font-medium tracking-wide">
                 ${comp.market_share ? comp.market_share + ' Market Share' : comp.valuation || 'Cement Sector'}
               </div>
@@ -284,14 +340,14 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
   };
 
   return html`
-    <div className=${`fixed inset-y-0 right-0 w-[450px] glass-panel z-[100] transform transition-transform duration-500 ease-in-out shadow-2xl flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-      <div className="p-6 border-b border-obsidian-border flex items-center justify-between bg-obsidian-card/40 backdrop-blur-3xl">
+    <div className=${`fixed inset-y-0 right-0 w-[450px] glass-panel z-[100] transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-2xl flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="p-6 border-b border-obsidian-border/50 flex items-center justify-between bg-obsidian-card/40 backdrop-blur-3xl">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gold/10 rounded-xl">
              <${Icon} name=${MessageSquare} className="w-5 h-5 text-gold" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-sm tracking-tight">Research Assistant</h3>
+            <h3 className="text-white dark:text-white font-bold text-sm tracking-tight">Research Assistant</h3>
             <div className="flex items-center gap-2">
                <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse shadow-[0_0_8px_#d4af37]"></div>
                <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Model 1.5 Real-Time</span>
@@ -327,7 +383,7 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
         `}
       </div>
 
-      <div className="p-6 border-t border-obsidian-border bg-obsidian-card/60 backdrop-blur-2xl">
+      <div className="p-6 border-t border-obsidian-border/50 bg-obsidian-card/60 backdrop-blur-2xl">
         <div className="relative group">
           <input 
             value=${input}
@@ -342,7 +398,7 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
         </div>
         <div className="mt-5 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           ${["M&A Strategy", "Growth vs Peer", "ESG Rating", "Macro Impacts"].map(chip => html`
-             <button onClick=${() => handleSend(chip)} className="whitespace-nowrap px-4 py-2 rounded-xl border border-obsidian-border text-[11px] font-bold text-slate-500 hover:text-gold hover:border-gold/30 hover:bg-obsidian-hover transition-all">
+             <button key=${chip} onClick=${() => handleSend(chip)} className="whitespace-nowrap px-4 py-2 rounded-xl border border-obsidian-border text-[11px] font-bold text-slate-500 hover:text-gold hover:border-gold/30 hover:bg-obsidian-hover transition-all shadow-sm">
                ${chip}
              </button>
           `)}
@@ -361,7 +417,7 @@ const CommandK = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[15vh] px-4">
       <div className="absolute inset-0 bg-obsidian/80 backdrop-blur-md" onClick=${onClose}></div>
       <div className="w-full max-w-2xl glass-panel bg-obsidian-card relative rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] overflow-hidden border-gold/10 animate-in fade-in zoom-in duration-300">
-        <div className="p-5 border-b border-obsidian-border flex items-center gap-4">
+        <div className="p-5 border-b border-obsidian-border/50 flex items-center gap-4">
           <${Icon} name=${Search} className="w-6 h-6 text-gold" />
           <input 
             autoFocus
@@ -391,10 +447,10 @@ const CommandK = ({ isOpen, onClose }) => {
              </button>
            `)}
         </div>
-        <div className="p-4 bg-obsidian-border/20 border-t border-obsidian-border text-[10px] font-bold text-slate-600 flex justify-between items-center tracking-widest uppercase">
+        <div className="p-4 bg-obsidian-border/20 border-t border-obsidian-border/50 text-[10px] font-bold text-slate-600 flex justify-between items-center tracking-widest uppercase">
            <span>Select Item with ↑↓ and Enter</span>
            <span className="flex gap-4">
-              <span className="flex items-center gap-1.5"><span className="px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-slate-500">ESC</span> to Close</span>
+              <span className="flex items-center gap-1.5 font-mono"><span className="px-1.5 py-0.5 rounded bg-obsidian border border-obsidian-border text-slate-500">ESC</span> to Close</span>
            </span>
         </div>
       </div>
@@ -404,11 +460,17 @@ const CommandK = ({ isOpen, onClose }) => {
 
 const BentoGrid = ({ data, loading }) => {
   const stockChartData = useMemo(() => {
-    const ts = data?.financials?.timeseries;
-    if (!Array.isArray(ts)) return null;
+    const history = data?.financials?.companies?.['UltraTech Cement']?.price_history;
+    if (!Array.isArray(history)) return null;
+
+    // Use last 30 intervals for better visual
+    const recent = history.slice(-30);
     return {
-      labels: ts.map(d => d.date),
-      datasets: [{ data: ts.map(d => d.value) }]
+      labels: recent.map(d => d.date),
+      datasets: [{
+        data: recent.map(d => d.close),
+        label: 'Price (NSE)'
+      }]
     };
   }, [data]);
 
@@ -417,9 +479,11 @@ const BentoGrid = ({ data, loading }) => {
   }, [data]);
 
   const pills = useMemo(() => {
-    const p = data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars;
+    const p = data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars || data?.company_info?.competitive_advantages;
     return Array.isArray(p) ? p : [];
   }, [data]);
+
+  const company = data?.financials?.companies?.['UltraTech Cement'] || {};
 
   return html`
     <div className="mt-20 p-6 grid grid-cols-12 gap-6 max-w-[1700px] mx-auto pb-32">
@@ -427,8 +491,8 @@ const BentoGrid = ({ data, loading }) => {
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
             <${MetricCard} 
                 label="Market Capitalization" 
-                value=${data?.financials?.companies?.ULTRACEMCO_NS?.market_cap || '₹8.42T'} 
-                sub="INR (Aggregated)" 
+                value=${company.market_cap || '₹3.75T'} 
+                sub="INR (Consolidated)" 
                 trend=${2.4}
                 loading=${loading}
             />
@@ -436,53 +500,54 @@ const BentoGrid = ({ data, loading }) => {
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
             <${MetricCard} 
                 label="Spot Exchange Price" 
-                value=${data?.financials?.companies?.ULTRACEMCO_NS?.price || '₹10,240'} 
-                sub="NSE Tracking" 
-                trend=${-1.2}
+                value=${company.current_price || '₹12,748'} 
+                sub="NSE: ULTRACEMCO" 
+                trend=${company.ytd_return_raw || 1.2}
                 loading=${loading}
             />
         </div>
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
             <${MetricCard} 
                 label="Operational Baseline" 
-                value=${data?.company_info?.operational_capacity_mtpa || '152.7'} 
-                sub="MTPA Capacity" 
+                value=${data?.company_info?.capacity_mtpa || '183.1'} 
+                sub="MTPA Capacity (FY25)" 
                 loading=${loading}
             />
         </div>
         <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
             <${MetricCard} 
                 label="Premium Valuation" 
-                value=${data?.financials?.companies?.ULTRACEMCO_NS?.pe_ratio || '34.2'} 
-                sub="P/E Multiplier" 
+                value=${company.pe_ratio || '48.9'} 
+                sub="P/E Multiplier (LTM)" 
                 loading=${loading}
             />
         </div>
 
         <!-- Row 2: Executive Summary & Performance Chart -->
-        <div className="col-span-12 lg:col-span-8 glass-panel p-8 rounded-3xl min-h-[480px]">
-            <div className="flex justify-between items-center mb-10">
-                <h2 className="text-white text-lg font-black flex items-center gap-3">
+        <div className="col-span-12 lg:col-span-8 glass-panel p-8 rounded-3xl min-h-[480px] shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full pointer-events-none"></div>
+            <div className="flex justify-between items-center mb-10 relative z-10">
+                <h2 className="text-white dark:text-white text-lg font-black flex items-center gap-3">
                    <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_#d4af37]"></div>
                    Strategic Asset Dossier
                 </h2>
                 <div className="flex items-center gap-4">
-                   <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em]">Confidential / V7.0</span>
-                   <button className="text-slate-500 hover:text-white transition-colors"><${Icon} name=${Maximize2} className="w-4 h-4" /></button>
+                   <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.3em]">Confidential / V7.1</span>
+                   <button className="text-slate-500 hover:text-white transition-colors active:scale-90"><${Icon} name=${Maximize2} className="w-4 h-4" /></button>
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 h-full">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 h-full relative z-10">
                 <div className="md:col-span-5 flex flex-col justify-between">
-                    <div>
-                        <div className=${`text-slate-300 text-lg leading-relaxed font-light mb-8 italic ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-10' : ''}`}>
-                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Loading strategic overview...')}"
+                    <div className="flex flex-col h-full">
+                        <div className=${`text-slate-300 text-sm leading-relaxed font-light mb-8 italic border-l-2 border-gold/20 pl-4 py-1 flex-1 ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-5 bg-gold/5' : ''}`}>
+                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Synchronizing strategic intelligence datasets...')}"
                         </div>
-                        <div className="grid grid-cols-1 gap-3">
+                        <div className="grid grid-cols-1 gap-3 mt-auto">
                             ${pills.slice(0, 3).map(pill => html`
-                                <div key=${pill.title || pill} className="flex items-center gap-4 p-3.5 rounded-2xl bg-obsidian-card/50 border border-obsidian-border group hover:border-gold/30 transition-all">
-                                    <div className="text-gold"><${Icon} name=${(pill.title || pill || '').toString().toLowerCase().includes('growth') ? TrendingUp : (pill.title || pill || '').toString().toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
-                                    <div className="text-white font-bold text-[11px] uppercase tracking-[0.2em]">${pill.title || pill}</div>
+                                <div key=${pill.title || pill} className="flex items-center gap-4 p-3.5 rounded-2xl bg-obsidian-card/40 border border-obsidian-border group hover:border-gold/30 hover:bg-obsidian-hover transition-all cursor-default">
+                                    <div className="text-gold group-hover:scale-110 transition-transform"><${Icon} name=${(pill.title || pill || '').toString().toLowerCase().includes('growth') ? TrendingUp : (pill.title || pill || '').toString().toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
+                                    <div className="text-white font-bold text-[10px] uppercase tracking-[0.2em] line-clamp-1">${pill.title || pill}</div>
                                 </div>
                             `)}
                         </div>
@@ -491,7 +556,7 @@ const BentoGrid = ({ data, loading }) => {
                 <div className="md:col-span-7 h-full min-h-[300px]">
                     <${ChartCard} 
                         title="Equity Performance" 
-                        subtitle="Relative Returns Spectrum (LTM)"
+                        subtitle="Relative Returns Spectrum (LTM Historical)"
                         loading=${loading}
                         data=${stockChartData}
                         config=${{ type: 'line' }}
@@ -500,9 +565,10 @@ const BentoGrid = ({ data, loading }) => {
             </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl min-h-[480px] flex flex-col overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[64px] rounded-full"></div>
-            <h2 className="text-white text-lg font-black mb-8 flex justify-between items-center group">
+        <!-- Sentiment Card -->
+        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl min-h-[480px] flex flex-col overflow-hidden relative shadow-2xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[64px] rounded-full"></div>
+            <h2 className="text-white dark:text-white text-lg font-black mb-8 flex justify-between items-center group">
                 <span className="relative">
                    Market Sentiment
                    <div className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-emerald-500/50 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
@@ -511,62 +577,39 @@ const BentoGrid = ({ data, loading }) => {
             </h2>
             <div className="flex-1 flex flex-col items-center justify-center pt-4">
                 <div className="relative w-64 h-32 overflow-hidden">
-                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-obsidian-border/50 rounded-full"></div>
-                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-emerald-500/80 rounded-full clip-half-gauge transition-all duration-1000 ease-out" 
+                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-obsidian-border/50 rounded-full shadow-inner"></div>
+                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-emerald-500/80 rounded-full clip-half-gauge transition-all duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)]" 
                          style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 180}deg)` }}></div>
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-28 bg-white/40 rounded-full origin-bottom shadow-sm"
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-28 bg-white/40 rounded-full origin-bottom shadow-md"
                          style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 90}deg)` }}></div>
                 </div>
                 <div className="text-center mt-8 space-y-2">
                     <div className="text-emerald-400 uppercase font-black tracking-[0.4em] text-3xl drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
                         ${data?.outlook?.mood_label || 'BULLISH'}
                     </div>
-                    <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Confidence Rating: 84.2%</div>
+                    <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 justify-center">
+                      <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                      Confidence Rating: 84.2%
+                    </div>
                 </div>
             </div>
-            <div className="mt-8 p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm self-stretch">
+            <div className="mt-8 p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm self-stretch group hover:bg-emerald-500/10 transition-colors">
                 <p className="text-slate-400 text-xs italic font-medium leading-relaxed text-center">
-                    "${data?.outlook?.sentiment_analysis || 'Macro momentum remains resilient against cyclical sector headwinds.'}"
+                    "${data?.outlook?.sentiment_analysis || 'Macro momentum remains resilient against cyclical sector headwinds, supported by aggressive infra-led demand.'}"
                 </p>
             </div>
         </div>
 
         <!-- Row 3: Detail Modules -->
-        <div className="col-span-12 lg:col-span-4 h-[600px]">
+        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-xl">
            <${NewsModule} data=${data?.news} loading=${loading} />
         </div>
         
-        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl h-[600px] flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold/0 via-gold/40 to-gold/0"></div>
-            <h2 className="text-white text-lg font-black mb-8 flex items-center gap-3">
-               <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_10px_#d4af37]"></div>
-               Macro Pulse
-            </h2>
-            <div className="flex-1 flex flex-col justify-center gap-4">
-                ${macroItems.map((item, i) => html`
-                    <div key=${i} className="flex items-center justify-between p-4.5 rounded-2xl bg-obsidian-card/40 border border-obsidian-border group hover:bg-obsidian-hover hover:border-gold/20 transition-all duration-300">
-                        <div className="flex items-center gap-4">
-                           <div className="w-10 h-10 rounded-xl bg-obsidian border border-obsidian-border flex items-center justify-center text-slate-500 group-hover:text-gold transition-colors">
-                              <${Icon} name=${(item.name || '').toLowerCase().includes('coal') ? Zap : (item.name || '').toLowerCase().includes('usd') ? ShieldCheck : Target} className="w-5 h-5" />
-                           </div>
-                           <span className="text-slate-400 text-xs font-black uppercase tracking-widest">${item.name}</span>
-                        </div>
-                        <div className="text-right">
-                           <div className="text-white font-black text-base leading-none mb-1.5">${item.value}</div>
-                           <div className=${`text-[11px] font-black tracking-tighter flex items-center gap-1 justify-end ${item.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                             ${item.change >= 0 ? html`<${Icon} name=${ArrowUpRight} className="w-3 h-3" />` : html`<${Icon} name=${ArrowDownRight} className="w-3 h-3" />`}
-                             ${Math.abs(item.change)}%
-                           </div>
-                        </div>
-                    </div>
-                `)}
-            </div>
-            <div className="mt-6 p-4 rounded-xl border border-obsidian-border/50 bg-obsidian-card/20 text-[10px] text-slate-500 font-medium italic text-center">
-              * Real-time indices synchronized via Bloomberg Terminal APIs
-            </div>
+        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-xl">
+           <${M_A_Module} data=${data?.ma_deals} loading=${loading} />
         </div>
 
-        <div className="col-span-12 lg:col-span-4 h-[600px]">
+        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-xl">
            <${CompetitorGrid} data=${data?.competitors} loading=${loading} />
         </div>
     </div>
@@ -578,6 +621,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('ut-theme') || 'dark');
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -592,6 +636,12 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    localStorage.setItem('ut-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
     const loadData = async () => {
       try {
         const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
@@ -604,11 +654,13 @@ const App = () => {
         setLoading(false);
       } catch (e) {
         console.error("Data load error", e);
-        setLoading(false); // Even if data fails, stop loading to show fallback UI or error
+        setLoading(false);
       }
     };
     loadData();
   }, []);
+
+  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   const triggerRefresh = async () => {
     setLoading(true);
@@ -617,12 +669,14 @@ const App = () => {
   };
 
   return html`
-    <div className="min-h-screen bg-obsidian selection:bg-gold/30">
+    <div className="min-h-screen bg-obsidian dark:bg-obsidian light:bg-slate-50 selection:bg-gold/30 transition-colors duration-500">
       <${Header} 
         onRefresh=${triggerRefresh} 
         onExport=${() => window.print()} 
         onSearchOpen=${() => setIsSearchOpen(true)}
         status=${loading ? 'Synchronizing' : 'Live Intelligence'} 
+        theme=${theme}
+        onThemeToggle=${toggleTheme}
       />
       
       <main className=${`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isAIOpen ? 'mr-[450px]' : ''}`}>
@@ -651,19 +705,19 @@ const App = () => {
       <!-- Search Shorthand UI -->
       <div className="fixed left-6 bottom-16 z-50 pointer-events-none">
          <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-2xl border border-obsidian-border bg-obsidian-card/40 backdrop-blur-md opacity-40 hover:opacity-100 transition-opacity">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Intelligence Search (Ctrl+K)</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">Global Intelligence Search (Ctrl+K)</span>
          </div>
       </div>
       
       <!-- Market Ticker -->
-      <div className="fixed bottom-0 left-0 right-0 h-10 bg-obsidian/95 backdrop-blur-xl border-t border-obsidian-border z-40 overflow-hidden flex items-center">
+      <div className="fixed bottom-0 left-0 right-0 h-10 bg-obsidian/95 dark:bg-obsidian/95 light:bg-white/95 backdrop-blur-xl border-t border-obsidian-border z-40 overflow-hidden flex items-center shadow-[0_-4px_20px_rgba(0,0,0,0.1)] transition-colors duration-500">
         <div className="animate-ticker whitespace-nowrap flex gap-16 px-8">
            ${(() => {
       const mData = Array.isArray(data?.macro?.data) ? data.macro.data : [];
       return [...mData, ...mData, ...mData].map((m, i) => html`
                 <div key=${i} className="flex gap-4 items-center text-[10px] font-black tracking-[0.1em] uppercase group">
                     <span className="text-slate-500 group-hover:text-slate-300 transition-colors uppercase">${m.name}</span>
-                    <span className="text-white font-black">${m.value}</span>
+                    <span className="text-white dark:text-white light:text-obsidian font-black">${m.value}</span>
                     <span className=${`font-black flex items-center gap-0.5 ${m.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                        ${m.change >= 0 ? '▲' : '▼'} ${Math.abs(m.change)}%
                     </span>
