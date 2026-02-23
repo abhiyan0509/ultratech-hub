@@ -37,8 +37,14 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
     };
-    if (isOpen) window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    if (isOpen) {
+      window.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -135,7 +141,7 @@ const MetricCard = ({ label, value, sub, trend, loading }) => {
   `;
 };
 
-const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand }) => {
+const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand, activeTimeframe, onTimeframeChange }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
@@ -150,6 +156,7 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand }) =>
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 300 },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -165,26 +172,30 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand }) =>
         },
         scales: {
           x: { display: false },
-          y: { display: false }
+          y: {
+            display: true,
+            grid: { color: 'rgba(255,255,255,0.02)' },
+            ticks: { display: false }
+          }
         },
         interaction: { intersect: false, mode: 'index' },
         elements: {
           line: {
             tension: 0.4,
             borderColor: '#d4af37',
-            borderWidth: 3,
+            borderWidth: 2,
             fill: true,
             backgroundColor: (context) => {
               const chart = context.chart;
               const { ctx, chartArea } = chart;
               if (!chartArea) return null;
               const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.15)');
+              gradient.addColorStop(0, 'rgba(212, 175, 55, 0.08)');
               gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
               return gradient;
             }
           },
-          point: { radius: 0, hoverRadius: 6, hoverBackgroundColor: '#d4af37', hoverBorderColor: '#fff', hoverBorderWidth: 2 }
+          point: { radius: 0, hoverRadius: 4, hoverBackgroundColor: '#d4af37', hoverBorderColor: '#fff', hoverBorderWidth: 2 }
         }
       }
     });
@@ -193,28 +204,34 @@ const ChartCard = ({ title, subtitle, loading, data, config = {}, onExpand }) =>
   }, [loading, data]);
 
   return html`
-    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all shadow-sm">
-      <div className="flex justify-between items-start mb-6">
+    <div className="glass-panel p-6 rounded-3xl h-full flex flex-col group hover:border-gold/20 transition-all shadow-sm bg-obsidian-card/40">
+      <div className="flex justify-between items-start mb-4">
         <div>
            <h3 className="text-slate-900 dark:text-white text-xs font-bold tracking-tight">${title}</h3>
            <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">${subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-obsidian-border/30 rounded-lg">
-             ${['1M', '6M', '1Y'].map(t => html`
-                <button key=${t} className=${`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${t === '1Y' ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
-                  ${t}
-                </button>
-             `)}
-          </div>
+          ${onTimeframeChange && html`
+            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-obsidian-border/30 rounded-lg">
+               ${['1M', '6M', '1Y'].map(t => html`
+                  <button 
+                    key=${t} 
+                    onClick=${() => onTimeframeChange(t)}
+                    className=${`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${activeTimeframe === t ? 'bg-gold text-obsidian shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                  >
+                    ${t}
+                  </button>
+               `)}
+            </div>
+          `}
           ${onExpand && html`
-            <button onClick=${onExpand} className="p-2 text-slate-400 hover:text-gold transition-colors active:scale-90" title="Expand Analysis">
+            <button onClick=${onExpand} className="p-2 text-slate-400 hover:text-gold transition-colors active:scale-90" title="Expand View">
               <${Icon} name=${Maximize2} className="w-3.5 h-3.5" />
             </button>
           `}
         </div>
       </div>
-      <div className="flex-1 min-h-0 relative">
+      <div className="flex-1 min-h-[140px] relative">
         ${loading && html`<div className="absolute inset-0 animate-shimmer rounded-xl opacity-10 bg-gold/5"></div>`}
         <canvas ref=${chartRef}></canvas>
       </div>
@@ -492,10 +509,18 @@ const CommandK = ({ isOpen, onClose, onAction }) => {
 };
 
 const BentoGrid = ({ data, loading, onShowChart }) => {
+  const [timeframe, setTimeframe] = useState('1M');
+
   const stockChartData = useMemo(() => {
     const history = data?.financials?.companies?.['UltraTech Cement']?.price_history;
     if (!Array.isArray(history)) return null;
-    const recent = history.slice(-30);
+
+    // Define slice sizes: 1M ~ 30, 6M ~ 180, 1Y ~ 365
+    let slice = 30;
+    if (timeframe === '6M') slice = 180;
+    if (timeframe === '1Y') slice = 365;
+
+    const recent = history.slice(-slice);
     return {
       labels: recent.map(d => d.date),
       datasets: [{
@@ -503,7 +528,7 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
         label: 'Price (NSE)'
       }]
     };
-  }, [data]);
+  }, [data, timeframe]);
 
   const pills = useMemo(() => {
     const p = data?.company_info?.strategic_focus || data?.company_info?.strategic_pillars || data?.company_info?.competitive_advantages;
@@ -514,23 +539,23 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
 
   return html`
     <div className="mt-20 p-6 grid grid-cols-12 gap-6 max-w-[1700px] mx-auto pb-32">
-        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <${MetricCard} label="Market Capitalization" value=${company.market_cap || '₹3.75T'} sub="INR (Consolidated)" trend=${2.4} loading=${loading} />
         </div>
-        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <${MetricCard} label="Spot Exchange Price" value=${company.current_price || '₹12,748'} sub="NSE: ULTRACEMCO" trend=${company.ytd_return_raw || 1.2} loading=${loading} />
         </div>
-        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <${MetricCard} label="Operational Baseline" value=${data?.company_info?.capacity_mtpa || '183.1'} sub="MTPA Capacity (FY25)" loading=${loading} />
         </div>
-        <div className="col-span-12 md:col-span-6 lg:col-span-3 h-32">
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
             <${MetricCard} label="Premium Valuation" value=${company.pe_ratio || '48.9'} sub="P/E Multiplier (LTM)" loading=${loading} />
         </div>
 
         <!-- Strategic Dossier -->
-        <div className="col-span-12 lg:col-span-8 glass-panel p-8 rounded-3xl min-h-[480px] shadow-sm relative overflow-hidden group/dossier">
+        <div className="col-span-12 lg:col-span-9 glass-panel p-8 rounded-3xl min-h-[420px] shadow-sm relative overflow-hidden group/dossier">
             <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 blur-[100px] rounded-full pointer-events-none group-hover/dossier:bg-gold/10 transition-all duration-700"></div>
-            <div className="flex justify-between items-center mb-10 relative z-10">
+            <div className="flex justify-between items-center mb-8 relative z-10">
                 <h2 className="text-slate-900 dark:text-white text-lg font-black flex items-center gap-3">
                    <div className="w-1.5 h-6 bg-gold rounded-full shadow-[0_0_12px_#d4af37]"></div>
                    Strategic Asset Dossier
@@ -541,27 +566,27 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10 h-full relative z-10">
-                <div className="md:col-span-5 flex flex-col justify-between">
-                    <div className="flex flex-col h-full">
-                        <div className=${`text-slate-600 dark:text-slate-300 text-sm leading-relaxed font-bold mb-8 italic border-l-2 border-gold/40 pl-4 py-1 flex-1 ${loading ? 'animate-shimmer h-40 w-full rounded-xl opacity-5' : ''}`}>
-                            "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Synchronizing platform assets...')}"
-                        </div>
-                        <div className="grid grid-cols-1 gap-3 mt-auto">
-                            ${pills.slice(0, 3).map(pill => html`
-                                <div key=${pill.title || pill} className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-obsidian-card/40 border border-slate-200 dark:border-obsidian-border group/pill hover:border-gold/30 hover:bg-white dark:hover:bg-obsidian-hover transition-all cursor-default shadow-sm">
-                                    <div className="text-gold group-hover/pill:scale-110 transition-transform"><${Icon} name=${(pill.title || pill || '').toString().toLowerCase().includes('growth') ? TrendingUp : (pill.title || pill || '').toString().toLowerCase().includes('efficiency') ? Zap : Briefcase} className="w-4 h-4" /></div>
-                                    <div className="text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-[0.2em] line-clamp-1">${pill.title || pill}</div>
-                                </div>
-                            `)}
-                        </div>
+                <div className="md:col-span-4 flex flex-col gap-6">
+                    <div className=${`text-slate-600 dark:text-slate-300 text-xs leading-relaxed font-bold italic border-l-2 border-gold/40 pl-4 py-1 ${loading ? 'animate-shimmer h-32 w-full rounded-xl opacity-5' : ''}`}>
+                        "${!loading && (data?.outlook?.executive_summary || data?.company_info?.description || 'Synchronizing platform assets...')}"
+                    </div>
+                    <div className="grid grid-cols-1 gap-2 mt-auto">
+                        ${pills.slice(0, 3).map(pill => html`
+                            <div key=${pill.title || pill} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-obsidian-card/40 border border-slate-200 dark:border-obsidian-border group/pill hover:border-gold/30 transition-all cursor-default shadow-sm shadow-emerald-500/5">
+                                <div className="text-gold group-hover/pill:scale-110 transition-transform"><${Icon} name=${TrendingUp} className="w-4 h-4" /></div>
+                                <div className="text-slate-900 dark:text-white font-black text-[9px] uppercase tracking-[0.2em] line-clamp-1">${pill.title || pill}</div>
+                            </div>
+                        `)}
                     </div>
                 </div>
-                <div className="md:col-span-7 h-full min-h-[300px]">
+                <div className="md:col-span-8 h-full min-h-[300px]">
                     <${ChartCard} 
                         title="Equity Performance" 
-                        subtitle="Relative Returns Spectrum (LTM)"
+                        subtitle="Relative Returns Spectrum"
                         loading=${loading}
                         data=${stockChartData}
+                        activeTimeframe=${timeframe}
+                        onTimeframeChange=${setTimeframe}
                         onExpand=${() => onShowChart('equity', 'Equity Performance Spectrum', stockChartData)}
                     />
                 </div>
@@ -569,34 +594,34 @@ const BentoGrid = ({ data, loading, onShowChart }) => {
         </div>
 
         <!-- Sentiment Card -->
-        <div className="col-span-12 lg:col-span-4 glass-panel p-8 rounded-3xl min-h-[480px] flex flex-col overflow-hidden relative shadow-sm">
-            <h2 className="text-slate-900 dark:text-white text-lg font-black mb-8 flex justify-between items-center group">
+        <div className="col-span-12 lg:col-span-3 glass-panel p-8 rounded-3xl min-h-[420px] flex flex-col justify-between overflow-hidden relative shadow-sm">
+            <h2 className="text-slate-900 dark:text-white text-lg font-black flex justify-between items-center group">
                 <span className="relative">Market Sentiment</span>
-                <${Icon} name=${TrendingUp} className="w-5 h-5 text-emerald-500" />
+                <${Icon} name=${TrendingUp} className="w-4 h-4 text-emerald-500" />
             </h2>
-            <div className="flex-1 flex flex-col items-center justify-center pt-4">
-                <div className="relative w-64 h-32 overflow-hidden">
-                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-slate-200 dark:border-obsidian-border/50 rounded-full"></div>
-                    <div className="absolute top-0 left-0 w-64 h-64 border-[24px] border-emerald-500 rounded-full clip-half-gauge transition-all duration-1000 ease-out" 
+            <div className="flex-1 flex flex-col items-center justify-center pt-2">
+                <div className="relative w-48 h-24 overflow-hidden">
+                    <div className="absolute top-0 left-0 w-48 h-48 border-[20px] border-slate-200 dark:border-obsidian-border/50 rounded-full"></div>
+                    <div className="absolute top-0 left-0 w-48 h-48 border-[20px] border-emerald-500 rounded-full clip-half-gauge transition-all duration-1000 ease-out" 
                          style=${{ transform: `rotate(${(data?.outlook?.mood_score || 0.65) * 180 - 180}deg)` }}></div>
                 </div>
-                <div className="text-center mt-8 space-y-2">
-                    <div className="text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-[0.4em] text-3xl">
+                <div className="text-center mt-6">
+                    <div className="text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-[0.4em] text-2xl">
                         ${data?.outlook?.mood_label || 'BULLISH'}
                     </div>
-                    <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Confidence: 84.2%</div>
+                    <div className="text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] mt-1">Confidence: 84.2%</div>
                 </div>
             </div>
-            <div className="mt-8 p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm shadow-sm">
-                <p className="text-slate-600 dark:text-slate-400 text-xs italic font-bold leading-relaxed text-center">
+            <div className="p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-sm shadow-sm">
+                <p className="text-slate-600 dark:text-slate-400 text-[10px] italic font-bold leading-relaxed text-center">
                     "${data?.outlook?.sentiment_analysis || 'Macro momentum remains resilient against cyclical sector headwinds.'}"
                 </p>
             </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-sm"><${NewsModule} data=${data?.news} loading=${loading} /></div>
-        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-sm"><${M_A_Module} data=${data?.ma_deals} loading=${loading} /></div>
-        <div className="col-span-12 lg:col-span-4 h-[600px] shadow-sm"><${CompetitorGrid} data=${data?.competitors} loading=${loading} /></div>
+        <div className="col-span-12 lg:col-span-4 h-[550px] shadow-sm"><${NewsModule} data=${data?.news} loading=${loading} /></div>
+        <div className="col-span-12 lg:col-span-4 h-[550px] shadow-sm"><${M_A_Module} data=${data?.ma_deals} loading=${loading} /></div>
+        <div className="col-span-12 lg:col-span-4 h-[550px] shadow-sm"><${CompetitorGrid} data=${data?.competitors} loading=${loading} /></div>
     </div>
     `;
 };
@@ -607,7 +632,7 @@ const App = () => {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('ut-theme') || 'light');
-  const [modal, setModal] = useState({ isOpen: false, title: '', data: null });
+  const [modal, setModal] = useState({ isOpen: false, title: '', children: null });
 
   useEffect(() => {
     const handleKeyDown = (e) => {

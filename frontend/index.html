@@ -57,8 +57,14 @@
 
     <style>
         @layer base {
+            html {
+                scroll-behavior: smooth;
+            }
+
             body {
                 @apply bg-slate-50 text-slate-800 font-body antialiased transition-colors duration-500;
+                min-height: 101vh;
+                /* Forces scrollbar to be always present to prevent layout shifts */
             }
 
             .dark body {
