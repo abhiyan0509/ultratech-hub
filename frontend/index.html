@@ -13,279 +13,24 @@
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <!-- Hard-Bound CSS Engine (Native) -->
+    <!-- React & Dependencies via ESM -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom": "https://esm.sh/react-dom@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.344.0?external=react",
+            "htm": "https://esm.sh/htm",
+            "clsx": "https://esm.sh/clsx@2.1.0",
+            "tailwind-merge": "https://esm.sh/tailwind-merge@2.2.1"
+        }
+    }
+    </script>
+
+    <!-- Bulletproof CSS Engine (Native) -->
     <style>
         :root {
-            --obsidian: #09090b;
-            --obsidian-card: #111114;
-            --obsidian-border: #1f1f23;
-            --obsidian-hover: #27272a;
-            --gold: #d4af37;
-            --gold-muted: #b8922e;
-            --emerald: #10b981;
-            --rose: #f43f5e;
-            --slate-50: #f8fafc;
-            --slate-200: #e2e8f0;
-            --slate-400: #94a3b8;
-            --slate-500: #64748b;
-            --slate-800: #1e293b;
-            --slate-900: #0f172a;
-        }
-
-        /* Base Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background: var(--slate-50);
-            color: var(--slate-800);
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            transition: background 0.5s, color 0.5s;
-            min-height: 100vh;
-        }
-
-        .dark body {
-            background: var(--obsidian);
-            color: var(--slate-200);
-        }
-
-        /* Typography */
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: 'Manrope', sans-serif;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-        }
-
-        /* Layout Utilities */
-        .flex {
-            display: flex;
-        }
-
-        .flex-row {
-            flex-direction: row;
-        }
-
-        .flex-col {
-            flex-direction: column;
-        }
-
-        .flex-1 {
-            flex: 1 1 0%;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .items-start {
-            align-items: flex-start;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .justify-center {
-            justify-content: center;
-        }
-
-        .gap-1 {
-            gap: 0.25rem;
-        }
-
-        .gap-1\.5 {
-            gap: 0.375rem;
-        }
-
-        .gap-2 {
-            gap: 0.5rem;
-        }
-
-        .gap-3 {
-            gap: 0.75rem;
-        }
-
-        .gap-4 {
-            gap: 1rem;
-        }
-
-        .gap-6 {
-            gap: 1.5rem;
-        }
-
-        .grid {
-            display: grid;
-        }
-
-        .grid-cols-2 {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .grid-cols-12 {
-            grid-template-columns: repeat(12, minmax(0, 1fr));
-        }
-
-        .col-span-12 {
-            grid-column: span 12 / span 12;
-        }
-
-        .lg\:col-span-3 {
-            @media (min-width: 1024px) {
-                grid-column: span 3 / span 3;
-            }
-        }
-
-        .lg\:col-span-9 {
-            @media (min-width: 1024px) {
-                grid-column: span 9 / span 9;
-            }
-        }
-
-        .p-2 {
-            padding: 0.5rem;
-        }
-
-        .p-4 {
-            padding: 1rem;
-        }
-
-        .p-5 {
-            padding: 1.25rem;
-        }
-
-        .p-6 {
-            padding: 1.5rem;
-        }
-
-        .p-7 {
-            padding: 1.75rem;
-        }
-
-        .p-8 {
-            padding: 2rem;
-        }
-
-        .p-10 {
-            padding: 2.5rem;
-        }
-
-        .px-2 {
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-        }
-
-        .px-4 {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        .py-0\.5 {
-            padding-top: 0.125rem;
-            padding-bottom: 0.125rem;
-        }
-
-        .mt-1 {
-            margin-top: 0.25rem;
-        }
-
-        .mb-1 {
-            margin-bottom: 0.25rem;
-        }
-
-        .mb-1\.5 {
-            margin-bottom: 0.375rem;
-        }
-
-        .mb-4 {
-            margin-bottom: 1rem;
-        }
-
-        .mb-6 {
-            margin-bottom: 1.5rem;
-        }
-
-        .mb-7 {
-            margin-bottom: 1.75rem;
-        }
-
-        .mb-8 {
-            margin-bottom: 2rem;
-        }
-
-        .mb-10 {
-            margin-bottom: 2.5rem;
-        }
-
-        .space-y-4>*+* {
-            margin-top: 1rem;
-        }
-
-        /* Positioning */
-        .relative {
-            position: relative;
-        }
-
-        .absolute {
-            position: absolute;
-        }
-
-        .fixed {
-            position: fixed;
-        }
-
-        .inset-0 {
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
-
-        .top-0 {
-            top: 0;
-        }
-
-        .right-0 {
-            right: 0;
-        }
-
-        .bottom-0 {
-            bottom: 0;
-        }
-
-        .left-0 {
-            left: 0;
-        }
-
-        .z-10 {
-            z-index: 10;
-        }
-
-        .z-50 {
-            z-index: 50;
-        }
-
-        .pointer-events-none {
-            pointer-events: none;
-        }
-
-        .cursor-pointer {
-            cursor: pointer;
-        }
-
-        <style> :root {
             --obsidian: #09090b;
             --obsidian-card: #111114;
             --obsidian-border: #1f1f23;
@@ -341,7 +86,7 @@
             letter-spacing: -0.025em;
         }
 
-        /* Hard-Bound Utility Classes (Replacing Tailwind) */
+        /* Hard-Bound Utility Classes */
         .flex {
             display: flex;
         }
@@ -547,6 +292,10 @@
             margin-bottom: 0.25rem;
         }
 
+        .mb-1\.5 {
+            margin-bottom: 0.375rem;
+        }
+
         .mb-2 {
             margin-bottom: 0.5rem;
         }
@@ -650,6 +399,22 @@
 
         .max-w-\[1700px\] {
             max-width: 1700px;
+        }
+
+        .h-full {
+            height: 100%;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
         }
 
         /* Aesthetics */
@@ -830,6 +595,39 @@
             color: var(--gold);
             opacity: 0.5;
         }
+    </style>
+    /* Animations */
+    @keyframes shimmer {
+    0% {
+    background-position: -1000px 0;
+    }
+
+    100% {
+    background-position: 1000px 0;
+    }
+    }
+
+    .animate-shimmer {
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.05) 50%, rgba(212, 175, 55, 0)
+    100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    }
+
+    #root:empty::before {
+    content: 'Initializing Premium V7 Platform...';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    opacity: 0.5;
+    }
     </style>
 </head>
 
