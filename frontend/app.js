@@ -413,7 +413,7 @@ const ResearchAssistant = ({ isOpen, onClose, data }) => {
     setIsTyping(true);
 
     try {
-      const res = await fetch('/api/ask', {
+      const res = await fetch(`${window.API_BASE || ''}/api/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: userMsg })
@@ -702,7 +702,7 @@ const App = () => {
       try {
         const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
         const results = await Promise.all(
-          datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
+          datasets.map(ds => fetch(`${window.API_BASE || ''}/api/data/${ds}`).then(r => r.json()))
         );
         const combined = {};
         datasets.forEach((ds, i) => combined[ds] = results[i]);
