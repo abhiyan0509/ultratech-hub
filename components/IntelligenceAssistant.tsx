@@ -7,9 +7,11 @@ import { ArrowLeft, Send, MessageSquare } from "lucide-react";
 interface IntelligenceAssistantProps {
     isOpen: boolean;
     onClose: () => void;
+    initialQuery?: string;
+    onQueryProcessed?: () => void;
 }
 
-export const IntelligenceAssistant = ({ isOpen, onClose }: IntelligenceAssistantProps) => {
+export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryProcessed }: IntelligenceAssistantProps) => {
     const [messages, setMessages] = useState([
         { role: 'bot', text: "Assistant active. Awaiting natural language query against the UltraTech knowledge graph." }
     ]);
@@ -43,8 +45,16 @@ export const IntelligenceAssistant = ({ isOpen, onClose }: IntelligenceAssistant
             setMessages(prev => [...prev, { role: 'bot', text: "System Error: Connection to backend intelligence failed." }]);
         } finally {
             setIsTyping(false);
+            if (onQueryProcessed) onQueryProcessed();
         }
     };
+
+    useEffect(() => {
+        if (initialQuery && isOpen) {
+            handleSend(initialQuery);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialQuery, isOpen]);
 
     return (
         <>

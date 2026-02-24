@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
     AreaChart,
     Area,
@@ -17,8 +17,20 @@ interface IntelligenceChartProps {
 }
 
 export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => {
+    const [period, setPeriod] = useState('1Y');
     const history = data?.financials?.companies?.['UltraTech Cement']?.price_history || [];
-    const chartData = history.slice(-60).map((d: any) => ({
+
+    const getSliceCount = (p: string) => {
+        switch (p) {
+            case '1M': return -22;
+            case '6M': return -130;
+            case '1Y': return -252;
+            case '5Y': return -1260;
+            default: return -252;
+        }
+    };
+
+    const chartData = history.slice(getSliceCount(period)).map((d: any) => ({
         date: d.date,
         price: d.close
     }));
@@ -44,7 +56,11 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
                 </div>
                 <div className="flex gap-2">
                     {['1M', '6M', '1Y', '5Y'].map(t => (
-                        <button key={t} className={`px-3 py-1.5 rounded-md text-[11px] font-bold tracking-widest uppercase transition-colors ${t === '1Y' ? 'bg-foreground text-surface' : 'bg-transparent text-muted hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                        <button
+                            key={t}
+                            onClick={() => setPeriod(t)}
+                            className={`px-3 py-1.5 rounded-md text-[11px] font-bold tracking-widest uppercase transition-colors ${period === t ? 'bg-foreground text-surface' : 'bg-transparent text-muted hover:bg-black/5 dark:hover:bg-white/5'}`}
+                        >
                             {t}
                         </button>
                     ))}

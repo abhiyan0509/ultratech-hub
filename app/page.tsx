@@ -29,6 +29,8 @@ export default function Dashboard() {
     const [theme, setTheme] = useState<"dark" | "light">("light");
     const [isAIOpen, setIsAIOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchInput, setSearchInput] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
 
     const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://abhiyan1021-ultratech-hub.hf.space";
 
@@ -89,6 +91,16 @@ export default function Dashboard() {
                                     <Search className="w-5 h-5 text-muted" />
                                     <input
                                         autoFocus
+                                        value={searchInput}
+                                        onChange={e => setSearchInput(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter' && searchInput.trim()) {
+                                                setSearchQuery(searchInput);
+                                                setSearchInput("");
+                                                setIsSearchOpen(false);
+                                                setIsAIOpen(true);
+                                            }
+                                        }}
                                         placeholder="Search intelligence..."
                                         className="bg-transparent border-none outline-none text-foreground w-full text-xl font-medium placeholder-muted"
                                     />
@@ -107,6 +119,7 @@ export default function Dashboard() {
                 theme={theme}
                 onThemeToggle={toggleTheme}
                 onSearchOpen={() => setIsSearchOpen(true)}
+                onExport={() => window.print()}
                 loading={loading}
             />
 
@@ -187,7 +200,12 @@ export default function Dashboard() {
             </motion.button>
 
             {/* Neural Interface Sidebar */}
-            <IntelligenceAssistant isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
+            <IntelligenceAssistant
+                isOpen={isAIOpen}
+                onClose={() => setIsAIOpen(false)}
+                initialQuery={searchQuery}
+                onQueryProcessed={() => setSearchQuery("")}
+            />
 
             {/* Corporate Footer (Minimal) */}
             <footer className="fixed bottom-0 left-0 right-0 h-10 bg-surface/90 backdrop-blur-md border-t border-border z-50 overflow-hidden flex items-center">

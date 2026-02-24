@@ -13,10 +13,11 @@ interface DashboardHeaderProps {
     theme: "dark" | "light";
     onThemeToggle: () => void;
     onSearchOpen: () => void;
+    onExport: () => void;
     loading: boolean;
 }
 
-export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, loading }: DashboardHeaderProps) => {
+export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, onExport, loading }: DashboardHeaderProps) => {
     return (
         <header className="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl z-50 px-10 flex items-center justify-between border-b border-border transition-colors">
             <div className="flex items-center gap-12">
@@ -57,7 +58,9 @@ export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, loading }:
                     {theme === "dark" ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
                 </button>
 
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-[11px] font-bold uppercase tracking-widest shadow-apple-sm">
+                <button
+                    onClick={onExport}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-[11px] font-bold uppercase tracking-widest shadow-apple-sm">
                     <FileDown size={14} strokeWidth={2.5} />
                     Export
                 </button>
