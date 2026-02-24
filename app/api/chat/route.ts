@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://xcaeygmmlolpoeyuxyxp.supabase.co";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_oKS-fK6l5oKyZuQP3bEWZA_ALBCYz7o";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyAaLryzrE8DTCY55FwUdSj6w_NSGYUayWo";
 
 export async function POST(req: Request) {
     try {
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
         }
 
         if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_API_KEY) {
-            console.error("Missing Environment Variables");
+            console.error("Missing Environment Variables in API Chat Route");
             return NextResponse.json({ error: "Server misconfiguration. Missing API keys." }, { status: 500 });
         }
 

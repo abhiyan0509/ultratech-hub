@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://xcaeygmmlolpoeyuxyxp.supabase.co";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_oKS-fK6l5oKyZuQP3bEWZA_ALBCYz7o";
 
 export async function GET(req: Request, { params }: { params: { dataset: string } }) {
     try {
