@@ -4,8 +4,6 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Target, Activity, Zap, ShieldAlert, ArrowUpRight } from "lucide-react";
 
-import { CompetitorFinancials } from "@/components/CompetitorFinancials";
-
 interface CompetitorAnalysisProps {
     data: any;
     loading: boolean;
@@ -156,12 +154,6 @@ export const CompetitorAnalysis = ({ data, loading }: CompetitorAnalysisProps) =
 
                 </div>
             </div>
-
-            {/* Financial Benchmark Row */}
-            <div className="h-[450px]">
-                <CompetitorFinancials data={data} loading={loading} />
-            </div>
-
         </div>
     );
 };
