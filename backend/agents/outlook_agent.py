@@ -135,7 +135,7 @@ Return ONLY valid JSON, no markdown formatting."""
                 pass
         return None
     except Exception as e:
-        print(f"  [Outlook] Gemini error: {e}")
+        print(f"  [Outlook] Gemini API error (Rate Limit/Quota): {e}")
         return None
 
 

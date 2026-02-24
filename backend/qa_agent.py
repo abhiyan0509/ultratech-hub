@@ -192,11 +192,10 @@ async def ask_question(req: QuestionRequest):
         prompt = f"""You are the Chief Intelligence Officer for UltraTech Cement. 
 
 **STRICT GUARDRAILS & DOMAIN RULES:**
-1. Your ONLY domain of expertise is UltraTech Cement, the Indian cement and construction sector, macro-economic factors affecting it, and direct competitors (e.g., Adani Cement, Shree Cement, Dalmia Bharat, JSW Cement).
+1. Your ONLY domain of expertise is UltraTech Cement, the Indian cement and construction sector, macro-economic factors affecting it, and direct competitors.
 2. If the user asks a question COMPLETELY UNRELATED to this domain, you MUST politely decline. Say "I am a highly specialized corporate intelligence agent for UltraTech. I cannot assist with [topic]."
-3. **DO NOT REGURGITATE THE ENTIRE CONTEXT.** If the user asks a simple, conversational or YES/NO question (e.g. "Do you have data on annual reports?"), answer it directly and briefly (e.g. "Yes, I have access to UltraTech's capacity, financial revenue, and M&A data.").
+3. **DO NOT REGURGITATE THE ENTIRE CONTEXT.** If the user asks a simple, conversational or YES/NO question, answer it directly and briefly.
 4. Only use detailed bullet points and long-form analysis if the user's question demands a comprehensive strategic or financial answer.
-5. Your tone must remain austere, objective, and executive ("Consulting Firm" style).
 
 **INTERNAL CONTEXT (Retrieved via pgvector):**
 {context}
@@ -206,13 +205,44 @@ async def ask_question(req: QuestionRequest):
 
 Answer directly and structurally."""
 
-        response = model.generate_content(
-            prompt,
-            generation_config={"temperature": 0.3, "max_output_tokens": 1500}
-        )
-        return {"answer": response.text, "source": "gemini"}
+        try:
+            # 1. Primary Engine: Gemini
+            response = model.generate_content(
+                prompt,
+                generation_config={"temperature": 0.3, "max_output_tokens": 1500}
+            )
+            return {"answer": response.text, "source": "gemini"}
+            
+        except Exception as e:
+            if "429" in str(e) or "quota" in str(e).lower():
+                print("  [QA] Gemini Quota Exceeded. Falling back to HuggingFace Inference API...")
+                # 2. Free Serverless Fallback: HuggingFace (Mistral/Llama)
+                try:
+                    import requests
+                    HF_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+                    # Default public HF token if user doesn't have one in ENV
+                    hf_token = os.environ.get("HF_TOKEN", "") 
+                    headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
+                    
+                    payload = {
+                        "inputs": f"[INST] {prompt} [/INST]",
+                        "parameters": {"max_new_tokens": 1000, "temperature": 0.3, "return_full_text": False}
+                    }
+                    
+                    res = requests.post(HF_URL, headers=headers, json=payload, timeout=20)
+                    if res.status_code == 200:
+                        hf_ans = res.json()[0]["generated_text"].strip()
+                        return {"answer": hf_ans, "source": "mistral-fallback"}
+                    else:
+                        print(f"  [QA] HF Fallback failed: {res.status_code} - {res.text}")
+                except Exception as hf_e:
+                    print(f"  [QA] HF Fallback exception: {hf_e}")
+            
+            # If both fail
+            raise HTTPException(500, f"AI error (Rate limits exhausted): {str(e)}")
+
     except Exception as e:
-        raise HTTPException(500, f"AI error: {str(e)}")
+        raise HTTPException(500, f"System error: {str(e)}")
 
 
 # ─── Frontend Serving ────────────────────────────────────────────
