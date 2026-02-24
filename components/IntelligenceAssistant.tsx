@@ -19,7 +19,7 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://abhiyan1021-ultratech-hub.hf.space";
+
 
     useEffect(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -34,13 +34,18 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
         setIsTyping(true);
 
         try {
-            const res = await fetch(`${API_BASE}/api/ask`, {
+            const res = await fetch(`/api/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question: userMsg })
             });
             const result = await res.json();
-            setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
+
+            if (res.ok) {
+                setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
+            } else {
+                setMessages(prev => [...prev, { role: 'bot', text: `Error: ${result.error}` }]);
+            }
         } catch (e) {
             setMessages(prev => [...prev, { role: 'bot', text: "System Error: Connection to backend intelligence failed." }]);
         } finally {
@@ -98,8 +103,8 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
                             {messages.map((msg, i) => (
                                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[85%] p-4 rounded-2xl text-[14px] leading-relaxed tracking-tight ${msg.role === 'user'
-                                            ? 'bg-foreground text-surface font-medium rounded-tr-sm shadow-sm'
-                                            : 'bg-surface border border-border text-foreground rounded-tl-sm shadow-sm'
+                                        ? 'bg-foreground text-surface font-medium rounded-tr-sm shadow-sm'
+                                        : 'bg-surface border border-border text-foreground rounded-tl-sm shadow-sm whitespace-pre-wrap'
                                         }`}>
                                         {msg.text}
                                     </div>
@@ -108,7 +113,11 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
                             {isTyping && (
                                 <div className="flex justify-start">
                                     <div className="bg-surface border border-border px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm">
-                                        <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Processing Query...</span>
+                                        <div className="flex space-x-1.5 items-center h-4">
+                                            <div className="w-1.5 h-1.5 bg-foreground/40 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-foreground/40 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-foreground/40 rounded-full animate-bounce"></div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
