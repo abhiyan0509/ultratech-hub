@@ -31,7 +31,7 @@ export const NewsFeed = ({ data, loading }: NewsFeedProps) => {
                     news.slice(0, 12).map((item: any, i: number) => (
                         <a
                             key={i}
-                            href={item.link}
+                            href={item.link || item.url || "#"}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group flex flex-col gap-2 py-6 border-b border-border first:pt-0 last:border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors -mx-4 px-4 rounded-xl"

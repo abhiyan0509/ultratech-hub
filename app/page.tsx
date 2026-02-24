@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Plus } from "lucide-react";
 
 // Professional V10 Components
-import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardHeader, DashboardSegment } from "@/components/DashboardHeader";
 import { MetricsGrid } from "@/components/MetricsGrid";
 import { IntelligenceChart } from "@/components/IntelligenceChart";
 import { MarketMomentum } from "@/components/MarketMomentum";
@@ -14,6 +14,7 @@ import { IntelligenceAssistant } from "@/components/IntelligenceAssistant";
 import { CompetitorAnalysis } from "@/components/CompetitorAnalysis";
 import { M_A_Module } from "@/components/M_A_Module";
 import { StrategicOutlook } from "@/components/StrategicOutlook";
+import { Target, TrendingUp, ShieldAlert, Newspaper, Users, BarChart } from "lucide-react";
 
 // Types
 interface DashboardData {
@@ -31,6 +32,8 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [theme, setTheme] = useState<"dark" | "light">("light");
     const [isAIOpen, setIsAIOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activeSegment, setActiveSegment] = useState<DashboardSegment>('overview');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchInput, setSearchInput] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
@@ -123,88 +126,169 @@ export default function Dashboard() {
                 onThemeToggle={toggleTheme}
                 onSearchOpen={() => setIsSearchOpen(true)}
                 onExport={() => window.print()}
+                onMenuOpen={() => setIsMenuOpen(true)}
+                activeSegment={activeSegment}
                 loading={loading}
             />
 
-            <main className="pt-32 pb-40 px-10 max-w-[1600px] mx-auto space-y-8">
-                {/* Market Context Section */}
-                <section className="animate-fade-in">
-                    <MetricsGrid data={data} loading={loading} />
-                </section>
-
-                {/* Primary Analytical Grid */}
-                <div className="grid grid-cols-12 gap-8 items-stretch pt-4">
-
-                    {/* Chart Column */}
-                    <div className="col-span-12 lg:col-span-8 h-[600px] animate-fade-in [animation-delay:0.1s]">
-                        <IntelligenceChart data={data} loading={loading} />
+            {/* Segment Navigation Sidebar */}
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <div className="fixed inset-0 z-[100] flex">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="relative w-80 h-full bg-surface border-r border-border shadow-apple-2xl flex flex-col pt-24 px-6 pb-10"
+                        >
+                            <h2 className="text-xs font-bold uppercase tracking-widest text-muted mb-6">Execution Segments</h2>
+                            <div className="flex flex-col gap-2 flex-1">
+                                {[
+                                    { id: 'overview', icon: <BarChart className="w-5 h-5" />, label: 'Executive Overview', desc: 'Core operational & value trajectory.' },
+                                    { id: 'market', icon: <Newspaper className="w-5 h-5" />, label: 'Market Intelligence', desc: 'Real-time tactical news & deals.' },
+                                    { id: 'strategic', icon: <Target className="w-5 h-5" />, label: 'Strategic Positioning', desc: 'Rivals, threats, & forward vectors.' }
+                                ].map((seg) => (
+                                    <button
+                                        key={seg.id}
+                                        onClick={() => {
+                                            setActiveSegment(seg.id as DashboardSegment);
+                                            setIsMenuOpen(false);
+                                        }}
+                                        className={`flex items-start gap-4 p-4 rounded-2xl transition-all text-left ${activeSegment === seg.id ? 'bg-foreground text-surface' : 'hover:bg-black/5 dark:hover:bg-white/5 text-foreground'}`}
+                                    >
+                                        <div className={`mt-0.5 ${activeSegment === seg.id ? 'text-surface' : 'text-muted'}`}>{seg.icon}</div>
+                                        <div>
+                                            <div className="text-sm font-bold tracking-tight">{seg.label}</div>
+                                            <div className={`text-[11px] mt-1 pr-4 leading-tight ${activeSegment === seg.id ? 'text-surface/70' : 'text-muted'}`}>{seg.desc}</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
                     </div>
+                )}
+            </AnimatePresence>
 
-                    {/* Momentum & Integrity Column */}
-                    <div className="col-span-12 lg:col-span-4 flex flex-col gap-8 h-[600px] animate-fade-in [animation-delay:0.2s]">
-                        <div className="h-1/2">
-                            <MarketMomentum data={data} loading={loading} />
-                        </div>
-                        <div className="h-1/2 apple-surface rounded-3xl p-10 flex flex-col justify-center items-center relative overflow-hidden group">
-                            <div className="mb-6 w-full flex justify-center">
-                                <div className="w-24 h-1 bg-border rounded-full overflow-hidden">
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: "99.98%" }}
-                                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                                        className="h-full bg-foreground"
-                                    />
+            <main className="pt-32 pb-40 px-10 max-w-[1600px] mx-auto min-h-[85vh]">
+                <AnimatePresence mode="wait">
+                    {/* --- EXECUTIVE OVERVIEW SEGMENT --- */}
+                    {activeSegment === 'overview' && (
+                        <motion.div
+                            key="overview"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="space-y-8"
+                        >
+                            <section>
+                                <MetricsGrid data={data} loading={loading} />
+                            </section>
+
+                            <div className="grid grid-cols-12 gap-8 items-stretch pt-4">
+                                {/* Chart Column */}
+                                <div className="col-span-12 lg:col-span-8 h-[600px]">
+                                    <IntelligenceChart data={data} loading={loading} />
+                                </div>
+
+                                {/* Momentum Column */}
+                                <div className="col-span-12 lg:col-span-4 flex flex-col gap-8 h-[600px]">
+                                    <div className="h-1/2">
+                                        <MarketMomentum data={data} loading={loading} />
+                                    </div>
+                                    <div className="h-1/2 apple-surface rounded-3xl p-10 flex flex-col justify-center items-center relative overflow-hidden group">
+                                        <div className="mb-6 w-full flex justify-center">
+                                            <div className="w-24 h-1 bg-border rounded-full overflow-hidden">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: "99.98%" }}
+                                                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                                                    className="h-full bg-foreground"
+                                                />
+                                            </div>
+                                        </div>
+                                        <h4 className="consulting-label mb-2">Platform Integrity</h4>
+                                        <div className="text-4xl font-bold text-foreground tracking-tight">99.98%</div>
+                                        <p className="consulting-label opacity-60 mt-4 text-center">Data node synchronization verified.</p>
+                                    </div>
                                 </div>
                             </div>
-                            <h4 className="consulting-label mb-2">Platform Integrity</h4>
-                            <div className="text-4xl font-bold text-foreground tracking-tight">99.98%</div>
-                            <p className="consulting-label opacity-60 mt-4 text-center">Data node synchronization verified.</p>
-                        </div>
-                    </div>
+                        </motion.div>
+                    )}
 
-                    {/* Auxiliary Data Area: Semantic alignment */}
-                    <div className="col-span-12 lg:col-span-7 h-[560px] animate-fade-in [animation-delay:0.3s]">
-                        <NewsFeed data={data} loading={loading} />
-                    </div>
-
-                    <div className="col-span-12 lg:col-span-5 h-[560px] animate-fade-in [animation-delay:0.4s]">
-                        <div className="apple-surface p-10 rounded-3xl h-full flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-foreground text-xl font-bold tracking-tight mb-1">Strategic Overview</h3>
-                                <p className="consulting-label opacity-60">Consolidated Position Summary</p>
+                    {/* --- MARKET INTELLIGENCE SEGMENT --- */}
+                    {activeSegment === 'market' && (
+                        <motion.div
+                            key="market"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="grid grid-cols-12 gap-8 items-stretch"
+                        >
+                            {/* News Feed */}
+                            <div className="col-span-12 lg:col-span-6 2xl:col-span-5 h-[800px]">
+                                <NewsFeed data={data} loading={loading} />
                             </div>
 
-                            <div className="py-8">
-                                <div className="w-8 h-1 bg-foreground mb-6"></div>
-                                <p className="text-foreground/80 text-[15px] leading-relaxed font-medium">
-                                    "UltraTech Cement retains its defensive market-leader position with a confirmed 186.4 MTPA active capacity. The current capital expenditure cycle and inorganic acquisition strategy effectively isolates the firm from peer conglomerate expansion, securing the trajectory toward the 200 MTPA FY27 milestone."
-                                </p>
+                            {/* M&A Module */}
+                            <div className="col-span-12 lg:col-span-6 2xl:col-span-7 h-[800px]">
+                                <M_A_Module data={data} loading={loading} />
                             </div>
+                        </motion.div>
+                    )}
 
-                            <div className="flex justify-between items-end pt-8 border-t border-border">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-foreground font-black text-3xl tracking-tight">200m</span>
-                                    <span className="consulting-label">FY27 Target (MTPA)</span>
+                    {/* --- STRATEGIC POSITIONING SEGMENT --- */}
+                    {activeSegment === 'strategic' && (
+                        <motion.div
+                            key="strategic"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="space-y-8"
+                        >
+                            {/* Competitor Intel */}
+                            <section>
+                                <CompetitorAnalysis data={data} loading={loading} />
+                            </section>
+
+                            <div className="grid grid-cols-12 gap-8 items-stretch pt-4">
+                                <div className="col-span-12 xl:col-span-7 flex flex-col gap-6 h-[650px]">
+                                    <div className="apple-surface p-10 rounded-3xl h-full flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="text-foreground text-xl font-bold tracking-tight mb-1">Strategic Overview</h3>
+                                            <p className="consulting-label opacity-60">Consolidated Position Summary</p>
+                                        </div>
+                                        <div className="py-8">
+                                            <div className="w-8 h-1 bg-foreground mb-6"></div>
+                                            <p className="text-foreground/80 text-[15px] leading-relaxed font-medium">
+                                                "UltraTech Cement retains its defensive market-leader position with a confirmed 186.4 MTPA active capacity. The current capital expenditure cycle and inorganic acquisition strategy effectively isolates the firm from peer conglomerate expansion, securing the trajectory toward the 200 MTPA FY27 milestone."
+                                            </p>
+                                        </div>
+                                        <div className="flex justify-between items-end pt-8 border-t border-border mt-auto">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-foreground font-black text-3xl tracking-tight">200m</span>
+                                                <span className="consulting-label">FY27 Target (MTPA)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-span-12 xl:col-span-5 flex h-[650px]">
+                                    <StrategicOutlook data={data} loading={loading} />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Competitor Analysis Section */}
-                <section className="animate-fade-in [animation-delay:0.5s] pt-4">
-                    <CompetitorAnalysis data={data} loading={loading} />
-                </section>
-
-                {/* Intelligence Modules (M&A and Strategic Outlook) */}
-                <section className="grid grid-cols-12 gap-8 items-stretch pt-4 animate-fade-in [animation-delay:0.6s]">
-                    <div className="col-span-12 xl:col-span-7 h-[650px]">
-                        <M_A_Module data={data} loading={loading} />
-                    </div>
-                    <div className="col-span-12 xl:col-span-5 h-[650px] flex">
-                        <StrategicOutlook data={data} loading={loading} />
-                    </div>
-                </section>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </main>
 
             {/* Floating Action Elements (Austere Design) */}

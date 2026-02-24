@@ -6,28 +6,49 @@ import {
     RotateCw,
     FileDown,
     Moon,
-    Sun
+    Sun,
+    Menu
 } from "lucide-react";
+
+export type DashboardSegment = 'overview' | 'market' | 'strategic';
 
 interface DashboardHeaderProps {
     theme: "dark" | "light";
     onThemeToggle: () => void;
     onSearchOpen: () => void;
     onExport: () => void;
+    onMenuOpen: () => void;
+    activeSegment: DashboardSegment;
     loading: boolean;
 }
 
-export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, onExport, loading }: DashboardHeaderProps) => {
+const SegmentTitles: Record<DashboardSegment, string> = {
+    overview: "Executive Overview",
+    market: "Market Intelligence",
+    strategic: "Strategic Positioning"
+};
+
+export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, onExport, onMenuOpen, activeSegment, loading }: DashboardHeaderProps) => {
     return (
-        <header className="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl z-50 px-10 flex items-center justify-between border-b border-border transition-colors">
+        <header className="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl z-[90] px-10 flex items-center justify-between border-b border-border transition-colors">
             <div className="flex items-center gap-12">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-foreground text-surface rounded-lg flex items-center justify-center shadow-apple-sm">
-                        <span className="font-display font-black text-xl italic tracking-tighter">UT</span>
-                    </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-foreground font-black text-sm tracking-widest uppercase leading-tight">UltraTech Executive</h1>
-                        <span className="consulting-label mt-0.5">V10 Structural Intelligence</span>
+                <div className="flex items-center gap-6">
+                    <button
+                        onClick={onMenuOpen}
+                        className="p-2 -ml-2 rounded-lg text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                        aria-label="Open Navigation Segment Menu"
+                    >
+                        <Menu size={20} strokeWidth={2.5} />
+                    </button>
+
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-foreground text-surface rounded-lg flex items-center justify-center shadow-apple-sm">
+                            <span className="font-display font-black text-xl italic tracking-tighter">UT</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <h1 className="text-foreground font-black text-sm tracking-widest uppercase leading-tight">UltraTech Executive</h1>
+                            <span className="consulting-label mt-0.5">{SegmentTitles[activeSegment]}</span>
+                        </div>
                     </div>
                 </div>
 

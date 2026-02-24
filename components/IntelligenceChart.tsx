@@ -82,7 +82,15 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
                                 minTickGap={50}
                                 dy={15}
                             />
-                            <YAxis hide domain={['auto', 'auto']} />
+                            <YAxis
+                                domain={['auto', 'auto']}
+                                tickFormatter={(value) => `${(value / 1000).toFixed(1)}k`}
+                                tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 600 }}
+                                axisLine={false}
+                                tickLine={false}
+                                width={40}
+                                dx={-10}
+                            />
                             <Tooltip cursor={{ stroke: 'var(--muted)', strokeWidth: 1, strokeDasharray: '4 4' }} content={<CustomTooltip />} />
                             <Area
                                 type="step"
