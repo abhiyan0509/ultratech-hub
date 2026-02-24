@@ -9,7 +9,7 @@ interface M_A_ModuleProps {
 }
 
 export const M_A_Module = ({ data, loading }: M_A_ModuleProps) => {
-    const deals = Array.isArray(data?.deals) ? data.deals : [];
+    const deals = Array.isArray(data?.ma_deals?.deals) ? data?.ma_deals?.deals : [];
 
     return (
         <div className="apple-surface px-10 py-8 rounded-3xl h-full flex flex-col group relative overflow-hidden">
