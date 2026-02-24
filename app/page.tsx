@@ -36,10 +36,7 @@ export default function Dashboard() {
     const [searchInput, setSearchInput] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
 
-    // V15 Tri-Modal Active Tab State
     const [activeTab, setActiveTab] = useState<'past' | 'current' | 'future'>('current');
-
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://abhiyan1021-ultratech-hub.hf.space";
 
     // Force Light mode initially for the true "Consulting Firm" default Look
     useEffect(() => {
@@ -52,7 +49,8 @@ export default function Dashboard() {
             try {
                 const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
                 const results = await Promise.all(
-                    datasets.map(ds => fetch(`${API_BASE}/api/data/${ds}`).then(r => r.json()))
+                    // Fetch directly from the native Next.js API route instead of HuggingFace
+                    datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
                 );
                 const combined: DashboardData = {};
                 datasets.forEach((ds, i) => (combined as any)[ds] = results[i]);
@@ -64,7 +62,7 @@ export default function Dashboard() {
             }
         };
         loadData();
-    }, [API_BASE]);
+    }, []);
 
     const toggleTheme = () => {
         const newTheme = theme === "dark" ? "light" : "dark";
