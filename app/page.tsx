@@ -309,18 +309,25 @@ export default function Dashboard() {
 
             {/* Corporate Footer (Minimal) */}
             <footer className="fixed bottom-0 left-0 right-0 h-10 bg-surface/90 backdrop-blur-md border-t border-border z-50 overflow-hidden flex items-center">
-                <div className="animate-ticker whitespace-nowrap flex gap-12 px-8 items-center">
-                    {data?.macro?.data ? data.macro.data.map((m: any, i: number) => (
-                        <div key={i} className="flex gap-3 items-center text-[10px] font-bold tracking-widest uppercase group cursor-default">
-                            <span className="text-muted">{m.name}</span>
-                            <span className="text-foreground">{m.value}</span>
-                            <span className={m.change >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}>
-                                {m.change >= 0 ? '▲' : '▼'} {Math.abs(m.change)}%
-                            </span>
+                <div className="animate-ticker flex w-max hover:[animation-play-state:paused] transition-all">
+                    {/* Render sequence twice for seamless continuous loop */}
+                    {[...Array(2)].map((_, arrayIndex) => (
+                        <div key={arrayIndex} className="flex gap-12 px-6 items-center flex-shrink-0">
+                            {data?.macro?.data ? data.macro.data.map((m: any, i: number) => (
+                                <div key={`${arrayIndex}-${i}`} className="flex gap-3 items-center text-[10px] font-bold tracking-widest uppercase group cursor-default whitespace-nowrap">
+                                    <span className="text-muted">{m.name}</span>
+                                    <span className="text-foreground">{m.value}</span>
+                                    <span className={m.change >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}>
+                                        {m.change >= 0 ? '▲' : '▼'} {Math.abs(m.change)}%
+                                    </span>
+                                </div>
+                            )) : (
+                                <div className="flex gap-3 items-center text-[10px] font-bold tracking-widest uppercase text-muted whitespace-nowrap">
+                                    Awaiting Macro Indices...
+                                </div>
+                            )}
                         </div>
-                    )) : (
-                        <div className="flex gap-3 items-center text-[10px] font-bold tracking-widest uppercase text-muted">Awaiting Macro Indices...</div>
-                    )}
+                    ))}
                 </div>
             </footer>
         </div>

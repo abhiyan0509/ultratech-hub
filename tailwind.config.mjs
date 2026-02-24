@@ -32,6 +32,15 @@ export default {
                 'apple-md': '0 8px 24px rgba(0,0,0,0.08)',
                 'apple-lg': '0 24px 48px rgba(0,0,0,0.12)',
             },
+            keyframes: {
+                ticker: {
+                    '0%': { transform: 'translateX(0)' },
+                    '100%': { transform: 'translateX(-50%)' },
+                }
+            },
+            animation: {
+                ticker: 'ticker 40s linear infinite',
+            },
         },
     },
     plugins: [],
