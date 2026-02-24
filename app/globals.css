@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --foreground-rgb: 9, 9, 11;
+    --background-start-rgb: 248, 250, 252;
+    --background-end-rgb: 255, 255, 255;
+}
+
+.dark {
+    --foreground-rgb: 248, 250, 252;
+    --background-start-rgb: 9, 9, 11;
+    --background-end-rgb: 0, 0, 0;
+}
+
+body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(to bottom,
+            transparent,
+            rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+}
+
+@layer components {
+    .glass-panel {
+        @apply bg-white/70 dark:bg-obsidian-card/60 backdrop-blur-2xl border border-slate-200/50 dark:border-obsidian-border/50 shadow-sm transition-all duration-500;
+    }
+
+    .glass-panel:hover {
+        @apply border-gold/30 shadow-premium;
+    }
+
+    .shadow-premium {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        @apply w-1.5;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-slate-200 dark:bg-obsidian-border rounded-full;
+    }
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.05) 50%, rgba(212, 175, 55, 0) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.clip-half-gauge {
+    clip-path: inset(0 0 50% 0);
+}
