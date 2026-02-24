@@ -17,8 +17,6 @@ interface DashboardHeaderProps {
     onThemeToggle: () => void;
     onSearchOpen: () => void;
     onExport: () => void;
-    onMenuOpen: () => void;
-    activeSegment: DashboardSegment;
     loading: boolean;
 }
 

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Plus } from "lucide-react";
 
 // Professional V10 Components
-import { DashboardHeader, DashboardSegment } from "@/components/DashboardHeader";
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { MetricsGrid } from "@/components/MetricsGrid";
 import { IntelligenceChart } from "@/components/IntelligenceChart";
 import { MarketMomentum } from "@/components/MarketMomentum";
@@ -124,7 +124,6 @@ export default function Dashboard() {
                 onThemeToggle={toggleTheme}
                 onSearchOpen={() => setIsSearchOpen(true)}
                 onExport={() => window.print()}
-                activeSegment='overview'
                 loading={loading}
             />
 
