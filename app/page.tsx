@@ -210,24 +210,8 @@ export default function Dashboard() {
                                 </div>
 
                                 <div className="grid grid-cols-12 gap-8 items-stretch mb-8">
-                                    <div className="col-span-12 lg:col-span-5 flex flex-col gap-8 h-[500px]">
+                                    <div className="col-span-12 flex flex-col gap-8 h-[350px]">
                                         <MarketMomentum data={data} loading={loading} />
-                                    </div>
-                                    <div className="col-span-12 lg:col-span-7 apple-surface rounded-3xl p-10 flex flex-col justify-center items-center relative overflow-hidden group h-[500px]">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5 pointer-events-none"></div>
-                                        <div className="mb-6 w-full flex justify-center">
-                                            <div className="w-32 h-1 bg-border rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: "99.98%" }}
-                                                    transition={{ duration: 1.5, ease: "easeInOut" }}
-                                                    className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                                                />
-                                            </div>
-                                        </div>
-                                        <h4 className="consulting-label mb-2">Platform Integrity</h4>
-                                        <div className="text-6xl font-black text-foreground tracking-tighter">99.98<span className="text-3xl font-bold text-muted">%</span></div>
-                                        <p className="consulting-label opacity-60 mt-4 text-center">Data node synchronization verified against live market feeds.</p>
                                     </div>
                                 </div>
 

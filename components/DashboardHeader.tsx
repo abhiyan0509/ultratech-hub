@@ -53,6 +53,11 @@ export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, onExport, 
             </div>
 
             <div className="flex items-center gap-6">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Integrity 99.98%</span>
+                </div>
+
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/5 text-foreground dark:bg-white/10 dark:text-white">
                     <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-orange-500 animate-pulse' : 'bg-emerald-500'}`}></div>
                     <span className="text-[10px] uppercase font-bold tracking-widest">
