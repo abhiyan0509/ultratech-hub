@@ -13,15 +13,24 @@ interface MetricCardProps {
     label: string;
     value: string | number;
     sub: string;
+    rationale?: string;
     trend?: number;
     loading?: boolean;
 }
 
-export const MetricCard = ({ label, value, sub, trend, loading }: MetricCardProps) => {
+export const MetricCard = ({ label, value, sub, rationale, trend, loading }: MetricCardProps) => {
     const isPositive = trend && trend > 0;
 
     return (
-        <div className="apple-surface p-6 rounded-2xl flex flex-col justify-between h-36 relative overflow-hidden">
+        <div className="apple-surface p-6 rounded-2xl flex flex-col justify-between h-36 relative overflow-visible group">
+            {/* Tooltip Rationale */}
+            {rationale && (
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-foreground text-surface text-[10px] font-medium px-3 py-2 rounded-lg shadow-apple-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap hidden md:block">
+                    {rationale}
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground rotate-45"></div>
+                </div>
+            )}
+
             <div className="flex justify-between items-start mb-4">
                 <span className="consulting-label">{label}</span>
                 {trend !== undefined && (

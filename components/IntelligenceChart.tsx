@@ -88,7 +88,7 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
                                 tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 600 }}
                                 axisLine={false}
                                 tickLine={false}
-                                width={40}
+                                width={65}
                                 dx={-10}
                             />
                             <Tooltip cursor={{ stroke: 'var(--muted)', strokeWidth: 1, strokeDasharray: '4 4' }} content={<CustomTooltip />} />

@@ -18,6 +18,7 @@ export const MetricsGrid = ({ data, loading }: MetricsGridProps) => {
                 value={company.market_cap || "₹3.82T"}
                 sub="INR (Consolidated)"
                 trend={2.4}
+                rationale="Enterprise value reflecting defensive market leadership and strong institutional holding despite broader market volatility."
                 loading={loading}
             />
             <MetricCard
@@ -25,18 +26,21 @@ export const MetricsGrid = ({ data, loading }: MetricsGridProps) => {
                 value={company.current_price || "₹12,976"}
                 sub="NSE: ULTRACEMCO"
                 trend={company.ytd_return_raw || 1.2}
+                rationale="Current trading valuation. The YTD trend indicates investor confidence in the aggressive capacity expansion cycle (M&A)."
                 loading={loading}
             />
             <MetricCard
                 label="Operational Baseline"
                 value={data?.company_info?.capacity_mtpa || "186.4"}
                 sub="MTPA Capacity (FY26 Forecast)"
+                rationale="Confirmed aggregated native and acquired manufacturing capacity. Currently the undeniable volume leader in the Indian subcontinent."
                 loading={loading}
             />
             <MetricCard
                 label="Premium Valuation"
                 value={company.pe_ratio || "51.2"}
                 sub="P/E Multiplier (LTM)"
+                rationale="Trailing Price-to-Earnings ratio. This premium highlights the market assigning an 'industry bellwether' multiple versus peers."
                 loading={loading}
             />
         </div>
