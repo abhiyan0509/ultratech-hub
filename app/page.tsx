@@ -11,6 +11,7 @@ import { IntelligenceChart } from "@/components/IntelligenceChart";
 import { MarketMomentum } from "@/components/MarketMomentum";
 import { NewsFeed } from "@/components/NewsFeed";
 import { IntelligenceAssistant } from "@/components/IntelligenceAssistant";
+import { CompetitorAnalysis } from "@/components/CompetitorAnalysis";
 
 // Types
 interface DashboardData {
@@ -187,6 +188,11 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
+
+                {/* Competitor Analysis Section */}
+                <section className="animate-fade-in [animation-delay:0.5s] pt-4">
+                    <CompetitorAnalysis data={data} loading={loading} />
+                </section>
             </main>
 
             {/* Floating Action Elements (Austere Design) */}
@@ -210,14 +216,7 @@ export default function Dashboard() {
             {/* Corporate Footer (Minimal) */}
             <footer className="fixed bottom-0 left-0 right-0 h-10 bg-surface/90 backdrop-blur-md border-t border-border z-50 overflow-hidden flex items-center">
                 <div className="animate-ticker whitespace-nowrap flex gap-12 px-8 items-center">
-                    {[
-                        { name: "CRUDE OIL", value: "66.39", change: -1.2 },
-                        { name: "NIFTY INFRA", value: "9714.3", change: 0.85 },
-                        { name: "NIFTY REALTY", value: "819.15", change: -0.19 },
-                        { name: "USD/INR", value: "90.97", change: 0.08 },
-                        { name: "SENSEX", value: "81,224", change: 0.42 },
-                        { name: "CEMENT IND", value: "1,442.8", change: 1.15 }
-                    ].map((m, i) => (
+                    {data?.macro?.data ? data.macro.data.map((m: any, i: number) => (
                         <div key={i} className="flex gap-3 items-center text-[10px] font-bold tracking-widest uppercase group cursor-default">
                             <span className="text-muted">{m.name}</span>
                             <span className="text-foreground">{m.value}</span>
@@ -225,7 +224,9 @@ export default function Dashboard() {
                                 {m.change >= 0 ? '▲' : '▼'} {Math.abs(m.change)}%
                             </span>
                         </div>
-                    ))}
+                    )) : (
+                        <div className="flex gap-3 items-center text-[10px] font-bold tracking-widest uppercase text-muted">Awaiting Macro Indices...</div>
+                    )}
                 </div>
             </footer>
         </div>
