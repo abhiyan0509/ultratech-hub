@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         const queryVector = embedData.embedding.values;
 
         // 2. Query Supabase pgvector using REST API
-        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/match_knowledge`, {
+        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/match_documents`, {
             method: 'POST',
             headers: {
                 'apikey': SUPABASE_KEY,

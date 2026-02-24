@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: { params: { dataset: string 
         }
 
         // Fetch directly from the Supabase REST API
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/ultratech_intelligence?source=eq.${dataset}&select=data`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/ultratech_intelligence?id=eq.${dataset}&select=data`, {
             method: 'GET',
             headers: {
                 'apikey': SUPABASE_KEY,
