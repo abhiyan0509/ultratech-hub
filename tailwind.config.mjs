@@ -11,32 +11,54 @@ export default {
         extend: {
             colors: {
                 obsidian: {
-                    DEFAULT: '#09090b',
-                    card: '#111114',
-                    border: '#1f1f23',
-                    hover: '#27272a',
+                    DEFAULT: '#050505',
+                    card: '#0a0a0a',
+                    depth: '#0f0f0f',
+                    border: '#1a1a1a',
+                    hover: '#1d1d1f',
                 },
-                gold: {
-                    DEFAULT: '#d4af37',
-                    muted: '#b8922e',
+                khaki: {
+                    DEFAULT: '#b4a076', // Desaturated Metallic Gold
+                    muted: '#8e7e5e',
+                    light: '#d4c5a9',
+                },
+                slate: {
+                    950: '#020617',
+                    900: '#1e1b4b',
+                    400: '#a1a1aa',
+                    500: '#71717a',
                 }
             },
             fontFamily: {
-                sans: ['Inter', 'sans-serif'],
-                display: ['Manrope', 'sans-serif'],
+                sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                display: ['"Manrope"', '"Inter"', 'sans-serif'],
+            },
+            fontSize: {
+                '2xs': '0.625rem',
+                '3xs': '0.5rem',
+            },
+            letterSpacing: {
+                'extra-wide': '0.3em',
+                'tighter-executive': '-0.04em',
+            },
+            boxShadow: {
+                'surface-low': '0 1px 2px rgba(0,0,0,0.5)',
+                'surface-medium': '0 4px 12px rgba(0,0,0,0.6)',
+                'surface-high': '0 12px 32px rgba(0,0,0,0.7)',
+                'khaki-glow': '0 0 20px rgba(180, 160, 118, 0.05)',
             },
             animation: {
-                'shimmer': 'shimmer 2s infinite linear',
-                'v7-pulse': 'v7-pulse 2s infinite ease-in-out',
+                'fade-in': 'fadeIn 0.5s ease-out forwards',
+                'float': 'float 6s ease-in-out infinite',
             },
             keyframes: {
-                shimmer: {
-                    '0%': { backgroundPosition: '-1000px 0' },
-                    '100%': { backgroundPosition: '1000px 0' },
+                fadeIn: {
+                    '0%': { opacity: '0', transform: 'translateY(10px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
                 },
-                'v7-pulse': {
-                    '0%, 100%': { opacity: 0.3 },
-                    '50%': { opacity: 0.6 },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
                 }
             }
         },

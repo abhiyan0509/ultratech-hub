@@ -3,39 +3,45 @@
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 9, 9, 11;
-    --background-start-rgb: 248, 250, 252;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 245, 245, 247;
     --background-end-rgb: 255, 255, 255;
 }
 
 .dark {
-    --foreground-rgb: 248, 250, 252;
-    --background-start-rgb: 9, 9, 11;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 5, 5, 5;
     --background-end-rgb: 0, 0, 0;
 }
 
 body {
     color: rgb(var(--foreground-rgb));
-    background: linear-gradient(to bottom,
-            transparent,
-            rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+    background: rgb(var(--background-start-rgb));
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 }
 
 @layer components {
-    .glass-panel {
-        @apply bg-white/70 dark:bg-obsidian-card/60 backdrop-blur-2xl border border-slate-200/50 dark:border-obsidian-border/50 shadow-sm transition-all duration-500;
+
+    /* Apple-Style Surface */
+    .v9-surface {
+        @apply bg-obsidian-card/40 backdrop-blur-3xl border border-obsidian-border/50 shadow-surface-low transition-all duration-500;
     }
 
-    .glass-panel:hover {
-        @apply border-gold/30 shadow-premium;
+    .v9-surface:hover {
+        @apply border-khaki-light/20 shadow-surface-medium;
     }
 
-    .shadow-premium {
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    .executive-label {
+        @apply text-[9px] font-black uppercase tracking-extra-wide text-slate-500;
+    }
+
+    .executive-value {
+        @apply text-2xl font-black tracking-tighter-executive text-white;
     }
 
     .custom-scrollbar::-webkit-scrollbar {
-        @apply w-1.5;
+        @apply w-1;
     }
 
     .custom-scrollbar::-webkit-scrollbar-track {
@@ -43,26 +49,33 @@ body {
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-slate-200 dark:bg-obsidian-border rounded-full;
+        @apply bg-obsidian-border rounded-full hover:bg-khaki/20 transition-colors;
     }
 }
 
-.animate-shimmer {
-    background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.05) 50%, rgba(212, 175, 55, 0) 100%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
+/* Typography Refinement */
+h1,
+h2,
+h3,
+h4,
+.font-executive {
+    @apply font-display tracking-tighter-executive;
 }
 
-@keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
-    }
-
-    100% {
-        background-position: 1000px 0;
-    }
+/* Subtle Environment Light */
+.v9-ambient-light {
+    background: radial-gradient(circle at center, rgba(180, 160, 118, 0.03) 0%, transparent 70%);
 }
 
 .clip-half-gauge {
     clip-path: inset(0 0 50% 0);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

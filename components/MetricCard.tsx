@@ -23,19 +23,18 @@ export const MetricCard = ({ label, value, sub, trend, loading }: MetricCardProp
 
     return (
         <motion.div
-            whileHover={{ y: -5 }}
-            className="glass-panel p-6 rounded-2xl flex flex-col justify-between h-40 relative overflow-hidden group"
+            whileHover={{ y: -2 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="v9-surface p-6 rounded-2xl flex flex-col justify-between h-36 group relative overflow-hidden"
         >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-gold/15 transition-all duration-700"></div>
-
-            <div className="flex justify-between items-start mb-4 relative z-10">
-                <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.2em]">{label}</span>
+            <div className="flex justify-between items-start relative z-10">
+                <span className="executive-label">{label}</span>
                 {trend !== undefined && (
                     <div className={cn(
-                        "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black",
+                        "flex items-center gap-1 font-black text-[10px] tracking-tight px-2 py-0.5 rounded-full",
                         isPositive ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
                     )}>
-                        {isPositive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                        {isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
                         {Math.abs(trend)}%
                     </div>
                 )}
@@ -43,12 +42,12 @@ export const MetricCard = ({ label, value, sub, trend, loading }: MetricCardProp
 
             <div className="relative z-10">
                 <div className={cn(
-                    "text-3xl font-black text-white mb-1.5 tracking-tighter",
-                    loading && "animate-shimmer rounded h-9 w-2/3 opacity-10 bg-gold/10"
+                    "text-3xl font-black text-white tracking-tighter-executive mb-0.5 leading-none",
+                    loading && "animate-pulse rounded h-8 w-2/3 bg-obsidian-border"
                 )}>
                     {!loading && value}
                 </div>
-                <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest opacity-60">{sub}</div>
+                <div className="text-slate-500 text-[9px] font-bold uppercase tracking-extra-wide opacity-50">{sub}</div>
             </div>
         </motion.div>
     );

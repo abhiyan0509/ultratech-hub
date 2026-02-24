@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Clock } from "lucide-react";
+import { ExternalLink, Clock, ChevronRight } from "lucide-react";
 
 interface NewsFeedProps {
     data: any;
@@ -13,48 +13,52 @@ export const NewsFeed = ({ data, loading }: NewsFeedProps) => {
     const news = Array.isArray(data?.news) ? data.news : [];
 
     return (
-        <div className="glass-panel p-8 rounded-3xl h-full flex flex-col relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 blur-[60px] rounded-full pointer-events-none group-hover:bg-gold/10 transition-all duration-700"></div>
-
-            <div className="flex justify-between items-center mb-8 relative z-10">
+        <div className="v9-surface p-8 rounded-3xl h-full flex flex-col relative overflow-hidden group">
+            <div className="flex justify-between items-center mb-10">
                 <div>
-                    <h3 className="text-white text-lg font-black tracking-tight uppercase flex items-center gap-3">
-                        <div className="w-1.5 h-6 bg-gold rounded-full"></div>
-                        Intelligence Stream
-                    </h3>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1 font-bold">Real-Time Strategic News-Flow</p>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-1 h-4 bg-khaki rounded-full"></div>
+                        <h3 className="text-white text-base font-black tracking-tighter-executive uppercase">Intelligence Stream</h3>
+                    </div>
+                    <p className="executive-label opacity-40">Tactical Market News-Flow</p>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2 relative z-10">
+            <div className="flex-1 overflow-y-auto space-y-0 custom-scrollbar pr-4">
                 {loading ? (
-                    [1, 2, 3].map(i => (
-                        <div key={i} className="bg-obsidian-card/40 border border-obsidian-border p-5 rounded-2xl animate-shimmer opacity-10 h-32"></div>
+                    [1, 2, 3, 4].map(i => (
+                        <div key={i} className="py-6 border-b border-obsidian-border animate-pulse h-24"></div>
                     ))
                 ) : (
-                    news.slice(0, 10).map((item: any, i: number) => (
+                    news.slice(0, 12).map((item: any, i: number) => (
                         <motion.a
                             key={i}
                             href={item.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="block bg-obsidian-card/40 border border-obsidian-border p-5 rounded-2xl hover:border-gold/30 hover:bg-obsidian-hover/50 transition-all group/card shadow-sm"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="group/item flex items-start gap-6 py-6 border-b border-obsidian-border/50 first:pt-0 last:border-none transition-all"
                         >
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="text-[9px] font-black text-gold uppercase tracking-[0.2em] bg-gold/10 px-2 py-0.5 rounded-full border border-gold/10 overflow-hidden relative">
-                                    {item.source || "Intelligence"}
-                                </span>
-                                <Clock className="w-3 h-3 text-slate-500" />
+                            <div className="flex flex-col items-center">
+                                <div className="text-[9px] font-black text-khaki uppercase tracking-widest bg-khaki/5 border border-khaki/10 px-2 py-1 rounded">
+                                    {item.source?.substring(0, 3) || "INT"}
+                                </div>
+                                <div className="w-px h-full bg-obsidian-border group-last/item:hidden mt-2"></div>
                             </div>
-                            <h4 className="text-[13px] font-bold text-slate-200 leading-snug group-hover/card:text-white transition-colors line-clamp-2">
-                                {item.title}
-                            </h4>
-                            <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                                <span>Interrogate Dataset</span>
-                                <ExternalLink className="w-3 h-3 group-hover/card:translate-x-1 group-hover/card:-translate-y-1 transition-transform" />
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-1.5 opacity-40 group-hover/item:opacity-70 transition-opacity">
+                                    <Clock className="w-3 h-3 text-slate-500" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Live Asset Update</span>
+                                </div>
+                                <h4 className="text-[14px] font-bold text-slate-200 leading-snug group-hover/item:text-khaki-light transition-colors line-clamp-2 pr-4">
+                                    {item.title}
+                                </h4>
+                                <div className="mt-2 flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-extra-wide group-hover/item:text-slate-300 transition-colors">
+                                    <span>Deep Insight Reference</span>
+                                    <ChevronRight className="w-3 h-3 group-hover/item:translate-x-0.5 transition-transform" />
+                                </div>
                             </div>
                         </motion.a>
                     ))

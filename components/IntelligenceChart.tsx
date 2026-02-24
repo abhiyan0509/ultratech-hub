@@ -19,7 +19,7 @@ interface IntelligenceChartProps {
 
 export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => {
     const history = data?.financials?.companies?.['UltraTech Cement']?.price_history || [];
-    const chartData = history.slice(-30).map((d: any) => ({
+    const chartData = history.slice(-45).map((d: any) => ({
         date: d.date,
         price: d.close
     }));
@@ -27,9 +27,9 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-obsidian-card border border-gold/20 p-4 rounded-xl shadow-2xl backdrop-blur-xl">
-                    <p className="text-[10px] text-slate-500 uppercase font-black mb-1">{label}</p>
-                    <p className="text-sm font-black text-gold">₹{payload[0].value.toLocaleString()}</p>
+                <div className="bg-obsidian/95 border border-khaki/20 p-4 rounded-xl shadow-surface-high backdrop-blur-2xl ring-1 ring-white/5">
+                    <p className="executive-label mb-1 text-slate-400">{label}</p>
+                    <p className="text-lg font-black text-khaki-light tracking-tighter">₹{payload[0].value.toLocaleString()}</p>
                 </div>
             );
         }
@@ -37,52 +37,60 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
     };
 
     return (
-        <div className="glass-panel p-8 rounded-3xl h-full flex flex-col relative overflow-hidden group">
-            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-gold/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-gold/10 transition-all duration-700"></div>
-
-            <div className="flex justify-between items-start mb-8 relative z-10">
+        <div className="v9-surface p-8 rounded-3xl h-full flex flex-col group transition-all duration-700">
+            <div className="flex justify-between items-start mb-10">
                 <div>
-                    <h3 className="text-white text-lg font-black tracking-tight uppercase flex items-center gap-3">
-                        <div className="w-1.5 h-6 bg-gold rounded-full"></div>
-                        Equity Performance
-                    </h3>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1 font-bold">Relative Market Return Spectrum</p>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-1 h-4 bg-khaki rounded-full"></div>
+                        <h3 className="text-white text-base font-black tracking-tighter-executive uppercase">Equity Performance</h3>
+                    </div>
+                    <p className="executive-label opacity-40">Relative Strategic Market Value</p>
+                </div>
+                <div className="flex gap-1.5">
+                    {['1M', '6M', '1Y', '5Y'].map(t => (
+                        <button key={t} className={`px-2 py-1 rounded text-[9px] font-black tracking-widest uppercase transition-colors ${t === '1Y' ? 'bg-khaki/10 text-khaki' : 'text-slate-500 hover:text-slate-300'}`}>
+                            {t}
+                        </button>
+                    ))}
                 </div>
             </div>
 
-            <div className="flex-1 min-h-[300px] w-full relative">
+            <div className="flex-1 min-h-[350px] w-full mt-4">
                 {loading ? (
-                    <div className="absolute inset-0 animate-shimmer rounded-xl opacity-10 bg-gold/5"></div>
+                    <div className="w-full h-full animate-pulse bg-obsidian-depth/50 rounded-2xl" />
                 ) : (
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData}>
                             <defs>
-                                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#d4af37" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#d4af37" stopOpacity={0} />
+                                <linearGradient id="v9Gold" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#b4a076" stopOpacity={0.15} />
+                                    <stop offset="95%" stopColor="#b4a076" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f1f23" />
+                            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#1a1a1a" />
                             <XAxis
                                 dataKey="date"
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }}
-                                minTickGap={30}
+                                tick={{ fill: '#525252', fontSize: 9, fontWeight: 900, textTransform: 'uppercase' }}
+                                minTickGap={40}
+                                dy={10}
                             />
                             <YAxis
                                 hide
                                 domain={['auto', 'auto']}
                             />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#b4a076', strokeWidth: 1 }} />
                             <Area
                                 type="monotone"
                                 dataKey="price"
-                                stroke="#d4af37"
-                                strokeWidth={3}
+                                stroke="#b4a076"
+                                strokeWidth={2.5}
                                 fillOpacity={1}
-                                fill="url(#colorPrice)"
-                                animationDuration={2000}
+                                fill="url(#v9Gold)"
+                                animationDuration={1500}
+                                dot={false}
+                                activeDot={{ r: 4, fill: '#fff', stroke: '#b4a076', strokeWidth: 2 }}
                             />
                         </AreaChart>
                     </ResponsiveContainer>
