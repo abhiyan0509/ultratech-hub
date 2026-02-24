@@ -56,6 +56,18 @@ def run_all_agents():
         except Exception as e:
             print(f"  [FAIL] {name}: {e}")
 
+    # Synchronize all generated JSON files to Supabase Cloud
+    print("\n[DB SYNC] Upserting intelligence to Supabase...")
+    try:
+        from db_client import upsert_intelligence
+        for f in glob.glob(os.path.join(DATA_DIR, "*.json")):
+            ds_name = os.path.splitext(os.path.basename(f))[0]
+            with open(f, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+            upsert_intelligence(ds_name, data)
+    except Exception as e:
+        print(f"[DB SYNC FAIL] {e}")
+
     print(f"[SCHEDULER] All agents complete at {datetime.now().strftime('%H:%M:%S')}\n")
 
 
@@ -103,9 +115,19 @@ async def list_datasets():
 @app.get("/api/data/{dataset}")
 async def get_dataset(dataset: str):
     """Get a specific dataset"""
+    try:
+        from db_client import get_intelligence
+        # 1. Attempt to fetch from Supabase for instant load
+        db_data = get_intelligence(dataset)
+        if db_data:
+            return db_data
+    except Exception as e:
+        print(f"Supabase fetch error for {dataset}: {e}")
+
+    # 2. Fallback to local file
     filepath = os.path.join(DATA_DIR, f"{dataset}.json")
     if not os.path.exists(filepath):
-        raise HTTPException(404, f"Dataset '{dataset}' not found")
+        raise HTTPException(404, f"Dataset '{dataset}' not found locally or in DB")
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
 

@@ -40,10 +40,24 @@ def main():
             print(f"[FAIL] {name.title()} Agent failed: {e}")
             results[name] = {"error": str(e)}
 
+    # Sync to Supabase
+    print("\n   [DB SYNC] Upserting intelligence to Supabase...")
+    try:
+        import glob
+        import json
+        from db_client import upsert_intelligence
+        for f in glob.glob(os.path.join(os.path.dirname(__file__), "data", "*.json")):
+            ds_name = os.path.splitext(os.path.basename(f))[0]
+            with open(f, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+            upsert_intelligence(ds_name, data)
+    except Exception as e:
+        print(f"   [DB SYNC FAIL] {e}")
+
     elapsed = time.time() - start_time
     print("=" * 60)
     print(f"   [DONE] All agents complete! ({elapsed:.1f}s)")
-    print(f"   Data saved to: backend/data/")
+    print(f"   Data saved to: backend/data/ and synced to Supabase")
     print(f"")
     print(f"   Next steps:")
     print(f"   1. Start the server:  python backend/qa_agent.py")
