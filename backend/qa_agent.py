@@ -65,6 +65,10 @@ def run_all_agents():
             with open(f, "r", encoding="utf-8") as fh:
                 data = json.load(fh)
             upsert_intelligence(ds_name, data)
+            
+        print("\n[VECTOR SYNC] Generating Knowledge Embeddings...")
+        from knowledge_indexer import process_datasets
+        process_datasets()
     except Exception as e:
         print(f"[DB SYNC FAIL] {e}")
 
@@ -164,35 +168,7 @@ class QuestionRequest(BaseModel):
     question: str
 
 
-def build_qa_context():
-    """Build a condensed, token-efficient context from research data"""
-    parts = []
-    # Prioritize critical files
-    priority = ['outlook', 'macro', 'company_info', 'financials', 'ma_deals']
-    
-    for ds in priority:
-        f = os.path.join(DATA_DIR, f"{ds}.json")
-        if os.path.exists(f):
-            try:
-                with open(f, "r", encoding="utf-8") as fh:
-                    data = json.load(fh)
-                # Condense JSON: removing whitespace significantly reduces tokens
-                condensed = json.dumps(data, separators=(',', ':'))
-                parts.append(f"[{ds.upper()}]: {condensed[:3000]}")
-            except Exception: pass
-            
-    # Add snippets of others
-    for f in sorted(glob.glob(os.path.join(DATA_DIR, "*.json"))):
-        name = os.path.splitext(os.path.basename(f))[0]
-        if name not in priority:
-            try:
-                with open(f, "r", encoding="utf-8") as fh:
-                    data = json.load(fh)
-                condensed = json.dumps(data, separators=(',', ':'))
-                parts.append(f"[{name.upper()}]: {condensed[:1000]}")
-            except Exception: pass
-            
-    return "\n".join(parts)
+# Legacy context builder removed. Using vector RAG instead.
 
 
 @app.post("/api/ask")
@@ -205,16 +181,29 @@ async def ask_question(req: QuestionRequest):
         genai.configure(api_key=GEMINI_API_KEY)
         model = genai.GenerativeModel("gemini-flash-latest")
 
-        context = build_qa_context()
-        prompt = f"""You are an expert analyst preparing someone for an interview at UltraTech Cement.
-Answer ONLY based on this data. Be specific, cite numbers. Keep answers concise but insightful.
+        # Retrieve semantic context via vector search
+        from db_client import query_knowledge_base
+        context = query_knowledge_base(req.question, match_threshold=0.3, match_count=8)
 
-DATA:
+        # Fallback if DB is empty or fails
+        if not context:
+            context = "No specific data found in the knowledge base. However, you are an UltraTech expert, answer based on general corporate knowledge."
+
+        prompt = f"""You are the Chief Intelligence Officer for UltraTech Cement. 
+
+**STRICT GUARDRAILS & DOMAIN RULES:**
+1. Your ONLY domain of expertise is UltraTech Cement, the Indian cement and construction sector, macro-economic factors affecting it, and direct competitors (e.g., Adani Cement, Shree Cement, Dalmia Bharat, JSW Cement).
+2. If the user asks a question COMPLETELY UNRELATED to this domain (e.g., software engineering, political sports, medical advice, cooking, or other random companies like Apple or Tesla), you MUST politely decline. Say "I am a highly specialized corporate intelligence agent for UltraTech. I cannot assist with [topic], but I can analyze cement industry dynamics or competitor financials."
+3. Your tone must remain austere, objective, and executive ("Consulting Firm" style).
+4. Rely heavily on the provided internal context.
+
+**INTERNAL CONTEXT (Retrieved via pgvector):**
 {context}
 
-QUESTION: {req.question}
+**USER QUESTION:** 
+{req.question}
 
-Provide a clear, structured answer with bullet points where helpful."""
+Provide a clear, highly analytical, and structured executive answer. Use bullet points where helpful."""
 
         response = model.generate_content(
             prompt,

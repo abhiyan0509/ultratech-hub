@@ -51,6 +51,10 @@ def main():
             with open(f, "r", encoding="utf-8") as fh:
                 data = json.load(fh)
             upsert_intelligence(ds_name, data)
+            
+        print("\n   [VECTOR SYNC] Generating Knowledge Embeddings...")
+        from knowledge_indexer import process_datasets
+        process_datasets()
     except Exception as e:
         print(f"   [DB SYNC FAIL] {e}")
 

@@ -57,3 +57,42 @@ def get_intelligence(dataset_id: str):
         
     print(f"[Supabase] Cache MISS for '{dataset_id}'")
     return None
+
+def query_knowledge_base(query: str, match_threshold: float = 0.5, match_count: int = 5):
+    """Semantic vector search against the knowledge base."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return ""
+        
+    try:
+        from knowledge_indexer import get_embedding
+        query_embedding = get_embedding(query)
+    except Exception as e:
+        print(f"[Gemini] Failed to embed query: {e}")
+        return ""
+        
+    endpoint = f"{SUPABASE_URL}/rest/v1/rpc/match_documents"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "query_embedding": query_embedding,
+        "match_threshold": match_threshold,
+        "match_count": match_count
+    }
+    
+    try:
+        response = requests.post(endpoint, headers=headers, json=payload, timeout=10)
+        if response.status_code == 200:
+            docs = response.json()
+            context = "\n\n".join([d.get("content", "") for d in docs])
+            print(f"[Supabase] RAG retrieval success: found {len(docs)} matching paragraphs.")
+            return context
+        else:
+            print(f"[Supabase] RAG retrieval failed: {response.text}")
+    except Exception as e:
+        print(f"[Supabase] RPC error: {e}")
+        
+    return ""
