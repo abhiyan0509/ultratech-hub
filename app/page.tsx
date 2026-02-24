@@ -12,6 +12,8 @@ import { MarketMomentum } from "@/components/MarketMomentum";
 import { NewsFeed } from "@/components/NewsFeed";
 import { IntelligenceAssistant } from "@/components/IntelligenceAssistant";
 import { CompetitorAnalysis } from "@/components/CompetitorAnalysis";
+import { M_A_Module } from "@/components/M_A_Module";
+import { StrategicOutlook } from "@/components/StrategicOutlook";
 
 // Types
 interface DashboardData {
@@ -192,6 +194,16 @@ export default function Dashboard() {
                 {/* Competitor Analysis Section */}
                 <section className="animate-fade-in [animation-delay:0.5s] pt-4">
                     <CompetitorAnalysis data={data} loading={loading} />
+                </section>
+
+                {/* Intelligence Modules (M&A and Strategic Outlook) */}
+                <section className="grid grid-cols-12 gap-8 items-stretch pt-4 animate-fade-in [animation-delay:0.6s]">
+                    <div className="col-span-12 xl:col-span-7 h-[650px]">
+                        <M_A_Module data={data} loading={loading} />
+                    </div>
+                    <div className="col-span-12 xl:col-span-5 h-[650px] flex">
+                        <StrategicOutlook data={data} loading={loading} />
+                    </div>
                 </section>
             </main>
 

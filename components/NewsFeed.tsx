@@ -9,7 +9,9 @@ interface NewsFeedProps {
 }
 
 export const NewsFeed = ({ data, loading }: NewsFeedProps) => {
-    const news = Array.isArray(data?.news) ? data.news : [];
+    // The crawler agent nests the articles array inside a `news` or `feed` property within the main `data.news` payload
+    const rawNews = data?.news?.news || data?.news?.feed || data?.news;
+    const news = Array.isArray(rawNews) ? rawNews : [];
 
     return (
         <div className="apple-surface px-10 py-8 rounded-3xl h-full flex flex-col">
