@@ -3,45 +3,52 @@
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 245, 245, 247;
-    --background-end-rgb: 255, 255, 255;
+    --background: #f9f9fb;
+    --foreground: #000000;
+    --surface: #ffffff;
+    --border: #e5e5e5;
+    --muted: #8e8e93;
 }
 
 .dark {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 5, 5, 5;
-    --background-end-rgb: 0, 0, 0;
+    --background: #000000;
+    --foreground: #ffffff;
+    --surface: #111111;
+    /* Extremely dark gray, not fully black */
+    --border: #2c2c2e;
+    --muted: #8e8e93;
 }
 
 body {
-    color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background-start-rgb));
+    color: var(--foreground);
+    background: var(--background);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* True Apple font rendering */
 }
 
 @layer components {
 
-    /* Apple-Style Surface */
-    .v9-surface {
-        @apply bg-obsidian-card/40 backdrop-blur-3xl border border-obsidian-border/50 shadow-surface-low transition-all duration-500;
+    /* Apple/Consulting Flat Surface */
+    .apple-surface {
+        @apply bg-surface border border-border shadow-apple-sm transition-all duration-300;
     }
 
-    .v9-surface:hover {
-        @apply border-khaki-light/20 shadow-surface-medium;
+    .apple-surface:hover {
+        @apply shadow-apple-md;
     }
 
-    .executive-label {
-        @apply text-[9px] font-black uppercase tracking-extra-wide text-slate-500;
+    .consulting-label {
+        @apply text-[10px] font-semibold uppercase tracking-[0.1em] text-muted;
     }
 
-    .executive-value {
-        @apply text-2xl font-black tracking-tighter-executive text-white;
+    .consulting-value {
+        @apply text-3xl font-bold tracking-tight text-foreground;
     }
 
     .custom-scrollbar::-webkit-scrollbar {
-        @apply w-1;
+        @apply w-1.5;
     }
 
     .custom-scrollbar::-webkit-scrollbar-track {
@@ -49,26 +56,8 @@ body {
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-obsidian-border rounded-full hover:bg-khaki/20 transition-colors;
+        @apply bg-border rounded-full hover:bg-muted transition-colors;
     }
-}
-
-/* Typography Refinement */
-h1,
-h2,
-h3,
-h4,
-.font-executive {
-    @apply font-display tracking-tighter-executive;
-}
-
-/* Subtle Environment Light */
-.v9-ambient-light {
-    background: radial-gradient(circle at center, rgba(180, 160, 118, 0.03) 0%, transparent 70%);
-}
-
-.clip-half-gauge {
-    clip-path: inset(0 0 50% 0);
 }
 
 .no-scrollbar::-webkit-scrollbar {

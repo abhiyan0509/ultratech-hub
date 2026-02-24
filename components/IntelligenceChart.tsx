@@ -10,7 +10,6 @@ import {
     Tooltip,
     ResponsiveContainer
 } from "recharts";
-import { motion } from "framer-motion";
 
 interface IntelligenceChartProps {
     data: any;
@@ -19,7 +18,7 @@ interface IntelligenceChartProps {
 
 export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => {
     const history = data?.financials?.companies?.['UltraTech Cement']?.price_history || [];
-    const chartData = history.slice(-45).map((d: any) => ({
+    const chartData = history.slice(-60).map((d: any) => ({
         date: d.date,
         price: d.close
     }));
@@ -27,9 +26,9 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-obsidian/95 border border-khaki/20 p-4 rounded-xl shadow-surface-high backdrop-blur-2xl ring-1 ring-white/5">
-                    <p className="executive-label mb-1 text-slate-400">{label}</p>
-                    <p className="text-lg font-black text-khaki-light tracking-tighter">₹{payload[0].value.toLocaleString()}</p>
+                <div className="bg-surface border border-border px-4 py-3 rounded-xl shadow-apple-lg">
+                    <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{label}</p>
+                    <p className="text-xl font-bold text-foreground tracking-tight">₹{payload[0].value.toLocaleString()}</p>
                 </div>
             );
         }
@@ -37,60 +36,46 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
     };
 
     return (
-        <div className="v9-surface p-8 rounded-3xl h-full flex flex-col group transition-all duration-700">
-            <div className="flex justify-between items-start mb-10">
+        <div className="apple-surface p-8 rounded-3xl h-full flex flex-col transition-all duration-300">
+            <div className="flex justify-between items-start mb-10 border-b border-border pb-6">
                 <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1 h-4 bg-khaki rounded-full"></div>
-                        <h3 className="text-white text-base font-black tracking-tighter-executive uppercase">Equity Performance</h3>
-                    </div>
-                    <p className="executive-label opacity-40">Relative Strategic Market Value</p>
+                    <h3 className="text-foreground text-xl font-bold tracking-tight mb-1">Equity Performance</h3>
+                    <p className="consulting-label opacity-60">Consolidated Market Value Trajectory</p>
                 </div>
-                <div className="flex gap-1.5">
+                <div className="flex gap-2">
                     {['1M', '6M', '1Y', '5Y'].map(t => (
-                        <button key={t} className={`px-2 py-1 rounded text-[9px] font-black tracking-widest uppercase transition-colors ${t === '1Y' ? 'bg-khaki/10 text-khaki' : 'text-slate-500 hover:text-slate-300'}`}>
+                        <button key={t} className={`px-3 py-1.5 rounded-md text-[11px] font-bold tracking-widest uppercase transition-colors ${t === '1Y' ? 'bg-foreground text-surface' : 'bg-transparent text-muted hover:bg-black/5 dark:hover:bg-white/5'}`}>
                             {t}
                         </button>
                     ))}
                 </div>
             </div>
 
-            <div className="flex-1 min-h-[350px] w-full mt-4">
+            <div className="flex-1 min-h-[350px] w-full pt-4">
                 {loading ? (
-                    <div className="w-full h-full animate-pulse bg-obsidian-depth/50 rounded-2xl" />
+                    <div className="w-full h-full animate-pulse bg-black/5 dark:bg-white/5 rounded-2xl" />
                 ) : (
                     <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData}>
-                            <defs>
-                                <linearGradient id="v9Gold" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#b4a076" stopOpacity={0.15} />
-                                    <stop offset="95%" stopColor="#b4a076" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#1a1a1a" />
+                        <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" strokeOpacity={0.5} />
                             <XAxis
                                 dataKey="date"
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fill: '#525252', fontSize: 9, fontWeight: 900, textTransform: 'uppercase' }}
-                                minTickGap={40}
-                                dy={10}
+                                tick={{ fill: 'var(--muted)', fontSize: 10, fontWeight: 600 }}
+                                minTickGap={50}
+                                dy={15}
                             />
-                            <YAxis
-                                hide
-                                domain={['auto', 'auto']}
-                            />
-                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#b4a076', strokeWidth: 1 }} />
+                            <YAxis hide domain={['auto', 'auto']} />
+                            <Tooltip cursor={{ stroke: 'var(--muted)', strokeWidth: 1, strokeDasharray: '4 4' }} content={<CustomTooltip />} />
                             <Area
-                                type="monotone"
+                                type="step"
                                 dataKey="price"
-                                stroke="#b4a076"
-                                strokeWidth={2.5}
-                                fillOpacity={1}
-                                fill="url(#v9Gold)"
-                                animationDuration={1500}
-                                dot={false}
-                                activeDot={{ r: 4, fill: '#fff', stroke: '#b4a076', strokeWidth: 2 }}
+                                stroke="var(--foreground)"
+                                strokeWidth={2}
+                                fill="transparent"
+                                animationDuration={1000}
+                                activeDot={{ r: 5, fill: 'var(--surface)', stroke: 'var(--foreground)', strokeWidth: 2 }}
                             />
                         </AreaChart>
                     </ResponsiveContainer>
