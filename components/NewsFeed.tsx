@@ -37,8 +37,8 @@ export const NewsFeed = ({ data, loading }: NewsFeedProps) => {
                             className="group flex flex-col gap-2 py-6 border-b border-border first:pt-0 last:border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors -mx-4 px-4 rounded-xl"
                         >
                             <div className="flex items-center justify-between">
-                                <div className="text-[10px] font-bold text-foreground bg-border/50 px-2 py-0.5 rounded uppercase tracking-widest">
-                                    {item.source?.substring(0, 3) || "INT"}
+                                <div className="text-[10px] font-bold text-foreground bg-border/50 px-2 py-0.5 rounded tracking-widest uppercase">
+                                    {item.source || "Intelligence Alert"}
                                 </div>
                                 <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Live</span>
                             </div>

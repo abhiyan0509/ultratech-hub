@@ -52,7 +52,7 @@ export const CompetitorAnalysis = ({ data, loading }: CompetitorAnalysisProps) =
                         <table className="w-full text-left relative">
                             <thead>
                                 <tr className="border-b border-border">
-                                    <th className="pb-4 pt-2 font-bold text-[10px] uppercase tracking-widest text-muted whitespace-nowrap">Entity</th>
+                                    <th className="pb-4 pt-2 pl-6 font-bold text-[10px] uppercase tracking-widest text-muted whitespace-nowrap">Entity</th>
                                     <th className="pb-4 pt-2 font-bold text-[10px] uppercase tracking-widest text-muted whitespace-nowrap text-right">Current MTPA</th>
                                     <th className="pb-4 pt-2 font-bold text-[10px] uppercase tracking-widest text-muted whitespace-nowrap text-right pr-6">Target MTPA</th>
                                     <th className="pb-4 pt-2 font-bold text-[10px] uppercase tracking-widest text-muted whitespace-nowrap">Parentage</th>
@@ -63,7 +63,7 @@ export const CompetitorAnalysis = ({ data, loading }: CompetitorAnalysisProps) =
                                     const isUT = name.includes("UltraTech");
                                     return (
                                         <tr key={name} className={`hover:bg-black/5 dark:hover:bg-white/5 transition-colors group ${isUT ? "bg-black/5 dark:bg-white/5" : ""}`}>
-                                            <td className="py-6 min-w-[200px]">
+                                            <td className="py-6 min-w-[200px] pl-6">
                                                 <div className="flex flex-col gap-1">
                                                     <div className="flex items-center gap-2">
                                                         <span className={`text-[13px] font-black tracking-tight ${isUT ? "text-foreground" : "text-foreground/80 group-hover:text-foreground transition-colors"}`}>

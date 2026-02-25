@@ -299,7 +299,7 @@ export default function Dashboard() {
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: '80%' }}
                                                                 transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
-                                                                className="bg-foreground/70 dark:bg-foreground/80 h-full rounded-full"
+                                                                className="bg-zinc-500 dark:bg-zinc-400 h-full rounded-full"
                                                             />
                                                         </div>
                                                     </div>
@@ -314,7 +314,7 @@ export default function Dashboard() {
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: '37.5%' }}
                                                                 transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-                                                                className="bg-foreground/40 dark:bg-foreground/60 h-full rounded-full"
+                                                                className="bg-zinc-300 dark:bg-zinc-600 h-full rounded-full"
                                                             />
                                                         </div>
                                                     </div>
