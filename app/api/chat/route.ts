@@ -15,7 +15,11 @@ export async function POST(req: Request) {
         }
 
         if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_API_KEY) {
-            console.error("Missing Environment Variables in API Chat Route");
+            console.error("Missing Environment Variables in API Chat Route:", {
+                hasSupabaseUrl: !!SUPABASE_URL,
+                hasSupabaseKey: !!SUPABASE_KEY,
+                hasGeminiKey: !!process.env.GEMINI_API_KEY,
+            });
             return NextResponse.json({ error: "Server misconfiguration. Missing API keys." }, { status: 500 });
         }
 
