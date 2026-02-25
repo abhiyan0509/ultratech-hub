@@ -31,6 +31,7 @@ def main():
         ("competitor", lambda: competitor_agent.run()),
         ("outlook", lambda: outlook_agent.run(api_key=api_key)),
         ("macro", lambda: macro_agent.run()),
+        ("quant_metrics", lambda: quant_agent.run()),
     ]
 
     for name, fn in agents:

@@ -191,7 +191,7 @@ export default function Dashboard() {
                                     <h2 className="text-3xl font-black tracking-tight text-foreground">Financial Execution & Profitability Drivers</h2>
                                 </div>
 
-                                <DuPontAnalysis data={data?.quant_metrics?.["UltraTech Cement"]} loading={loading} />
+                                <DuPontAnalysis data={data?.quant_metrics?.metrics?.["UltraTech Cement"]} loading={loading} />
 
                                 <div className="mt-12 h-[450px]">
                                     <CompetitorFinancials data={data} loading={loading} />
@@ -328,6 +328,20 @@ export default function Dashboard() {
                                     <h2 className="text-3xl font-black tracking-tight text-foreground">Strategic Positioning & Peer Threats</h2>
                                 </div>
                                 <CompetitorAnalysis data={data} loading={loading} />
+                            </section>
+
+                            <hr className="border-border/60 my-16" />
+
+                            <section className="pb-16">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <ShieldAlert className="w-6 h-6 text-foreground" />
+                                    <h2 className="text-3xl font-black tracking-tight text-foreground">Market Defensibility (Porter&apos;s Five Forces)</h2>
+                                </div>
+                                <div className="grid grid-cols-12 gap-8 items-stretch mb-8">
+                                    <div className="col-span-12 h-auto">
+                                        <PorterFiveForces />
+                                    </div>
+                                </div>
                             </section>
                         </motion.div>
                     )}

@@ -10,7 +10,7 @@ interface MetricsGridProps {
 
 export const MetricsGrid = ({ data, loading }: MetricsGridProps) => {
     const company = data?.financials?.companies?.['UltraTech Cement'] || {};
-    const quant = data?.quant_metrics?.['UltraTech Cement'] || {};
+    const quant = data?.quant_metrics?.metrics?.['UltraTech Cement'] || {};
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
