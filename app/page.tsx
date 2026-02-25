@@ -28,6 +28,7 @@ interface DashboardData {
     news?: any;
     outlook?: any;
     macro?: any;
+    quant_metrics?: any;
 }
 
 export default function Dashboard() {
