@@ -149,7 +149,7 @@ export default function Dashboard() {
 
                 {/* --- TRI-MODAL NAVIGATION --- */}
                 <div className="flex z-40 sticky top-24 justify-center mb-16">
-                    <div className="flex p-1.5 bg-surface/80 backdrop-blur-xl rounded-2xl border border-border shadow-apple-sm">
+                    <div className="flex p-1.5 bg-surface rounded-2xl border border-border shadow-md">
                         <button
                             onClick={() => setActiveTab('past')}
                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[13px] font-bold transition-all ${activeTab === 'past' ? 'bg-foreground text-surface shadow-md' : 'text-muted hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
