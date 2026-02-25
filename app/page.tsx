@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Plus, Clock, Activity, Eye, Layers, Target, Users } from "lucide-react";
+import { Search, Plus, Clock, Activity, Eye, Layers, Target, Users, ShieldAlert } from "lucide-react";
 
 // Professional V10 Components
 import { DashboardHeader } from "@/components/DashboardHeader";
@@ -15,6 +15,9 @@ import { CompetitorAnalysis } from "@/components/CompetitorAnalysis";
 import { CompetitorFinancials } from "@/components/CompetitorFinancials";
 import { M_A_Module } from "@/components/M_A_Module";
 import { StrategicOutlook } from "@/components/StrategicOutlook";
+import { DuPontAnalysis } from "@/components/DuPontAnalysis";
+import { PorterFiveForces } from "@/components/PorterFiveForces";
+import { PESTLEAnalysis } from "@/components/PESTLEAnalysis";
 
 // Types
 interface DashboardData {
@@ -47,7 +50,7 @@ export default function Dashboard() {
         const loadData = async () => {
             setLoading(true);
             try {
-                const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro'];
+                const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro', 'quant_metrics'];
                 const results = await Promise.all(
                     // Fetch directly from the native Next.js API route instead of HuggingFace
                     datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
@@ -184,9 +187,12 @@ export default function Dashboard() {
                             <section>
                                 <div className="flex items-center gap-3 mb-8">
                                     <Target className="w-6 h-6 text-foreground" />
-                                    <h2 className="text-3xl font-black tracking-tight text-foreground">Financial Benchmarking</h2>
+                                    <h2 className="text-3xl font-black tracking-tight text-foreground">Financial Execution & Profitability Drivers</h2>
                                 </div>
-                                <div className="h-[450px]">
+
+                                <DuPontAnalysis data={data?.quant_metrics?.["UltraTech Cement"]} loading={loading} />
+
+                                <div className="mt-12 h-[450px]">
                                     <CompetitorFinancials data={data} loading={loading} />
                                 </div>
                             </section>
@@ -212,6 +218,12 @@ export default function Dashboard() {
                                 <div className="grid grid-cols-12 gap-8 items-stretch mb-8">
                                     <div className="col-span-12 flex flex-col gap-8 h-[350px]">
                                         <MarketMomentum data={data} loading={loading} />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-12 gap-8 items-stretch mb-8">
+                                    <div className="col-span-12 h-auto">
+                                        <PESTLEAnalysis />
                                     </div>
                                 </div>
 
@@ -254,10 +266,43 @@ export default function Dashboard() {
                                                 <h3 className="text-foreground text-2xl font-black tracking-tight mb-1">Vision 2030 Overview</h3>
                                                 <p className="consulting-label opacity-60">Consolidated Pathway to Dominance</p>
                                             </div>
-                                            <div className="py-8 border-y border-border/50 my-auto z-10">
-                                                <p className="text-foreground/90 text-[18px] leading-relaxed font-medium">
-                                                    "UltraTech Cement retains its defensive market-leader position with a confirmed 186.4 MTPA active capacity. The current capital expenditure cycle and inorganic acquisition strategy effectively isolates the firm from peer conglomerate expansion, securing the trajectory toward the 200 MTPA FY27 milestone."
+                                            <div className="flex flex-col gap-6 py-6 border-y border-border/50 my-auto z-10">
+                                                <p className="text-foreground/90 text-[14px] leading-relaxed font-medium mb-2">
+                                                    "UltraTech Cement retains its defensive market-leader position with a confirmed 186.4 MTPA active capacity. The current capex cycle securely distances the firm from peer expansion."
                                                 </p>
+
+                                                {/* TAM / SAM / SOM Market Sizing */}
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <div className="flex justify-between items-center text-[12px] mb-1.5">
+                                                            <span className="font-bold text-foreground tracking-tight">TAM <span className="text-muted font-normal ml-1">(Total Available Market - India)</span></span>
+                                                            <span className="font-mono font-bold">~400 MTPA</span>
+                                                        </div>
+                                                        <div className="w-full bg-border/50 rounded-full h-1.5 overflow-hidden">
+                                                            <div className="bg-foreground h-full rounded-full w-full"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div className="flex justify-between items-center text-[12px] mb-1.5">
+                                                            <span className="font-bold text-foreground tracking-tight">SAM <span className="text-muted font-normal ml-1">(Serviceable Available Market)</span></span>
+                                                            <span className="font-mono font-bold">~320 MTPA</span>
+                                                        </div>
+                                                        <div className="w-full bg-border/50 rounded-full h-1.5 overflow-hidden">
+                                                            <div className="bg-foreground/70 h-full rounded-full w-[80%]"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div className="flex justify-between items-center text-[12px] mb-1.5">
+                                                            <span className="font-bold text-foreground tracking-tight">SOM <span className="text-muted font-normal ml-1">(Serviceable Obtainable - UltraTech)</span></span>
+                                                            <span className="font-mono font-bold">~150 MTPA</span>
+                                                        </div>
+                                                        <div className="w-full bg-border/50 rounded-full h-1.5 overflow-hidden">
+                                                            <div className="bg-foreground/40 h-full rounded-full w-[40%]"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="flex justify-between items-end pt-8 mt-auto z-10">
                                                 <div className="flex flex-col gap-1">

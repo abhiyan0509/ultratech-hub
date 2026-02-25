@@ -66,12 +66,37 @@ export const CompetitorFinancials = ({ data, loading }: CompetitorFinancialsProp
                         <tbody className="divide-y divide-border/50">
                             {filteredMetrics.map((row: any, i: number) => {
                                 const isValuation = row.metric === "P/E Ratio" || row.metric === "EV/EBITDA";
+
+                                // Map string metric names to our quant agent keys to pull the math formulas
+                                const quantKeyMap: Record<string, string> = {
+                                    "P/E Ratio": "pe_ratio",
+                                    "EV/EBITDA": "ev_ebitda",
+                                    "Operating Margin": "profit_margin", // Approximation for tooltip demo
+                                    "Debt/Equity": "debt_equity",
+                                };
+                                const mappedKey = quantKeyMap[row.metric as string];
+                                const quantNode = mappedKey && data?.quant_metrics?.["UltraTech Cement"]?.[mappedKey];
+
                                 return (
-                                    <tr key={i} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
+                                    <tr key={i} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group relative cursor-default">
                                         <td className="py-4 whitespace-nowrap">
-                                            <span className="text-[12px] font-bold text-foreground/80 tracking-tight">
-                                                {row.metric}
-                                            </span>
+                                            <div className="flex items-center gap-2 relative">
+                                                <span className="text-[12px] font-bold text-foreground/80 tracking-tight border-b border-dashed border-foreground/30 hover:border-foreground transition-colors">
+                                                    {row.metric}
+                                                </span>
+                                                {/* In-Table Math Tooltip */}
+                                                {quantNode && (
+                                                    <div className="absolute left-[110%] top-1/2 -translate-y-1/2 ml-2 bg-foreground text-surface px-4 py-3 rounded-xl shadow-apple-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap hidden md:flex flex-col gap-2 min-w-[220px]">
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-[9px] text-surface/50 font-mono">FORMULA ({row.metric})</span>
+                                                            <span className="text-[11px] font-mono tracking-tight font-bold">{quantNode.formula}</span>
+                                                            <span className="text-[9px] text-surface/50 font-mono mt-1">ULTRATECH CALCULATION</span>
+                                                            <span className="text-[11px] font-mono tracking-tight font-bold">{quantNode.calculation}</span>
+                                                        </div>
+                                                        <div className="absolute top-1/2 -translate-y-1/2 -left-1.5 w-3 h-3 bg-foreground rotate-45"></div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="py-4 text-right">
                                             <span className={`text-[14px] font-mono tracking-tight ${isValuation ? 'text-foreground font-bold' : 'text-foreground/80'}`}>

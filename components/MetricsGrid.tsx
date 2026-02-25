@@ -10,37 +10,42 @@ interface MetricsGridProps {
 
 export const MetricsGrid = ({ data, loading }: MetricsGridProps) => {
     const company = data?.financials?.companies?.['UltraTech Cement'] || {};
+    const quant = data?.quant_metrics?.['UltraTech Cement'] || {};
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <MetricCard
-                label="Market Capitalization"
-                value={company.market_cap || "₹3.82T"}
-                sub="INR (Consolidated)"
-                trend={2.4}
-                rationale="Enterprise value reflecting defensive market leadership and strong institutional holding despite broader market volatility."
+                label="Return on Equity"
+                value={quant?.roe?.value || "12.8%"}
+                sub="Profitability Yield"
+                trend={1.2}
+                rationale="Measures a corporation's profitability in relation to stockholders' equity."
+                quantNode={quant?.roe}
                 loading={loading}
             />
             <MetricCard
-                label="Spot Exchange Price"
-                value={company.current_price || "₹12,976"}
-                sub="NSE: ULTRACEMCO"
-                trend={company.ytd_return_raw || 1.2}
-                rationale="Current trading valuation. The YTD trend indicates investor confidence in the aggressive capacity expansion cycle (M&A)."
+                label="Return on Capital"
+                value={quant?.roce?.value || "10.4%"}
+                sub="ROCE (LTM)"
+                trend={-0.4}
+                rationale="The ultimate efficiency ratio. Evaluates how much operating income is generated for every rupee of capital employed."
+                quantNode={quant?.roce}
                 loading={loading}
             />
             <MetricCard
-                label="Operational Baseline"
-                value={data?.company_info?.capacity_mtpa || "186.4"}
-                sub="MTPA Capacity (FY26 Forecast)"
-                rationale="Confirmed aggregated native and acquired manufacturing capacity. Currently the undeniable volume leader in the Indian subcontinent."
+                label="Current Ratio"
+                value={quant?.current_ratio?.value || "1.1x"}
+                sub="Liquidity Margin"
+                rationale="Measures the company's ability to pay short-term obligations or those due within one year."
+                quantNode={quant?.current_ratio}
                 loading={loading}
             />
             <MetricCard
-                label="Premium Valuation"
-                value={company.pe_ratio || "51.2"}
-                sub="P/E Multiplier (LTM)"
-                rationale="Trailing Price-to-Earnings ratio. This premium highlights the market assigning an 'industry bellwether' multiple versus peers."
+                label="Debt to Equity"
+                value={quant?.debt_equity?.value || "0.2x"}
+                sub="Financial Leverage"
+                rationale="A strict evaluation of the firm's capital structure and reliance on external creditors."
+                quantNode={quant?.debt_equity}
                 loading={loading}
             />
         </div>

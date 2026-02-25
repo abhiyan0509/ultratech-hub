@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-from agents import crawler_agent, financial_agent, ma_agent, competitor_agent, outlook_agent, macro_agent
+from agents import crawler_agent, financial_agent, ma_agent, competitor_agent, outlook_agent, macro_agent, quant_agent
 
 
 def main():
