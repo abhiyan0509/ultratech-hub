@@ -47,6 +47,19 @@ export default function Dashboard() {
         document.documentElement.classList.remove("dark");
     }, []);
 
+    // Handle Ctrl+K / Cmd+K Global Shortcut
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsAIOpen(true);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
