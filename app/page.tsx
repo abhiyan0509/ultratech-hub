@@ -21,6 +21,8 @@ import { PESTLEAnalysis } from "@/components/PESTLEAnalysis";
 import { UnitEconomics } from "@/components/UnitEconomics";
 import { LogisticsMatrix } from "@/components/LogisticsMatrix";
 import { ESGScorecard } from "@/components/ESGScorecard";
+import { RegionalMonopolyMap } from "@/components/RegionalMonopolyMap";
+import { CapitalAllocation } from "@/components/CapitalAllocation";
 
 // Types
 interface DashboardData {
@@ -262,6 +264,12 @@ export default function Dashboard() {
                                         <M_A_Module data={data} loading={loading} />
                                     </div>
                                 </div>
+
+                                <div className="grid grid-cols-12 gap-8 items-stretch pt-4">
+                                    <div className="col-span-12 h-auto">
+                                        <RegionalMonopolyMap />
+                                    </div>
+                                </div>
                             </section>
                         </motion.div>
                     )}
@@ -360,6 +368,9 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-auto">
+                                        <div className="flex-none h-[400px]">
+                                            <CapitalAllocation />
+                                        </div>
                                         <div className="flex-1 h-full">
                                             <StrategicOutlook data={data} loading={loading} />
                                         </div>
