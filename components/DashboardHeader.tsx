@@ -44,11 +44,13 @@ export const DashboardHeader = ({ theme, onThemeToggle, onSearchOpen, onExport, 
 
                 <button
                     onClick={onSearchOpen}
-                    className="hidden lg:flex items-center gap-4 px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-border text-muted text-[11px] font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors w-80 shadow-inner"
+                    className="hidden lg:flex items-center justify-between px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-border text-muted text-[11px] font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors w-[320px] shadow-inner"
                 >
-                    <Search className="w-4 h-4" />
-                    <span>Search Intelligence Index...</span>
-                    <span className="ml-auto px-1.5 py-0.5 rounded-md bg-surface border border-border text-[9px] font-mono shadow-sm">⌘K</span>
+                    <div className="flex items-center gap-4">
+                        <Search className="w-4 h-4" />
+                        <span>Ask Intelligence Assistant...</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md bg-surface border border-border text-[9px] font-mono shadow-sm">Ctrl+K</span>
                 </button>
             </div>
 
