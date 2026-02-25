@@ -11,6 +11,16 @@ interface IntelligenceAssistantProps {
     onQueryProcessed?: () => void;
 }
 
+const renderMessageText = (text: string) => {
+    // Basic markdown parser for **bold** text
+    return text.split(/(\*\*.*?\*\*)/g).map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={index} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
+        }
+        return <span key={index}>{part}</span>;
+    });
+};
+
 export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryProcessed }: IntelligenceAssistantProps) => {
     const [messages, setMessages] = useState([
         { role: 'bot', text: "Hello! I am your UltraTech Intelligence Assistant. I can help analyze UltraTech's financials, supply chain, and growth targets. I am also trained on the broader cement manufacturing industry, housing sector dynamics, and relevant Government of India policies. How can I assist you today?" }
@@ -106,7 +116,7 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
                                         ? 'bg-foreground text-surface font-medium rounded-tr-sm shadow-sm'
                                         : 'bg-surface border border-border text-foreground rounded-tl-sm shadow-sm whitespace-pre-wrap'
                                         }`}>
-                                        {msg.text}
+                                        {renderMessageText(msg.text)}
                                     </div>
                                 </div>
                             ))}
