@@ -26,7 +26,7 @@ export const MetricCard = ({ label, value, sub, rationale, trend, loading, quant
         <div className="apple-surface p-6 rounded-2xl flex flex-col justify-between h-36 relative overflow-visible group cursor-default">
             {/* Tooltip Rationale & Math */}
             {(rationale || quantNode) && (
-                <div className="absolute -top-4 -translate-y-full left-1/2 -translate-x-1/2 bg-foreground text-surface px-4 py-3 rounded-xl shadow-apple-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap hidden md:flex flex-col gap-2 min-w-[220px]">
+                <div className="absolute -top-4 -translate-y-full left-1/2 -translate-x-1/2 bg-foreground text-surface px-4 py-3 rounded-xl shadow-apple-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 hidden md:flex flex-col gap-2 min-w-[220px] max-w-[320px] whitespace-normal break-words">
                     {rationale && <span className="text-[11px] font-medium leading-relaxed">{rationale}</span>}
 
                     {quantNode && (

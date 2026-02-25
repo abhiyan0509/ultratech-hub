@@ -24,7 +24,7 @@ export default function RootLayout({
         <html lang="en">
             <body className={cn(
                 inter.variable,
-                "font-sans antialiased"
+                "font-sans antialiased overflow-x-hidden"
             )}>
                 {children}
             </body>
