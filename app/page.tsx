@@ -355,13 +355,13 @@ export default function Dashboard() {
                                                 <Target className="w-16 h-16 text-foreground/20" />
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-auto auto-rows-max">
                                         <div className="flex-none">
-                                            <StrategicOutlook data={data} loading={loading} />
-                                        </div>
-                                        <div className="flex-1 min-h-[400px]">
                                             <ESGScorecard />
+                                        </div>
+                                    </div>
+                                    <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-auto">
+                                        <div className="flex-1 h-full">
+                                            <StrategicOutlook data={data} loading={loading} />
                                         </div>
                                     </div>
                                 </div>
