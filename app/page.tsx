@@ -53,7 +53,7 @@ export default function Dashboard() {
             try {
                 const datasets = ['company_info', 'financials', 'ma_deals', 'competitors', 'news', 'outlook', 'macro', 'quant_metrics'];
                 const results = await Promise.all(
-                    // Fetch directly from the native Next.js API route instead of HuggingFace
+                    // Fetch directly from the native Next.js API route
                     datasets.map(ds => fetch(`/api/data/${ds}`).then(r => r.json()))
                 );
                 const combined: DashboardData = {};

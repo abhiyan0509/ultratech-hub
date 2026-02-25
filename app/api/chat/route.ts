@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://xcaeygmmlolpoeyuxyxp.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_oKS-fK6l5oKyZuQP3bEWZA_ALBCYz7o";
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDmWFs1FN97m8Kjk9cjQIgcP4W9dY7hKW8";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 export async function POST(req: Request) {
     try {

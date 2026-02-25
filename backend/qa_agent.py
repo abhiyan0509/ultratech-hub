@@ -215,31 +215,6 @@ async def ask_question(req: QuestionRequest):
             return {"answer": response.text, "source": "gemini"}
             
         except Exception as e:
-            if "429" in str(e) or "quota" in str(e).lower():
-                print("  [QA] Gemini Quota Exceeded. Falling back to HuggingFace Inference API...")
-                # 2. Free Serverless Fallback: HuggingFace (Mistral/Llama)
-                try:
-                    import requests
-                    HF_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-                    # Default public HF token if user doesn't have one in ENV
-                    hf_token = os.environ.get("HF_TOKEN", "") 
-                    headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
-                    
-                    payload = {
-                        "inputs": f"[INST] {prompt} [/INST]",
-                        "parameters": {"max_new_tokens": 1000, "temperature": 0.3, "return_full_text": False}
-                    }
-                    
-                    res = requests.post(HF_URL, headers=headers, json=payload, timeout=20)
-                    if res.status_code == 200:
-                        hf_ans = res.json()[0]["generated_text"].strip()
-                        return {"answer": hf_ans, "source": "mistral-fallback"}
-                    else:
-                        print(f"  [QA] HF Fallback failed: {res.status_code} - {res.text}")
-                except Exception as hf_e:
-                    print(f"  [QA] HF Fallback exception: {hf_e}")
-            
-            # If both fail
             raise HTTPException(500, f"AI error (Rate limits exhausted): {str(e)}")
 
     except Exception as e:
