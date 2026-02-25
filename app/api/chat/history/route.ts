@@ -69,8 +69,8 @@ export async function DELETE() {
         const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_oKS-fK6l5oKyZuQP3bEWZA_ALBCYz7o";
 
         // To truncate a table via REST API in Supabase without a specific row ID, 
-        // you run a DELETE on the entire table endpoint
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_history`, {
+        // you MUST provide a filter (WHERE clause). We use id=gt.0 to match all valid rows.
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/chat_history?id=gt.0`, {
             method: 'DELETE',
             headers: {
                 'apikey': SUPABASE_KEY,
