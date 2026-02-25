@@ -13,7 +13,7 @@ export const StrategicOutlook = ({ data, loading }: StrategicOutlookProps) => {
     // Prepare fallback or empty state while loading
     if (loading || !data?.outlook) {
         return (
-            <div className="w-full flex-col gap-6 apple-surface rounded-3xl p-10 min-h-[500px] flex items-center justify-center border border-border">
+            <div className="w-full flex-col gap-6 apple-surface rounded-3xl p-10 min-h-[350px] flex items-center justify-center border border-border">
                 <Target className="w-8 h-8 text-muted animate-pulse mb-4" />
                 <div className="text-[10px] font-bold text-muted uppercase tracking-widest animate-pulse">
                     Computing Strategic Vectors...
@@ -27,7 +27,7 @@ export const StrategicOutlook = ({ data, loading }: StrategicOutlookProps) => {
     const risks = Array.isArray(outlook.risk_factors) ? outlook.risk_factors : [];
 
     return (
-        <div className="w-full flex flex-col gap-6 flex-shrink-0 min-h-[500px]">
+        <div className="w-full flex flex-col gap-6 flex-shrink-0 min-h-[350px]">
             {/* Forward Forecasts Card */}
             <div className="flex-1 apple-surface rounded-3xl p-8 flex flex-col relative overflow-hidden group border border-border transition-all hover:bg-black/5 dark:hover:bg-white/5">
                 <div className="flex items-start justify-between mb-8 pb-4 border-b border-border/50">

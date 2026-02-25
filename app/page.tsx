@@ -368,7 +368,7 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-auto">
-                                        <div className="flex-none h-[400px]">
+                                        <div className="flex-none h-[450px]">
                                             <CapitalAllocation data={data} loading={loading} />
                                         </div>
                                         <div className="flex-1 h-full">
