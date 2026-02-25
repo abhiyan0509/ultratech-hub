@@ -125,7 +125,7 @@ export const DuPontAnalysis = ({ data, loading }: DuPontAnalysisProps) => {
             </div>
 
             <div className="mt-8 pt-6 border-t border-border/50 text-[12px] leading-relaxed text-muted">
-                <strong className="text-foreground">Strategic Implication:</strong> UltraTech's structural ROE is predominantly driven by its <strong className="text-foreground">Profit Margin</strong> (pricing power & cost efficiency) and <strong className="text-foreground">Asset Turnover</strong> (capacity utilization), rather than artificial financial leverage (<strong className="text-foreground">Equity Multiplier</strong>). This indicates a highly sustainable organic growth model. Hover over each node to verify the exact mathematical calculation.
+                <strong className="text-foreground">Strategic Implication:</strong> UltraTech&apos;s structural ROE is predominantly driven by its <strong className="text-foreground">Profit Margin</strong> (pricing power &amp; cost efficiency) and <strong className="text-foreground">Asset Turnover</strong> (capacity utilization), rather than artificial financial leverage (<strong className="text-foreground">Equity Multiplier</strong>). This indicates a highly sustainable organic growth model. Hover over each node to verify the exact mathematical calculation.
             </div>
         </div>
     );

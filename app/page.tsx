@@ -268,7 +268,7 @@ export default function Dashboard() {
                                             </div>
                                             <div className="flex flex-col gap-6 py-6 border-y border-border/50 my-auto z-10">
                                                 <p className="text-foreground/90 text-[14px] leading-relaxed font-medium mb-2">
-                                                    "UltraTech Cement retains its defensive market-leader position with a confirmed 186.4 MTPA active capacity. The current capex cycle securely distances the firm from peer expansion."
+                                                    &quot;UltraTech Cement retains its defensive market-leader position with a confirmed 186.4 MTPA active capacity. The current capex cycle securely distances the firm from peer expansion.&quot;
                                                 </p>
 
                                                 {/* TAM / SAM / SOM Market Sizing */}

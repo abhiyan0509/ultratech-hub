@@ -75,7 +75,7 @@ export const PESTLEAnalysis = () => {
                     <Globe2 className="text-muted" size={24} />
                     Macro-Environmental Analysis (PESTLE)
                 </h3>
-                <p className="text-sm text-muted font-medium mt-1">Evaluating external systemic factors shaping UltraTech's operational theater.</p>
+                <p className="text-sm text-muted font-medium mt-1">Evaluating external systemic factors shaping UltraTech&apos;s operational theater.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 flex-1">

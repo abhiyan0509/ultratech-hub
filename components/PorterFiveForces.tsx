@@ -60,9 +60,9 @@ export const PorterFiveForces = () => {
             <div className="mb-6">
                 <h3 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <ShieldAlert className="text-muted" size={24} />
-                    Porter's Five Forces
+                    Porter&apos;s Five Forces
                 </h3>
-                <p className="text-sm text-muted font-medium mt-1">Structural analysis of the Indian cement industry's competitive intensity and profit potential.</p>
+                <p className="text-sm text-muted font-medium mt-1">Structural analysis of the Indian cement industry&apos;s competitive intensity and profit potential.</p>
             </div>
 
             <div className="flex-1 relative flex flex-col items-center justify-center p-4">
