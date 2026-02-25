@@ -27,6 +27,7 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const hasLoadedHistory = useRef(false);
 
     // Fetch Chat History
     useEffect(() => {
@@ -40,9 +41,11 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
                 } else {
                     setMessages([defaultMessage]);
                 }
+                hasLoadedHistory.current = true; // Mark history as loaded
             } catch (e) {
                 console.error("Failed to load history", e);
                 setMessages([defaultMessage]);
+                hasLoadedHistory.current = true; // Mark history as loaded even on error
             }
         };
         fetchHistory();
