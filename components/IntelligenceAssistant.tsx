@@ -27,12 +27,15 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const hasLoadedHistory = useRef(false);
+    const [historyLoaded, setHistoryLoaded] = useState(false);
 
     // Fetch Chat History
     useEffect(() => {
         const fetchHistory = async () => {
-            if (!isOpen) return;
+            if (!isOpen) {
+                setHistoryLoaded(false);
+                return;
+            }
             try {
                 const res = await fetch('/api/chat/history');
                 const data = await res.json();
@@ -41,11 +44,11 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
                 } else {
                     setMessages([defaultMessage]);
                 }
-                hasLoadedHistory.current = true; // Mark history as loaded
             } catch (e) {
                 console.error("Failed to load history", e);
                 setMessages([defaultMessage]);
-                hasLoadedHistory.current = true; // Mark history as loaded even on error
+            } finally {
+                setHistoryLoaded(true);
             }
         };
         fetchHistory();
@@ -108,11 +111,11 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
     };
 
     useEffect(() => {
-        if (initialQuery && isOpen) {
+        if (initialQuery && isOpen && historyLoaded) {
             handleSend(initialQuery);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialQuery, isOpen]);
+    }, [initialQuery, isOpen, historyLoaded]);
 
     const clearChat = async () => {
         try {
