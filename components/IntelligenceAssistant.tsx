@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, MessageSquare, Trash2 } from "lucide-react";
 
 interface IntelligenceAssistantProps {
     isOpen: boolean;
@@ -22,18 +22,48 @@ const renderMessageText = (text: string) => {
 };
 
 export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryProcessed }: IntelligenceAssistantProps) => {
-    const [messages, setMessages] = useState([
-        { role: 'bot', text: "Hello! I am your UltraTech Intelligence Assistant. I can help analyze UltraTech's financials, supply chain, and growth targets. I am also trained on the broader cement manufacturing industry, housing sector dynamics, and relevant Government of India policies. How can I assist you today?" }
-    ]);
+    const defaultMessage = { role: 'bot', text: "Hello! I am your UltraTech Intelligence Assistant. I can help analyze UltraTech's financials, supply chain, and growth targets. I am also trained on the broader cement manufacturing industry, housing sector dynamics, and relevant Government of India policies. How can I assist you today?" };
+    const [messages, setMessages] = useState<{ role: string, text: string }[]>([]);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-
+    // Fetch Chat History
+    useEffect(() => {
+        const fetchHistory = async () => {
+            if (!isOpen) return;
+            try {
+                const res = await fetch('/api/chat/history');
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    setMessages(data);
+                } else {
+                    setMessages([defaultMessage]);
+                }
+            } catch (e) {
+                console.error("Failed to load history", e);
+                setMessages([defaultMessage]);
+            }
+        };
+        fetchHistory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     useEffect(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [messages]);
+
+    const saveMessage = async (role: string, text: string) => {
+        try {
+            await fetch('/api/chat/history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role, text })
+            });
+        } catch (e) {
+            console.error("Failed to save message", e);
+        }
+    };
 
     const handleSend = async (customMsg?: string) => {
         const userMsg = customMsg || input;
@@ -43,6 +73,9 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
         setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
         setIsTyping(true);
 
+        // Async save user message
+        saveMessage('user', userMsg);
+
         try {
             const res = await fetch(`/api/chat`, {
                 method: 'POST',
@@ -51,13 +84,20 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
             });
             const result = await res.json();
 
+            let finalBotText = "";
             if (res.ok) {
-                setMessages(prev => [...prev, { role: 'bot', text: result.answer }]);
+                finalBotText = result.answer;
             } else {
-                setMessages(prev => [...prev, { role: 'bot', text: `Error: ${result.error}` }]);
+                finalBotText = `Error: ${result.error}`;
             }
+
+            setMessages(prev => [...prev, { role: 'bot', text: finalBotText }]);
+            saveMessage('bot', finalBotText);
+
         } catch (e) {
-            setMessages(prev => [...prev, { role: 'bot', text: "System Error: Connection to backend intelligence failed." }]);
+            const errorMsg = "System Error: Connection to backend intelligence failed.";
+            setMessages(prev => [...prev, { role: 'bot', text: errorMsg }]);
+            saveMessage('bot', errorMsg);
         } finally {
             setIsTyping(false);
             if (onQueryProcessed) onQueryProcessed();
@@ -70,6 +110,15 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialQuery, isOpen]);
+
+    const clearChat = async () => {
+        try {
+            await fetch('/api/chat/history', { method: 'DELETE' });
+            setMessages([defaultMessage]);
+        } catch (e) {
+            console.error("Failed to clear chat", e);
+        }
+    };
 
     return (
         <>
@@ -104,9 +153,14 @@ export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryPr
                                     <span className="consulting-label text-[9px]">V10 Natural Language Interface</span>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-2 text-muted hover:text-foreground transition-colors bg-black/5 dark:bg-white/5 rounded-md">
-                                <ArrowLeft className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={clearChat} title="Clear Chat History" className="p-2 text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors rounded-md">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                                <button onClick={onClose} title="Close Assistant" className="p-2 text-muted hover:text-foreground transition-colors bg-black/5 dark:bg-white/5 rounded-md">
+                                    <ArrowLeft className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
 
                         <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar bg-background/50">
