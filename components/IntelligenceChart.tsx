@@ -48,7 +48,7 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
     };
 
     return (
-        <div className="apple-surface p-8 rounded-3xl h-full flex flex-col">
+        <div className="apple-surface p-8 rounded-3xl h-full flex flex-col transition-all duration-300">
             <div className="flex justify-between items-start mb-10 border-b border-border pb-6">
                 <div>
                     <h3 className="text-foreground text-xl font-bold tracking-tight mb-1">Equity Performance</h3>
@@ -98,7 +98,7 @@ export const IntelligenceChart = ({ data, loading }: IntelligenceChartProps) => 
                                 stroke="var(--foreground)"
                                 strokeWidth={2}
                                 fill="transparent"
-                                isAnimationActive={false}
+                                animationDuration={1000}
                                 activeDot={{ r: 5, fill: 'var(--surface)', stroke: 'var(--foreground)', strokeWidth: 2 }}
                             />
                         </AreaChart>
