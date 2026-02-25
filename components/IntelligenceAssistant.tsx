@@ -13,7 +13,7 @@ interface IntelligenceAssistantProps {
 
 export const IntelligenceAssistant = ({ isOpen, onClose, initialQuery, onQueryProcessed }: IntelligenceAssistantProps) => {
     const [messages, setMessages] = useState([
-        { role: 'bot', text: "Assistant active. Awaiting natural language query against the UltraTech knowledge graph." }
+        { role: 'bot', text: "Hello! I am your UltraTech Intelligence Assistant. I can help analyze UltraTech's financials, supply chain, and growth targets. I am also trained on the broader cement manufacturing industry, housing sector dynamics, and relevant Government of India policies. How can I assist you today?" }
     ]);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
