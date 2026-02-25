@@ -27,7 +27,7 @@ export const StrategicOutlook = ({ data, loading }: StrategicOutlookProps) => {
     const risks = Array.isArray(outlook.risk_factors) ? outlook.risk_factors : [];
 
     return (
-        <div className="w-full xl:w-[500px] flex flex-col gap-6 flex-shrink-0 min-h-[500px]">
+        <div className="w-full flex flex-col gap-6 flex-shrink-0 min-h-[500px]">
             {/* Forward Forecasts Card */}
             <div className="flex-1 apple-surface rounded-3xl p-8 flex flex-col relative overflow-hidden group border border-border transition-all hover:bg-black/5 dark:hover:bg-white/5">
                 <div className="flex items-start justify-between mb-8 pb-4 border-b border-border/50">

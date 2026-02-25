@@ -283,7 +283,7 @@ export default function Dashboard() {
                                 </div>
 
                                 <div className="grid grid-cols-12 gap-8 items-stretch mb-16">
-                                    <div className="col-span-12 xl:col-span-7 flex flex-col gap-6 h-[650px]">
+                                    <div className="col-span-12 xl:col-span-7 flex flex-col gap-6 h-auto">
                                         <div className="apple-surface p-10 rounded-3xl h-full flex flex-col justify-between relative overflow-hidden">
                                             <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-foreground/5 dark:bg-foreground/10 rounded-bl-[100px] -mr-10 -mt-10 blur-3xl pointer-events-none"></div>
                                             <div>
@@ -356,11 +356,11 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-[650px]">
-                                        <div className="h-1/2">
+                                    <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-auto auto-rows-max">
+                                        <div className="flex-none">
                                             <StrategicOutlook data={data} loading={loading} />
                                         </div>
-                                        <div className="h-1/2">
+                                        <div className="flex-1 min-h-[400px]">
                                             <ESGScorecard />
                                         </div>
                                     </div>
