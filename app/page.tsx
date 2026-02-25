@@ -212,7 +212,7 @@ export default function Dashboard() {
                                 <DuPontAnalysis data={data?.quant_metrics?.metrics?.["UltraTech Cement"]} loading={loading} />
 
                                 <div className="mt-8 h-[550px]">
-                                    <UnitEconomics />
+                                    <UnitEconomics data={data} loading={loading} />
                                 </div>
 
                                 <div className="mt-12 h-[450px]">
@@ -267,7 +267,7 @@ export default function Dashboard() {
 
                                 <div className="grid grid-cols-12 gap-8 items-stretch pt-4">
                                     <div className="col-span-12 h-auto">
-                                        <RegionalMonopolyMap />
+                                        <RegionalMonopolyMap data={data} loading={loading} />
                                     </div>
                                 </div>
                             </section>
@@ -364,12 +364,12 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                         <div className="flex-none">
-                                            <ESGScorecard />
+                                            <ESGScorecard data={data} loading={loading} />
                                         </div>
                                     </div>
                                     <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-auto">
                                         <div className="flex-none h-[400px]">
-                                            <CapitalAllocation />
+                                            <CapitalAllocation data={data} loading={loading} />
                                         </div>
                                         <div className="flex-1 h-full">
                                             <StrategicOutlook data={data} loading={loading} />
@@ -397,7 +397,7 @@ export default function Dashboard() {
                                 </div>
                                 <div className="grid grid-cols-12 gap-8 items-stretch mb-8">
                                     <div className="col-span-12 h-auto">
-                                        <PorterFiveForces />
+                                        <PorterFiveForces data={data} loading={loading} />
                                     </div>
                                 </div>
                             </section>

@@ -4,10 +4,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Map, ShieldCheck } from "lucide-react";
 
-export const RegionalMonopolyMap = () => {
-    // Hardcoded verifiable data (Q3FY25/FY24 Base)
-    // UltraTech boasts that no single region accounts for > 30% of their mix
-    const regions = [
+interface RegionalMonopolyMapProps {
+    data: any;
+    loading: boolean;
+}
+
+export const RegionalMonopolyMap = ({ data, loading }: RegionalMonopolyMapProps) => {
+    // Hardcoded verifiable data (Q3FY25/FY24 Base) as fallback
+    const regions = data?.mba_metrics?.regional_monopoly || [
         { name: "North", capacity: 45.2, share: 24, color: "bg-blue-500/20", progress: "bg-blue-500", text: "text-blue-500" },
         { name: "Central", capacity: 38.6, share: 21, color: "bg-purple-500/20", progress: "bg-purple-500", text: "text-purple-500" },
         { name: "East", capacity: 41.5, share: 22, color: "bg-emerald-500/20", progress: "bg-emerald-500", text: "text-emerald-500" },
@@ -33,7 +37,7 @@ export const RegionalMonopolyMap = () => {
 
             {/* Core Visualization */}
             <div className="flex-1 flex flex-col justify-center space-y-6 relative z-10 my-4">
-                {regions.map((region, index) => (
+                {regions.map((region: any, index: number) => (
                     <div key={region.name} className="flex flex-col gap-2">
                         <div className="flex justify-between items-end">
                             <span className="text-[14px] font-bold text-foreground items-center flex gap-2">

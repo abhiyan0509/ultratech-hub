@@ -4,10 +4,15 @@ import React from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, ComposedChart, Line, Bar } from "recharts";
 import { Coins, TrendingUp } from "lucide-react";
 
-export const CapitalAllocation = () => {
+interface CapitalAllocationProps {
+    data: any;
+    loading: boolean;
+}
+
+export const CapitalAllocation = ({ data, loading }: CapitalAllocationProps) => {
     // Hardcoded static data demonstrating how Capex is funded via pure OCF (Operating Cash Flow)
-    // without blowing up Debt levels.
-    const allocationData = [
+    // without blowing up Debt levels as fallback
+    const allocationData = data?.mba_metrics?.capital_allocation || [
         { year: "FY20", ocf: 6500, capex: 1500, fcf: 5000, debtToEbitda: 1.4 },
         { year: "FY21", ocf: 8800, capex: 1200, fcf: 7600, debtToEbitda: 0.6 },
         { year: "FY22", ocf: 9200, capex: 5200, fcf: 4000, debtToEbitda: 0.3 },
@@ -47,19 +52,19 @@ export const CapitalAllocation = () => {
                                 <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} vertical={false} />
                         <XAxis
                             dataKey="year"
-                            stroke="rgba(255,255,255,0.2)"
-                            tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 600 }}
+                            stroke="var(--border)"
+                            tick={{ fill: 'var(--muted)', fontSize: 12, fontWeight: 600 }}
                             tickLine={false}
                             axisLine={false}
                             dy={10}
                         />
                         <YAxis
                             yAxisId="left"
-                            stroke="rgba(255,255,255,0.2)"
-                            tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 600 }}
+                            stroke="var(--border)"
+                            tick={{ fill: 'var(--muted)', fontSize: 12, fontWeight: 600 }}
                             tickLine={false}
                             axisLine={false}
                             tickFormatter={(val) => `₹${val / 1000}k`}
@@ -67,11 +72,11 @@ export const CapitalAllocation = () => {
                         />
                         <Tooltip
                             contentStyle={{
-                                backgroundColor: 'rgba(10, 10, 10, 0.9)',
+                                backgroundColor: 'var(--surface)',
                                 borderRadius: '16px',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
-                                color: '#fff',
+                                border: '1px solid var(--border)',
+                                boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)',
+                                color: 'var(--foreground)',
                                 padding: '12px 16px'
                             }}
                             itemStyle={{
@@ -79,13 +84,13 @@ export const CapitalAllocation = () => {
                                 fontWeight: 600
                             }}
                             labelStyle={{
-                                color: 'rgba(255,255,255,0.5)',
+                                color: 'var(--muted)',
                                 fontSize: '12px',
                                 fontWeight: 700,
                                 marginBottom: '8px',
                                 textTransform: 'uppercase'
                             }}
-                            cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }}
+                            cursor={{ stroke: 'var(--border)', strokeWidth: 1, strokeDasharray: '4 4' }}
                             formatter={(value: number, name: string) => {
                                 if (name === 'Net Debt / EBITDA (x)') return [value + 'x', name];
                                 return ['₹' + value.toLocaleString() + ' Cr', name];

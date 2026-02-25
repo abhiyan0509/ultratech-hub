@@ -175,7 +175,51 @@ def build_fallback_outlook():
             {"metric": "EBITDA per tonne", "current_value": "~Rs.1,100-1,200/tonne", "significance": "Improving this metric shows operational synergies from M&A are being realized"},
             {"metric": "Net Debt to EBITDA", "current_value": "~1.5x", "significance": "Key leverage metric - needs to stay manageable given M&A debt load"},
             {"metric": "India Cements subsidiary performance", "current_value": "First full quarter results pending", "significance": "Will validate the acquisition thesis"},
-        ]
+        ],
+        "mba_metrics": {
+            "unit_economics": [
+                { "category": "Net Sales Realization (NSR)", "value": 5250, "metric": "INR / Ton", "color": "#3b82f6" },
+                { "category": "Raw Material & Consumables", "value": -950, "metric": "INR / Ton", "color": "#ef4444" },
+                { "category": "Power & Fuel Costs", "value": -1450, "metric": "INR / Ton", "color": "#f97316" },
+                { "category": "Freight & Forwarding", "value": -1250, "metric": "INR / Ton", "color": "#eab308" },
+                { "category": "Employee & Other Opex", "value": -500, "metric": "INR / Ton", "color": "#a855f7" },
+                { "category": "EBITDA", "value": 1100, "metric": "INR / Ton", "color": "#10b981", "highlight": True }
+            ],
+            "logistics_matrix": {
+                "lead_distance": { "current": 403, "target": 380, "unit": "km", "label": "Avg Lead Distance" },
+                "transport_mix": [
+                    { "mode": "Road", "value": 65, "color": "bg-amber-500" },
+                    { "mode": "Rail", "value": 31, "color": "bg-blue-500" },
+                    { "mode": "Sea / Coastal", "value": 4, "color": "bg-emerald-500" }
+                ],
+                "footprint": {
+                    "integrated_units": { "count": 24, "label": "Clinker + Cement" },
+                    "grinding_units": { "count": 33, "label": "Cement Only" },
+                    "bulk_terminals": { "count": 8, "label": "Coastal / Rail Hubs" }
+                }
+            },
+            "esg_scorecard": [
+                { "metric": "Green Power Mix", "current": 25.4, "target": 60.0, "deadline": "FY26", "unit": "%", "status": "on_track", "icon": "wind" },
+                { "metric": "WHRS Capacity", "current": 296, "target": 425, "deadline": "FY26", "unit": "MW", "status": "on_track", "icon": "factory" },
+                { "metric": "Net CO2 Intensity", "current": 546, "target": 462, "deadline": "FY32", "unit": "kg/t", "status": "in_progress", "icon": "cloud-off" },
+                { "metric": "Water Positivity", "current": 4.5, "target": 5.0, "deadline": "FY30", "unit": "x", "status": "achieved", "icon": "droplet" }
+            ],
+            "regional_monopoly": [
+                { "name": "North", "capacity": 45.2, "share": 24, "color": "bg-blue-500/20", "progress": "bg-blue-500", "text": "text-blue-500" },
+                { "name": "Central", "capacity": 38.6, "share": 21, "color": "bg-purple-500/20", "progress": "bg-purple-500", "text": "text-purple-500" },
+                { "name": "East", "capacity": 41.5, "share": 22, "color": "bg-emerald-500/20", "progress": "bg-emerald-500", "text": "text-emerald-500" },
+                { "name": "West", "capacity": 44.1, "share": 24, "color": "bg-orange-500/20", "progress": "bg-orange-500", "text": "text-orange-500" },
+                { "name": "South", "capacity": 17.0, "share": 9,  "color": "bg-pink-500/20", "progress": "bg-pink-500", "text": "text-pink-500" }
+            ],
+            "capital_allocation": [
+                { "year": "FY20", "ocf": 6500, "capex": 1500, "fcf": 5000, "debtToEbitda": 1.4 },
+                { "year": "FY21", "ocf": 8800, "capex": 1200, "fcf": 7600, "debtToEbitda": 0.6 },
+                { "year": "FY22", "ocf": 9200, "capex": 5200, "fcf": 4000, "debtToEbitda": 0.3 },
+                { "year": "FY23", "ocf": 8500, "capex": 5600, "fcf": 2900, "debtToEbitda": 0.4 },
+                { "year": "FY24", "ocf": 12500, "capex": 8900, "fcf": 3600, "debtToEbitda": 0.4 },
+                { "year": "FY25E", "ocf": 14000, "capex": 10500, "fcf": 3500, "debtToEbitda": 0.5 }
+            ]
+        }
     }
 
 

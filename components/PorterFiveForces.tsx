@@ -46,14 +46,21 @@ const ForceCard = ({ data, className }: { data: any, className?: string }) => {
     );
 };
 
-export const PorterFiveForces = () => {
-    const forces = {
+interface PorterFiveForcesProps {
+    data?: any;
+    loading?: boolean;
+}
+
+export const PorterFiveForces = ({ data, loading }: PorterFiveForcesProps) => {
+    const fallbackForces = {
         rivalry: { title: "Industry Rivalry", intensity: "High", icon: Swords, desc: "Intense consolidation phase. Aggressive capacity expansion via M&A by Adani (Ambuja/ACC) directly challenges UltraTech's apex position." },
         entrants: { title: "Threat of New Entrants", intensity: "Low", icon: ShieldBan, desc: "Massive capex requirements, regulatory hurdles for limestone mining, and required distribution networks create insurmountable moats." },
         substitutes: { title: "Threat of Substitutes", intensity: "Low", icon: Shuffle, desc: "No viable ubiquitous alternative to cement in structural construction. Emerging green-cement tech is largely co-opted by incumbents." },
         suppliers: { title: "Power of Suppliers", intensity: "Medium", icon: Truck, desc: "Highly dependent on energy (coal/petcoke) and logistics. UltraTech hedges via captive power plants but remains exposed to global crude." },
         buyers: { title: "Power of Buyers", intensity: "Medium", icon: Users, desc: "B2B (Infra/Real Estate) buyers have high negotiation power on volume. B2C (Retail) buyers are highly fragmented and brand-loyal." }
     };
+
+    const forces = data?.mba_metrics?.porter_five_forces || fallbackForces;
 
     return (
         <div className="apple-surface p-6 sm:p-8 rounded-2xl border border-border/50 h-full flex flex-col">
