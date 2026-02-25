@@ -18,6 +18,9 @@ import { StrategicOutlook } from "@/components/StrategicOutlook";
 import { DuPontAnalysis } from "@/components/DuPontAnalysis";
 import { PorterFiveForces } from "@/components/PorterFiveForces";
 import { PESTLEAnalysis } from "@/components/PESTLEAnalysis";
+import { UnitEconomics } from "@/components/UnitEconomics";
+import { LogisticsMatrix } from "@/components/LogisticsMatrix";
+import { ESGScorecard } from "@/components/ESGScorecard";
 
 // Types
 interface DashboardData {
@@ -206,6 +209,10 @@ export default function Dashboard() {
 
                                 <DuPontAnalysis data={data?.quant_metrics?.metrics?.["UltraTech Cement"]} loading={loading} />
 
+                                <div className="mt-8 h-[550px]">
+                                    <UnitEconomics />
+                                </div>
+
                                 <div className="mt-12 h-[450px]">
                                     <CompetitorFinancials data={data} loading={loading} />
                                 </div>
@@ -236,8 +243,11 @@ export default function Dashboard() {
                                 </div>
 
                                 <div className="grid grid-cols-12 gap-8 items-stretch mb-8">
-                                    <div className="col-span-12 h-auto">
+                                    <div className="col-span-12 xl:col-span-7 h-auto">
                                         <PESTLEAnalysis />
+                                    </div>
+                                    <div className="col-span-12 xl:col-span-5 h-[auto] min-h-[450px]">
+                                        <LogisticsMatrix />
                                     </div>
                                 </div>
 
@@ -346,8 +356,13 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-span-12 xl:col-span-5 flex h-[650px]">
-                                        <StrategicOutlook data={data} loading={loading} />
+                                    <div className="col-span-12 xl:col-span-5 flex flex-col gap-6 h-[650px]">
+                                        <div className="h-1/2">
+                                            <StrategicOutlook data={data} loading={loading} />
+                                        </div>
+                                        <div className="h-1/2">
+                                            <ESGScorecard />
+                                        </div>
                                     </div>
                                 </div>
                             </section>
