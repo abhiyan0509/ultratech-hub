@@ -273,35 +273,54 @@ export default function Dashboard() {
                                                 </p>
 
                                                 {/* TAM / SAM / SOM Market Sizing */}
-                                                <div className="space-y-4">
-                                                    <div>
-                                                        <div className="flex justify-between items-center text-[12px] mb-1.5">
-                                                            <span className="font-bold text-foreground tracking-tight">TAM <span className="text-muted font-normal ml-1">(Total Available Market - India)</span></span>
-                                                            <span className="font-mono font-bold">~400 MTPA</span>
+                                                <div className="space-y-5">
+                                                    <div className="group">
+                                                        <div className="flex justify-between items-center text-[12px] mb-2">
+                                                            <span className="font-bold text-foreground tracking-tight">TAM <span className="text-muted font-normal ml-1 group-hover:text-foreground/80 transition-colors">(Total Available Market - India)</span></span>
+                                                            <span className="font-mono font-bold bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded text-foreground">~400 MTPA</span>
                                                         </div>
-                                                        <div className="w-full bg-border/50 rounded-full h-1.5 overflow-hidden">
-                                                            <div className="bg-foreground h-full rounded-full w-full"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <div className="flex justify-between items-center text-[12px] mb-1.5">
-                                                            <span className="font-bold text-foreground tracking-tight">SAM <span className="text-muted font-normal ml-1">(Serviceable Available Market)</span></span>
-                                                            <span className="font-mono font-bold">~320 MTPA</span>
-                                                        </div>
-                                                        <div className="w-full bg-border/50 rounded-full h-1.5 overflow-hidden">
-                                                            <div className="bg-foreground/70 h-full rounded-full w-[80%]"></div>
+                                                        <div className="w-full bg-black/10 dark:bg-white/10 border border-border/50 rounded-full h-2 overflow-hidden shadow-inner">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: '100%' }}
+                                                                transition={{ duration: 1.2, ease: "easeOut" }}
+                                                                className="bg-foreground h-full rounded-full"
+                                                            />
                                                         </div>
                                                     </div>
 
-                                                    <div>
-                                                        <div className="flex justify-between items-center text-[12px] mb-1.5">
-                                                            <span className="font-bold text-foreground tracking-tight">SOM <span className="text-muted font-normal ml-1">(Serviceable Obtainable - UltraTech)</span></span>
-                                                            <span className="font-mono font-bold">~150 MTPA</span>
+                                                    <div className="group">
+                                                        <div className="flex justify-between items-center text-[12px] mb-2">
+                                                            <span className="font-bold text-foreground tracking-tight">SAM <span className="text-muted font-normal ml-1 group-hover:text-foreground/80 transition-colors">(Serviceable Available Market)</span></span>
+                                                            <span className="font-mono font-bold bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded text-foreground">~320 MTPA</span>
                                                         </div>
-                                                        <div className="w-full bg-border/50 rounded-full h-1.5 overflow-hidden">
-                                                            <div className="bg-foreground/40 h-full rounded-full w-[40%]"></div>
+                                                        <div className="w-full bg-black/10 dark:bg-white/10 border border-border/50 rounded-full h-2 overflow-hidden shadow-inner">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: '80%' }}
+                                                                transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
+                                                                className="bg-foreground/70 dark:bg-foreground/80 h-full rounded-full"
+                                                            />
                                                         </div>
+                                                    </div>
+
+                                                    <div className="group">
+                                                        <div className="flex justify-between items-center text-[12px] mb-2">
+                                                            <span className="font-bold text-foreground tracking-tight">SOM <span className="text-muted font-normal ml-1 group-hover:text-foreground/80 transition-colors">(Serviceable Obtainable - UltraTech)</span></span>
+                                                            <span className="font-mono font-bold bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded text-foreground">~150 MTPA</span>
+                                                        </div>
+                                                        <div className="w-full bg-black/10 dark:bg-white/10 border border-border/50 rounded-full h-2 overflow-hidden shadow-inner">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: '37.5%' }}
+                                                                transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+                                                                className="bg-foreground/40 dark:bg-foreground/60 h-full rounded-full"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="pt-2">
+                                                        <p className="text-[10px] text-muted-foreground text-right italic font-medium">Source: UltraTech Investor Presentation Q4FY24 & Industry Reports</p>
                                                     </div>
                                                 </div>
                                             </div>

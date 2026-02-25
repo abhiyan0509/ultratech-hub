@@ -56,14 +56,28 @@ export const MarketMomentum = ({ data, loading }: MarketMomentumProps) => {
 
             {/* Right side: Compact Gauge */}
             <div className="flex-shrink-0 flex flex-col items-center justify-center p-10 bg-black/5 dark:bg-white/5 rounded-[2rem] border border-border min-w-[300px]">
-                <div className="relative w-40 h-20 overflow-hidden mb-6">
-                    <div className="absolute top-0 left-0 w-40 h-40 border-[4px] border-border rounded-full"></div>
-                    <motion.div
-                        initial={{ rotate: -180 }}
-                        animate={{ rotate: (score * 180) - 180 }}
-                        transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                        className="absolute top-0 left-0 w-40 h-40 border-[10px] border-foreground rounded-full clip-half-gauge origin-center"
-                    />
+                <div className="relative w-40 h-24 mb-4 flex justify-center items-end">
+                    <svg viewBox="0 0 100 50" className="w-full h-full overflow-visible">
+                        {/* Background Track */}
+                        <path
+                            d="M 10 50 A 40 40 0 0 1 90 50"
+                            fill="none"
+                            className="stroke-border"
+                            strokeWidth="10"
+                            strokeLinecap="round"
+                        />
+                        {/* Dynamic Score Fill */}
+                        <motion.path
+                            d="M 10 50 A 40 40 0 0 1 90 50"
+                            fill="none"
+                            className="stroke-foreground"
+                            strokeWidth="10"
+                            strokeLinecap="round"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: score }}
+                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
+                        />
+                    </svg>
                 </div>
                 <div className="text-center">
                     <div className="text-4xl font-black text-foreground tracking-tighter tabular-nums">
