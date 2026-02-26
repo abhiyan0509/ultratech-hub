@@ -39,7 +39,7 @@ sys.path.insert(0, BASE_DIR)
 def run_all_agents():
     """Run all data agents (called on startup + every 4 hours)"""
     print(f"\n[SCHEDULER] Running all agents at {datetime.now().strftime('%H:%M:%S')}...")
-    from agents import crawler_agent, financial_agent, ma_agent, competitor_agent, outlook_agent, macro_agent
+    from agents import crawler_agent, financial_agent, ma_agent, competitor_agent, outlook_agent, macro_agent, history_agent, quant_agent
 
     agents = [
         ("Crawler", crawler_agent.run, {}),
@@ -48,6 +48,8 @@ def run_all_agents():
         ("Competitor", competitor_agent.run, {}),
         ("Outlook", outlook_agent.run, {"api_key": GEMINI_API_KEY}),
         ("Macro", macro_agent.run, {}),
+        ("History", history_agent.run, {}),
+        ("Quant", quant_agent.run, {}),
     ]
 
     for name, fn, kwargs in agents:
