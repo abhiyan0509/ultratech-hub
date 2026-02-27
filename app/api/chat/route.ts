@@ -24,11 +24,11 @@ export async function POST(req: Request) {
         }
 
         // 1. Generate text embedding for the user's question using Gemini REST API
-        const embedRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`, {
+        const embedRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/embedding-001:embedContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "models/gemini-embedding-001",
+                model: "models/embedding-001",
                 content: { parts: [{ text: question }] }
             }),
         });
